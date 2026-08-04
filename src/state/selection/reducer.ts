@@ -83,6 +83,8 @@ export const initialState = {
     groupBy: "",
     defaultColors: INITIAL_COLORS,
     colorOverrides: [],
+    pointRadius: 4,
+    pointOpacity: 0.5,
     selectedAlbum: INITIAL_SELECTED_ALBUM_ID,
     selectedAlbumFileInfo: [] as FileInfo[],
     selectedGroupColors: {},

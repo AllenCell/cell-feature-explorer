@@ -39,8 +39,9 @@ import {
     getHoveredPointData,
     getXValues,
     getYValues,
+    getMainPlotSettings,
 } from "../../state/selection/selectors";
-import { SelectedPointData, TickConversion } from "../../state/selection/types";
+import { MainPlotSettings, SelectedPointData, TickConversion } from "../../state/selection/types";
 import {
     AnnotationData,
     ContinuousPlotData,
@@ -247,7 +248,8 @@ export const composePlotlyData = createSelector(
 
 function colorSettings(
     plotSettings: Partial<PlotData>,
-    plotData: GroupedPlotData | ContinuousPlotData
+    plotData: GroupedPlotData | ContinuousPlotData,
+    mainPlotSettings: MainPlotSettings
 ): Partial<PlotData> {
     if (plotData.dataType === DataType.GROUPED) {
         return {
@@ -262,7 +264,7 @@ function colorSettings(
                             value: {
                                 marker: {
                                     color: ele.color,
-                                    opacity: GENERAL_PLOT_SETTINGS.unselectedCircleOpacity,
+                                    opacity: mainPlotSettings.unselectedCircleOpacity,
                                 },
                             },
                         };
@@ -284,7 +286,10 @@ function colorSettings(
     };
 }
 
-function makeScatterPlotData(plotData: ContinuousPlotData | GroupedPlotData): Partial<PlotData> {
+function makeScatterPlotData(
+    plotData: ContinuousPlotData | GroupedPlotData,
+    mainPlotSettings: MainPlotSettings
+): Partial<PlotData> {
     const plotSettings = {
         hoverinfo: "none" as const,
         ids: plotData.ids,
@@ -303,7 +308,7 @@ function makeScatterPlotData(plotData: ContinuousPlotData | GroupedPlotData): Pa
         y: plotData.y,
         z: [],
     };
-    return colorSettings(plotSettings, plotData);
+    return colorSettings(plotSettings, plotData, mainPlotSettings);
 }
 
 function makeHistogramPlotX(data: (number | null)[]) {
@@ -379,16 +384,16 @@ export const getAnnotations = createSelector(
 );
 
 export const getScatterPlotDataArray = createSelector(
-    [composePlotlyData],
-    (allPlotData): Partial<PlotData>[] => {
+    [composePlotlyData, getMainPlotSettings],
+    (allPlotData, mainPlotSettings): Partial<PlotData>[] => {
         const { mainPlotData, selectedGroupPlotData } = allPlotData;
         const data = [
             makeHistogramPlotX(mainPlotData.x),
             makeHistogramPlotY(mainPlotData.y),
-            makeScatterPlotData(mainPlotData),
+            makeScatterPlotData(mainPlotData, mainPlotSettings),
         ];
         if (selectedGroupPlotData) {
-            data.push(makeScatterPlotData(selectedGroupPlotData));
+            data.push(makeScatterPlotData(selectedGroupPlotData, mainPlotSettings));
         }
 
         return data;
