@@ -1,5 +1,5 @@
 import type { SelectedGroups } from "..";
-import { CELL_ID_KEY } from "../../constants";
+import { CELL_ID_KEY, GENERAL_PLOT_SETTINGS } from "../../constants";
 import type { URLSearchParamMap } from "../../util/UrlState";
 import type { FileInfo } from "../metadata/types";
 
@@ -21,6 +21,8 @@ export interface SelectionStateBranch {
     groupBy: string;
     defaultColors: string[];
     colorOverrides: (string | undefined)[];
+    pointRadius: number;
+    pointOpacity: number;
     selectedAlbum: number;
     selectedGroupColors: { [key: string]: string };
     selectedGroups: SelectedGroups;
@@ -46,6 +48,8 @@ export interface MousePosition {
     pageX: number;
     pageY: number;
 }
+
+export type MainPlotSettings = typeof GENERAL_PLOT_SETTINGS;
 
 export interface LassoOrBoxSelectPointData {
     pointIndex: number;
@@ -195,5 +199,15 @@ export interface SetColorOverrideAction {
 
 export interface SetColorOverridesAction {
     payload: (string | undefined)[];
+    type: string;
+}
+
+export interface SetPointRadiusAction {
+    payload: number;
+    type: string;
+}
+
+export interface SetPointOpacityAction {
+    payload: number;
     type: string;
 }
