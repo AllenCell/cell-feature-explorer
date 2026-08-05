@@ -7,6 +7,7 @@ import selectionStateBranch from "../../state/selection";
 import { SetPointOpacityAction, SetPointRadiusAction } from "../../state/selection/types";
 import { State } from "../../state/types";
 import { useDebouncedSetter } from "../../hooks";
+import LabeledSlider from "../LabeledSlider";
 
 type PropsFromState = {
     pointOpacity: number;
@@ -25,9 +26,29 @@ const ColorBySettings = (props: PropsFromState & DispatchProps): ReactElement =>
     const [radius, setRadius] = useDebouncedSetter(pointRadius, handleSetPointRadius);
 
     return (
-        <Col>
-            <Slider value={opacity} onChange={setOpacity} min={0} max={1} step={0.01}></Slider>
-            <Slider value={radius} onChange={setRadius} min={1} max={10} step={0.25}></Slider>
+        <Col style={{ width: "100%" }}>
+            <LabeledSlider
+                label="Opacity"
+                sliderProps={{
+                    value: opacity,
+                    onChange: setOpacity,
+                    min: 0,
+                    max: 1,
+                    step: 0.01,
+                    marks: { 0.5: <></> },
+                }}
+            ></LabeledSlider>
+            <LabeledSlider
+                label="Radius"
+                sliderProps={{
+                    value: radius,
+                    onChange: setRadius,
+                    min: 1,
+                    max: 10,
+                    step: 0.25,
+                    marks: { 4: <></> },
+                }}
+            ></LabeledSlider>
         </Col>
     );
 };

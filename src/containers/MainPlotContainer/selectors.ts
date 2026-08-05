@@ -281,7 +281,7 @@ function colorSettings(
         marker: {
             ...plotSettings.marker,
             color: plotData.color,
-            opacity: plotData.opacity || GENERAL_PLOT_SETTINGS.unselectedCircleOpacity,
+            opacity: plotData.opacity || mainPlotSettings.unselectedCircleOpacity,
         },
     };
 }
@@ -295,7 +295,7 @@ function makeScatterPlotData(
         ids: plotData.ids,
         customdata: plotData.customdata as any,
         marker: {
-            size: GENERAL_PLOT_SETTINGS.circleRadius,
+            size: mainPlotSettings.circleRadius,
             symbol: "circle",
         },
         // literal typing to avoid a widened type inferred
