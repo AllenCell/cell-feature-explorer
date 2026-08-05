@@ -35,6 +35,8 @@ import {
     SET_CSV_URL,
     SET_COLOR_OVERRIDE,
     SET_COLOR_OVERRIDES,
+    SET_POINT_RADIUS,
+    SET_POINT_OPACITY,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -204,6 +206,22 @@ const actionToConfigMap: TypeToDescriptionMap = {
                 colorOverrides: newColorOverrides,
             };
         },
+    },
+    [SET_POINT_RADIUS]: {
+        accepts: (action: Action): action is SetColorOverrideAction =>
+            action.type === SET_POINT_RADIUS,
+        perform: (state: SelectionStateBranch, action: SetColorOverrideAction) => ({
+            ...state,
+            pointRadius: action.payload,
+        }),
+    },
+    [SET_POINT_OPACITY]: {
+        accepts: (action: Action): action is SetColorOverrideAction =>
+            action.type === SET_POINT_OPACITY,
+        perform: (state: SelectionStateBranch, action: SetColorOverrideAction) => ({
+            ...state,
+            pointOpacity: action.payload,
+        }),
     },
     [SET_COLOR_OVERRIDES]: {
         accepts: (action: Action): action is SetColorOverridesAction =>
