@@ -1,5 +1,4 @@
-import Icon from "@ant-design/icons";
-import { Button, Checkbox, Col, Collapse, Row, Slider } from "antd";
+import { Checkbox, Col, Collapse, Row } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 // import { RadioChangeEvent } from "antd/es/radio";
 import { filter, includes } from "lodash";
@@ -21,8 +20,6 @@ import { MappingOfMeasuredValuesArrays, MeasuredFeatureDef } from "../../state/m
 import selectionStateBranch from "../../state/selection";
 import { getFeatureDefTooltip, getDownloadRoot } from "../../state/selection/selectors";
 
-import { PreferencesSvg } from "../../assets";
-import ColorBySettings from "../../components/ColorBySettings";
 import {
     BoolToggleAction,
     ChangeDownloadConfigAction,
@@ -33,8 +30,6 @@ import {
     DownloadConfig,
     SelectAxisAction,
     SetColorOverrideAction,
-    SetPointOpacityAction,
-    SetPointRadiusAction,
 } from "../../state/selection/types";
 import { State } from "../../state/types";
 import { getColorByDisplayOptions, getGroupByDisplayOptions } from "../MainPlotContainer/selectors";
@@ -95,25 +90,13 @@ interface PropsFromApp {
 
 type ColorByMenuProps = PropsFromApp & PropsFromState & DispatchProps;
 
-type TimeoutId = ReturnType<typeof setTimeout>;
-
-const SET_PROPERTY_DEBOUNCE_MS = 100;
-
-type ColorByMenuState = {
-    colorOptionsOpen: boolean;
-};
-
-class ColorByMenu extends React.Component<ColorByMenuProps, ColorByMenuState> {
+class ColorByMenu extends React.Component<ColorByMenuProps> {
     // submenu keys of first level
 
-    private setColorTimeouts: Map<number, TimeoutId> = new Map();
+    private setColorTimeouts: Map<number, ReturnType<typeof setTimeout>> = new Map();
 
     constructor(props: ColorByMenuProps) {
         super(props);
-        this.state = {
-            colorOptionsOpen: false,
-        };
-
         this.onBarClicked = this.onBarClicked.bind(this);
         this.onActivePanelChange = this.onActivePanelChange.bind(this);
         this.renderTaggedStructuresPanel = this.renderTaggedStructuresPanel.bind(this);
@@ -217,7 +200,7 @@ class ColorByMenu extends React.Component<ColorByMenuProps, ColorByMenuState> {
         const timerId = setTimeout(() => {
             this.props.handleSetColorOverride({ index, color });
             this.setColorTimeouts.delete(index);
-        }, SET_PROPERTY_DEBOUNCE_MS);
+        }, 100);
         this.setColorTimeouts.set(index, timerId);
     }
 
@@ -243,38 +226,19 @@ class ColorByMenu extends React.Component<ColorByMenuProps, ColorByMenuState> {
         const showColorLegend = includes(categoricalFeatures, colorBy) && colorBy !== groupBy;
         return (
             <React.Fragment>
-                <Col className={styles.featureSelectRow}>
-                    <Row style={{ alignItems: "center" }}>
-                        <Col span={4}>Color by:</Col>
-                        <Col span={18}>
-                            <FeatureSelectDropdown
-                                value={colorBy.toString()}
-                                options={colorByMenuOptions}
-                                onChange={(v: string) => {
-                                    handleChangeAxis(COLOR_BY_SELECTOR, v);
-                                }}
-                                tooltip={getFeatureDefTooltip(
-                                    colorBy.toString(),
-                                    colorByMenuOptions
-                                )}
-                            />
-                        </Col>
-                        <Col span={2}>
-                            <Button
-                                onClick={() =>
-                                    this.setState({
-                                        colorOptionsOpen: !this.state.colorOptionsOpen,
-                                    })
-                                }
-                            >
-                                <Icon src={PreferencesSvg} />
-                            </Button>
-                        </Col>
-                    </Row>
-                    <div style={{ marginLeft: 20 }}>
-                        {this.state.colorOptionsOpen && <ColorBySettings />}
-                    </div>
-                </Col>
+                <Row className={styles.featureSelectRow}>
+                    <Col span={4}>Color by:</Col>
+                    <Col span={20}>
+                        <FeatureSelectDropdown
+                            value={colorBy.toString()}
+                            options={colorByMenuOptions}
+                            onChange={(v: string) => {
+                                handleChangeAxis(COLOR_BY_SELECTOR, v);
+                            }}
+                            tooltip={getFeatureDefTooltip(colorBy.toString(), colorByMenuOptions)}
+                        />
+                    </Col>
+                </Row>
                 <Row className={styles.featureSelectRow}>
                     <Col span={4}>Group by:</Col>
                     <Col span={20}>
