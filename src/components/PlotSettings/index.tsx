@@ -19,14 +19,14 @@ type DispatchProps = {
     handleSetPointRadius: ActionCreator<SetPointRadiusAction>;
 };
 
-const ColorBySettings = (props: PropsFromState & DispatchProps): ReactElement => {
+const PlotSettings = (props: PropsFromState & DispatchProps): ReactElement => {
     const { pointOpacity, pointRadius, handleSetPointOpacity, handleSetPointRadius } = props;
 
     const [opacity, setOpacity] = useDebouncedSetter(pointOpacity, handleSetPointOpacity);
     const [radius, setRadius] = useDebouncedSetter(pointRadius, handleSetPointRadius);
 
     return (
-        <Col style={{ width: "100%" }}>
+        <Col style={{ width: "200px" }}>
             <LabeledSlider
                 label="Opacity"
                 sliderProps={{
@@ -67,4 +67,4 @@ const dispatchToPropsMap: DispatchProps = {
 export default connect<PropsFromState, DispatchProps, {}, State>(
     mapStateToProps,
     dispatchToPropsMap
-)(ColorBySettings);
+)(PlotSettings);
