@@ -41,6 +41,10 @@ import {
 export const getPlotByOnX = (state: State): string => state.selection.plotByOnX;
 export const getPlotByOnY = (state: State): string => state.selection.plotByOnY;
 export const getGroupByCategory = (state: State): string => state.selection.groupBy;
+export const getConnectByCategory = (state: State): string => state.selection.connectByCategory;
+export const getConnectByFeature = (state: State): string => state.selection.connectByFeature;
+export const getShowConnectedPoints = (state: State): boolean =>
+    state.selection.showConnectedPoints;
 export const getClickedCellsFileInfo = (state: State): FileInfo[] => state.selection.selectedPoints;
 export const getSelectedGroups = (state: State): SelectedGroups => state.selection.selectedGroups;
 export const getColorBySelection = (state: State): keyof MappingOfMeasuredValuesArrays =>
