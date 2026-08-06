@@ -281,7 +281,7 @@ function colorSettings(
         marker: {
             ...plotSettings.marker,
             color: plotData.color,
-            opacity: plotData.opacity || mainPlotSettings.unselectedCircleOpacity,
+            opacity: plotData.opacity ?? mainPlotSettings.unselectedCircleOpacity,
         },
     };
 }

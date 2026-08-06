@@ -214,18 +214,28 @@ const actionToConfigMap: TypeToDescriptionMap = {
     [SET_POINT_RADIUS]: {
         accepts: (action: Action): action is SetPointRadiusAction =>
             action.type === SET_POINT_RADIUS,
-        perform: (state: SelectionStateBranch, action: SetPointRadiusAction) => ({
-            ...state,
-            pointRadius: Math.max(0, action.payload),
-        }),
+        perform: (state: SelectionStateBranch, action: SetPointRadiusAction) => {
+            if (Number.isFinite(action.payload)) {
+                return {
+                    ...state,
+                    pointRadius: Math.max(0, action.payload),
+                };
+            }
+            return state;
+        },
     },
     [SET_POINT_OPACITY]: {
         accepts: (action: Action): action is SetPointOpacityAction =>
             action.type === SET_POINT_OPACITY,
-        perform: (state: SelectionStateBranch, action: SetPointOpacityAction) => ({
-            ...state,
-            pointOpacity: Math.max(0, Math.min(1, action.payload)),
-        }),
+        perform: (state: SelectionStateBranch, action: SetPointOpacityAction) => {
+            if (Number.isFinite(action.payload)) {
+                return {
+                    ...state,
+                    pointOpacity: Math.max(0, Math.min(1, action.payload)),
+                };
+            }
+            return state;
+        },
     },
     [SET_COLOR_OVERRIDES]: {
         accepts: (action: Action): action is SetColorOverridesAction =>
