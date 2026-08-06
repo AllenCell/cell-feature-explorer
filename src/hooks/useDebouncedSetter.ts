@@ -14,7 +14,7 @@ type TimeoutId = ReturnType<typeof setTimeout> | null;
 const useDebouncedSetter = <T>(
     value: T,
     setter: (value: T) => void,
-    delayMs: number = 200
+    delayMs = 200
 ): [T, (value: T) => void] => {
     const timeoutRef = useRef<TimeoutId>(null);
     const [pendingValue, setPendingValue] = useState<T | undefined>(undefined);

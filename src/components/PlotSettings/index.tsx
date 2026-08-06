@@ -1,5 +1,5 @@
-import { Button, Col, Slider } from "antd";
-import React, { ReactElement, useState } from "react";
+import { Button } from "antd";
+import React, { ReactElement } from "react";
 import { connect } from "react-redux";
 import { ActionCreator } from "redux";
 
@@ -98,7 +98,7 @@ const dispatchToPropsMap: DispatchProps = {
     handleSetPointOpacity: selectionStateBranch.actions.setPointOpacity,
     handleSetPointRadius: selectionStateBranch.actions.setPointRadius,
 };
-export default connect<PropsFromState, DispatchProps, {}, State>(
+export default connect<PropsFromState, DispatchProps, unknown, State>(
     mapStateToProps,
     dispatchToPropsMap
 )(PlotSettings);
