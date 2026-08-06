@@ -161,7 +161,7 @@ const actionToConfigMap: TypeToDescriptionMap = {
             action.type === CHANGE_CONNECT_BY_CATEGORY,
         perform: (state: SelectionStateBranch, action: ChangeConnectByCategory) => ({
             ...state,
-            connectByGroup: action.payload,
+            connectByCategory: action.payload,
         }),
     },
     [CHANGE_CONNECT_BY_FEATURE]: {
