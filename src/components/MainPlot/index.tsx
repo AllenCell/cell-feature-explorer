@@ -220,14 +220,11 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
 
     const [showConfigPopup, setShowConfigPopup] = useState(false);
     const configPopupContainerRef = React.useRef<HTMLDivElement | null>(null);
-    const onClickConfigButton = React.useCallback(
-        (_: any, ev: MouseEvent): void => {
-            if (!showConfigPopup) {
-                setShowConfigPopup(true);
-            }
-        },
-        [showConfigPopup]
-    );
+    const onClickConfigButton = React.useCallback((): void => {
+        if (!showConfigPopup) {
+            setShowConfigPopup(true);
+        }
+    }, [showConfigPopup]);
     console.log("Showing config popup:", showConfigPopup);
     const config = React.useMemo(
         (): Partial<Plotly.Config> => ({

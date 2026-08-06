@@ -1,6 +1,5 @@
 import { InputNumber, Row } from "antd";
-import Slider, { SliderRangeProps, SliderSingleProps } from "antd/es/slider";
-import type { SliderProps as RcSliderProps } from "rc-slider";
+import Slider, { SliderSingleProps } from "antd/es/slider";
 import React, { ReactElement, useEffect, useState } from "react";
 
 type ValueType = number | number[];
