@@ -6,32 +6,36 @@ type TimeoutId = ReturnType<typeof setTimeout> | null;
  * Debounces changes to a state value by wrapping its value and setter function,
  * to reduce overhead for expensive setter function calls (e.g., Redux actions).
  * @param value The state value to debounce.
- * @param setter The setter function for the state value; will be called once no
+ * @param setValue The setter function for the state value; will be called once no
  * changes have occurred for the specified debounce delay.
- * @param delayMs The debounce delay in milliseconds. Defaults to 200ms.
+ * @param delayMs The debounce delay in milliseconds. Defaults to 250ms.
  * @returns A tuple containing the current value and a setter function.
  */
 const useDebouncedSetter = <T>(
     value: T,
-    setter: (value: T) => void,
-    delayMs = 200
+    setValue: (value: T) => void,
+    delayMs = 250
 ): [T, (value: T) => void] => {
     const timeoutRef = useRef<TimeoutId>(null);
-    const [pendingValue, setPendingValue] = useState<T | undefined>(undefined);
+    const [currentValue, setCurrentValue] = useState<T>(value);
 
     const setValueDebounce = useCallback(
         (value: T) => {
-            setPendingValue(value);
+            setCurrentValue(value);
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
             }
             timeoutRef.current = setTimeout(() => {
-                setter(value);
-                setPendingValue(undefined);
+                setValue(value);
             }, delayMs);
         },
-        [delayMs, setter]
+        [delayMs, setValue]
     );
+
+    // Sync changes to upstream value
+    useEffect(() => {
+        setCurrentValue(value);
+    }, [value]);
 
     // On unmount, clear the timeout
     useEffect(() => {
@@ -40,7 +44,7 @@ const useDebouncedSetter = <T>(
         };
     }, []);
 
-    return [pendingValue ?? value, setValueDebounce];
+    return [currentValue, setValueDebounce];
 };
 
 export default useDebouncedSetter;

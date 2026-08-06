@@ -8,6 +8,7 @@ type LabeledSliderProps = {
     sliderProps: SliderSingleProps;
     label: string;
     labelWidth?: string;
+    id?: string;
 };
 
 export default function LabeledSlider(props: LabeledSliderProps): ReactElement {
@@ -20,53 +21,56 @@ export default function LabeledSlider(props: LabeledSliderProps): ReactElement {
         }
     };
 
+    const inputId = props.id || `labeled-slider-${props.label.toLowerCase()}`;
+
     useEffect(() => {
         setInputValue(props.sliderProps.value);
     }, [props.sliderProps.value]);
 
     return (
-        <Row align="middle" style={{ width: "100%" }} wrap={false}>
-            <label
-                style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    flexWrap: "nowrap",
-                    alignItems: "center",
-                    width: "100%",
-                }}
-            >
-                <span style={{ width: props.labelWidth || "100px", display: "inline-block" }}>
-                    {props.label}
-                </span>
-                {typeof props.sliderProps.value === "number" && (
-                    <InputNumber
-                        size="small"
-                        controls={false}
-                        value={inputValue}
-                        onChange={(value) => {
-                            if (value !== null) {
-                                setInputValue(value);
-                            }
-                        }}
-                        onPressEnter={onConfirmInputValue}
-                        onBlur={onConfirmInputValue}
-                    ></InputNumber>
-                )}
-                <div style={{ width: "100%" }} ref={containerRef}>
-                    <Slider
-                        {...props.sliderProps}
-                        tooltip={{
-                            getPopupContainer: () => containerRef.current || document.body,
-                            ...props.sliderProps.tooltip,
-                        }}
-                        style={{
-                            width: "calc(100% - 32px)",
-                            margin: "8px 14px",
-                            ...props.sliderProps.style,
-                        }}
-                    />
-                </div>
+        <Row
+            align="middle"
+            style={{
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "nowrap",
+                alignItems: "center",
+                width: "100%",
+            }}
+            wrap={false}
+        >
+            <label htmlFor={inputId} style={{ width: props.labelWidth }}>
+                {props.label}
             </label>
+
+            <InputNumber
+                id={inputId}
+                size="small"
+                controls={false}
+                value={inputValue}
+                onChange={(value) => {
+                    if (value !== null) {
+                        setInputValue(value);
+                    }
+                }}
+                onPressEnter={onConfirmInputValue}
+                onBlur={onConfirmInputValue}
+            ></InputNumber>
+
+            <div style={{ width: "100%" }} ref={containerRef}>
+                <Slider
+                    {...props.sliderProps}
+                    tooltip={{
+                        getPopupContainer: () => containerRef.current || document.body,
+                        ...props.sliderProps.tooltip,
+                    }}
+                    style={{
+                        width: "calc(100% - 32px)",
+                        margin: "8px 14px",
+                        ...props.sliderProps.style,
+                    }}
+                />
+            </div>
         </Row>
     );
 }

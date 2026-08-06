@@ -87,7 +87,9 @@ export const initialState = {
     groupBy: "",
     defaultColors: INITIAL_COLORS,
     colorOverrides: [],
+    /** Radius of the points in the plot, in pixels. */
     pointRadius: 4,
+    /** Opacity of points in the plot, in the [0, 1] range. */
     pointOpacity: 0.5,
     selectedAlbum: INITIAL_SELECTED_ALBUM_ID,
     selectedAlbumFileInfo: [] as FileInfo[],
@@ -214,7 +216,7 @@ const actionToConfigMap: TypeToDescriptionMap = {
             action.type === SET_POINT_RADIUS,
         perform: (state: SelectionStateBranch, action: SetPointRadiusAction) => ({
             ...state,
-            pointRadius: action.payload,
+            pointRadius: Math.max(0, action.payload),
         }),
     },
     [SET_POINT_OPACITY]: {

@@ -30,9 +30,3 @@
     /*override plotly svg styling*/
     fill: white !important;
 }
-
-  :global(.ant-select-dropdown),
-  :global(.ant-dropdown-menu),
-  :global(.ant-modal-content){
-    border: 1px solid var(--color-modal-border);
-  }

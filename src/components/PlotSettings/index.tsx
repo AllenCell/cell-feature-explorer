@@ -1,4 +1,3 @@
-import { Button } from "antd";
 import React, { ReactElement } from "react";
 import { connect } from "react-redux";
 import { ActionCreator } from "redux";
@@ -8,7 +7,6 @@ import { SetPointOpacityAction, SetPointRadiusAction } from "../../state/selecti
 import { State } from "../../state/types";
 import { useDebouncedSetter } from "../../hooks";
 import LabeledSlider from "../LabeledSlider";
-import { CloseOutlined } from "@ant-design/icons";
 
 type PropsFromState = {
     pointOpacity: number;
@@ -20,11 +18,7 @@ type DispatchProps = {
     handleSetPointRadius: ActionCreator<SetPointRadiusAction>;
 };
 
-type PlotSettingsProps = PropsFromState &
-    DispatchProps & {
-        onClickClose?: () => void;
-    };
-
+type PlotSettingsProps = PropsFromState & DispatchProps;
 const SETTINGS_LABEL_WIDTH = "110px";
 
 const PlotSettings = (props: PlotSettingsProps): ReactElement => {
@@ -35,24 +29,6 @@ const PlotSettings = (props: PlotSettingsProps): ReactElement => {
 
     return (
         <div style={{ display: "flex", flexDirection: "column", width: "250px" }}>
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                }}
-            >
-                <p style={{ fontSize: "1.2em", margin: " 0 0 8px 0" }}>Point settings</p>
-                <Button
-                    onClick={props.onClickClose}
-                    type="text"
-                    size="small"
-                    style={{ padding: "0px 4px" }}
-                >
-                    <CloseOutlined />
-                </Button>
-            </div>
             <LabeledSlider
                 label="Opacity"
                 labelWidth={SETTINGS_LABEL_WIDTH}
@@ -78,9 +54,6 @@ const PlotSettings = (props: PlotSettingsProps): ReactElement => {
                     max: 10,
                     step: 1,
                     marks: { 4: <></> },
-                    tooltip: {
-                        formatter: (value) => (value !== undefined ? value.toFixed(1) : ""),
-                    },
                 }}
             ></LabeledSlider>
         </div>
