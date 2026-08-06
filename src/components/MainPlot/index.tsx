@@ -14,9 +14,10 @@ import { GENERAL_PLOT_SETTINGS } from "../../constants";
 import { TickConversion } from "../../state/selection/types";
 
 import styles from "./style.css";
-import { Popover } from "antd";
+import { Button, Popover, Row } from "antd";
 import PlotSettings from "../PlotSettings";
 import { ICON_SVG_PATH_PLOT_SETTINGS } from "./constants";
+import { CloseOutlined } from "@ant-design/icons";
 
 interface MainPlotProps {
     annotations: PlotlyAnnotation[];
@@ -225,7 +226,8 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
             setShowConfigPopup(true);
         }
     }, [showConfigPopup]);
-    console.log("Showing config popup:", showConfigPopup);
+
+    // Add config button to Plotly mode bar.
     const config = React.useMemo(
         (): Partial<Plotly.Config> => ({
             ...PLOT_CONFIG,
@@ -238,11 +240,17 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
                         height: 1000,
                         path: ICON_SVG_PATH_PLOT_SETTINGS,
                     },
+                    // TODO: There is a bug where clicking on the plotly button
+                    // will cause the popup menu to only temporarily close
+                    // instead of fully closing it. This is because Ant's
+                    // Popover reacts to the click on mouse down, closing the
+                    // popup, while Plotly reacts to the click on mouse up,
+                    // reopening it again.
                     click: onClickConfigButton,
                 },
             ],
         }),
-        []
+        [onClickConfigButton]
     );
 
     return (
@@ -291,7 +299,28 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
                     document.body
                 )}
             <Popover
-                content={<PlotSettings onClickClose={() => setShowConfigPopup(false)} />}
+                content={<PlotSettings />}
+                title={
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        Plot settings
+                        <Button
+                            onClick={() => setShowConfigPopup(false)}
+                            type="text"
+                            size="small"
+                            style={{ padding: "0px 4px" }}
+                            title="Close plot settings"
+                        >
+                            <CloseOutlined />
+                        </Button>
+                    </div>
+                }
                 open={showConfigPopup}
                 placement={"bottom"}
                 onOpenChange={setShowConfigPopup}
@@ -300,9 +329,12 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
                 <div
                     ref={configPopupContainerRef}
                     style={{
-                        position: "fixed",
-                        top: "205px",
-                        right: "160px",
+                        position: "absolute",
+                        // Positioned where the mode bar button is onscreen,
+                        // since we cannot directly attach the popup to the
+                        // button.
+                        top: "82px",
+                        right: "42px",
                         width: "5px",
                         height: "5px",
                         pointerEvents: "none",
