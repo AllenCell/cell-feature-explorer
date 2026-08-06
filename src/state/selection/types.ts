@@ -19,6 +19,9 @@ export interface SelectionStateBranch {
     plotByOnX: string;
     plotByOnY: string;
     groupBy: string;
+    connectByCategory: string;
+    connectByFeature: string;
+    showConnectedPoints: boolean;
     defaultColors: string[];
     colorOverrides: (string | undefined)[];
     pointRadius: number;
@@ -189,6 +192,21 @@ export interface SetCsvUrlAction {
 }
 export interface ChangeGroupByCategory {
     payload: string;
+    type: string;
+}
+
+export interface ChangeConnectByCategory {
+    payload: string;
+    type: string;
+}
+
+export interface ChangeConnectByFeature {
+    payload: string;
+    type: string;
+}
+
+export interface SetShowConnectLines {
+    payload: boolean;
     type: string;
 }
 
