@@ -1,4 +1,4 @@
-import { Col, Slider } from "antd";
+import { Button, Col, Slider } from "antd";
 import React, { ReactElement, useState } from "react";
 import { connect } from "react-redux";
 import { ActionCreator } from "redux";
@@ -8,6 +8,7 @@ import { SetPointOpacityAction, SetPointRadiusAction } from "../../state/selecti
 import { State } from "../../state/types";
 import { useDebouncedSetter } from "../../hooks";
 import LabeledSlider from "../LabeledSlider";
+import { CloseOutlined } from "@ant-design/icons";
 
 type PropsFromState = {
     pointOpacity: number;
@@ -19,37 +20,71 @@ type DispatchProps = {
     handleSetPointRadius: ActionCreator<SetPointRadiusAction>;
 };
 
-const PlotSettings = (props: PropsFromState & DispatchProps): ReactElement => {
+type PlotSettingsProps = PropsFromState &
+    DispatchProps & {
+        onClickClose?: () => void;
+    };
+
+const SETTINGS_LABEL_WIDTH = "110px";
+
+const PlotSettings = (props: PlotSettingsProps): ReactElement => {
     const { pointOpacity, pointRadius, handleSetPointOpacity, handleSetPointRadius } = props;
 
     const [opacity, setOpacity] = useDebouncedSetter(pointOpacity, handleSetPointOpacity);
     const [radius, setRadius] = useDebouncedSetter(pointRadius, handleSetPointRadius);
 
     return (
-        <Col style={{ width: "200px" }}>
+        <div style={{ display: "flex", flexDirection: "column", width: "250px" }}>
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                }}
+            >
+                <p style={{ fontSize: "1.2em", margin: " 0 0 8px 0" }}>Point settings</p>
+                <Button
+                    onClick={props.onClickClose}
+                    type="text"
+                    size="small"
+                    style={{ padding: "0px 4px" }}
+                >
+                    <CloseOutlined />
+                </Button>
+            </div>
             <LabeledSlider
                 label="Opacity"
+                labelWidth={SETTINGS_LABEL_WIDTH}
                 sliderProps={{
                     value: opacity,
                     onChange: setOpacity,
                     min: 0,
                     max: 1,
-                    step: 0.01,
+                    step: 0.05,
                     marks: { 0.5: <></> },
+                    tooltip: {
+                        formatter: (value) =>
+                            value !== undefined ? `${Math.round(value * 100)}%` : "",
+                    },
                 }}
             ></LabeledSlider>
             <LabeledSlider
                 label="Radius"
+                labelWidth={SETTINGS_LABEL_WIDTH}
                 sliderProps={{
                     value: radius,
                     onChange: setRadius,
                     min: 1,
                     max: 10,
-                    step: 0.25,
+                    step: 0.5,
                     marks: { 4: <></> },
+                    tooltip: {
+                        formatter: (value) => (value !== undefined ? value.toFixed(1) : ""),
+                    },
                 }}
             ></LabeledSlider>
-        </Col>
+        </div>
     );
 };
 
