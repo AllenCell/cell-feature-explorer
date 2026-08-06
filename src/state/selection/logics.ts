@@ -21,7 +21,12 @@ import {
     SYNC_STATE_WITH_URL,
 } from "./constants";
 import { COLOR_BY_SELECTOR, X_AXIS_ID, Y_AXIS_ID } from "../../constants";
-import { changeAxis, changeGroupByCategory } from "./actions";
+import {
+    changeAxis,
+    changeConnectByCategory,
+    changeConnectByFeature,
+    changeGroupByCategory,
+} from "./actions";
 import { FileInfo } from "../metadata/types";
 import { DatasetMetaData } from "../image-dataset/types";
 import { getImageDataset } from "../image-dataset/selectors";
@@ -100,6 +105,15 @@ const changeDatasetLogic = createLogic({
                 }
                 if (!featureKeys.has(state.selection.groupBy)) {
                     actions.push(changeGroupByCategory(selections.defaultGroupBy));
+                }
+                if (
+                    !featureKeys.has(state.selection.connectByFeature) &&
+                    selections.defaultConnectBy
+                ) {
+                    actions.push(changeConnectByFeature(selections.defaultConnectBy));
+                }
+                if (!featureKeys.has(state.selection.connectByCategory)) {
+                    actions.push(changeConnectByCategory(selections.defaultGroupBy));
                 }
                 if (!featureKeys.has(state.selection.colorBy) && selections.defaultColorBy) {
                     actions.push(changeAxis(COLOR_BY_SELECTOR, selections.defaultColorBy));

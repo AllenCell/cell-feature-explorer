@@ -188,6 +188,7 @@ class JsonRequest implements ImageDataset {
                 defaultYAxis: data.yAxis?.default || "",
                 defaultColorBy: data.colorBy?.default || "",
                 defaultGroupBy: data.groupBy?.default || "",
+                defaultConnectBy: data.connectBy?.default || "",
                 thumbnailRoot: data.thumbnailRoot || "",
                 downloadRoot: data.downloadRoot || "",
                 volumeViewerDataRoot: data.volumeViewerDataRoot || "",

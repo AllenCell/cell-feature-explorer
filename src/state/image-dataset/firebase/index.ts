@@ -123,6 +123,7 @@ class FirebaseRequest implements ImageDataset {
                 yAxis: { default: any };
                 colorBy: { default: any };
                 groupBy: { default: any };
+                connectBy?: { default: any };
             }) => {
                 this.featuresDataPath = data.featuresDataPath;
                 this.viewerSettingsPath = data.viewerSettingsPath;
@@ -139,6 +140,7 @@ class FirebaseRequest implements ImageDataset {
                     defaultYAxis: data.yAxis.default,
                     defaultColorBy: data.colorBy.default,
                     defaultGroupBy: data.groupBy.default,
+                    defaultConnectBy: data.connectBy?.default || "",
                     thumbnailRoot: data.thumbnailRoot,
                     downloadRoot: data.downloadRoot,
                     volumeViewerDataRoot: data.volumeViewerDataRoot,
