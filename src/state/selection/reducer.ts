@@ -60,6 +60,8 @@ import {
     SetColorOverrideAction,
     SetColorOverridesAction,
     SetCsvUrlAction,
+    SetPointOpacityAction,
+    SetPointRadiusAction,
 } from "./types";
 
 export const initialState = {
@@ -208,19 +210,19 @@ const actionToConfigMap: TypeToDescriptionMap = {
         },
     },
     [SET_POINT_RADIUS]: {
-        accepts: (action: Action): action is SetColorOverrideAction =>
+        accepts: (action: Action): action is SetPointRadiusAction =>
             action.type === SET_POINT_RADIUS,
-        perform: (state: SelectionStateBranch, action: SetColorOverrideAction) => ({
+        perform: (state: SelectionStateBranch, action: SetPointRadiusAction) => ({
             ...state,
             pointRadius: action.payload,
         }),
     },
     [SET_POINT_OPACITY]: {
-        accepts: (action: Action): action is SetColorOverrideAction =>
+        accepts: (action: Action): action is SetPointOpacityAction =>
             action.type === SET_POINT_OPACITY,
-        perform: (state: SelectionStateBranch, action: SetColorOverrideAction) => ({
+        perform: (state: SelectionStateBranch, action: SetPointOpacityAction) => ({
             ...state,
-            pointOpacity: action.payload,
+            pointOpacity: Math.max(0, Math.min(1, action.payload)),
         }),
     },
     [SET_COLOR_OVERRIDES]: {
