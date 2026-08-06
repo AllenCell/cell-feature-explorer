@@ -27,7 +27,7 @@ export default function LabeledSlider(props: LabeledSliderProps): ReactElement {
         }
     };
 
-    const inputId = props.id || `labeled-slider-${props.label.toLowerCase()}`;
+    const inputId = props.id || `labeled-slider-${props.label.toLowerCase().replace(/\s+/g, "-")}`;
 
     useEffect(() => {
         setInputValue(props.sliderProps.value);
