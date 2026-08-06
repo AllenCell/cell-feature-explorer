@@ -55,6 +55,8 @@ const PlotSettings = (props: PlotSettingsProps): ReactElement => {
                     step: 1,
                     marks: { 4: <></> },
                 }}
+                inputMin={0}
+                inputMax={100}
             ></LabeledSlider>
         </div>
     );

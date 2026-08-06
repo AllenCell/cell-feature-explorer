@@ -9,6 +9,8 @@ type LabeledSliderProps = {
     label: string;
     labelWidth?: string;
     id?: string;
+    inputMax?: number;
+    inputMin?: number;
 };
 
 export default function LabeledSlider(props: LabeledSliderProps): ReactElement {
@@ -17,7 +19,11 @@ export default function LabeledSlider(props: LabeledSliderProps): ReactElement {
 
     const onConfirmInputValue = () => {
         if (inputValue !== undefined) {
-            props.sliderProps.onChange?.(inputValue);
+            const clampMax = props.inputMax ?? props.sliderProps.max ?? Infinity;
+            const clampMin = props.inputMin ?? props.sliderProps.min ?? -Infinity;
+            const clampedValue = Math.max(clampMin, Math.min(clampMax, inputValue as number));
+            setInputValue(clampedValue);
+            props.sliderProps.onChange?.(clampedValue);
         }
     };
 

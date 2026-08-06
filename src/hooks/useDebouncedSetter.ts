@@ -34,6 +34,11 @@ const useDebouncedSetter = <T>(
 
     // Sync changes to upstream value
     useEffect(() => {
+        // Clear timers if set
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+        }
         setCurrentValue(value);
     }, [value]);
 
