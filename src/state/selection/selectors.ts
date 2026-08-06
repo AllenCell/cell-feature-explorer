@@ -48,7 +48,9 @@ export const getColorBySelection = (state: State): keyof MappingOfMeasuredValues
 export const getDefaultColors = (state: State): string[] => state.selection.defaultColors;
 export const getColorOverrides = (state: State): (string | undefined)[] =>
     state.selection.colorOverrides;
+/** Returns the radius of points in the plot, in pixels. */
 export const getPointRadius = (state: State): number => state.selection.pointRadius;
+/** Returns the opacity of points in the plot, in a [0, 1] range. */
 export const getPointOpacity = (state: State): number => state.selection.pointOpacity;
 export const getSelectionSetColors = (state: State): { [key: string]: string } =>
     state.selection.selectedGroupColors;
