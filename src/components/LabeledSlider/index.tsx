@@ -1,7 +1,7 @@
 import { InputNumber, Row } from "antd";
 import Slider, { SliderRangeProps, SliderSingleProps } from "antd/es/slider";
 import type { SliderProps as RcSliderProps } from "rc-slider";
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 
 type ValueType = number | number[];
 
@@ -14,6 +14,16 @@ type LabeledSliderProps = {
 export default function LabeledSlider(props: LabeledSliderProps): ReactElement {
     const containerRef = React.useRef<HTMLDivElement>(null);
     const [inputValue, setInputValue] = useState(props.sliderProps.value);
+
+    const onConfirmInputValue = () => {
+        if (inputValue !== undefined) {
+            props.sliderProps.onChange?.(inputValue);
+        }
+    };
+
+    useEffect(() => {
+        setInputValue(props.sliderProps.value);
+    }, [props.sliderProps.value]);
 
     return (
         <Row align="middle" style={{ width: "100%" }} wrap={false}>
@@ -39,10 +49,8 @@ export default function LabeledSlider(props: LabeledSliderProps): ReactElement {
                                 setInputValue(value);
                             }
                         }}
-                        onPressEnter={(value) => {
-                            value !== null &&
-                                (props.sliderProps.onChange as (value: number) => void)?.(value);
-                        }}
+                        onPressEnter={onConfirmInputValue}
+                        onBlur={onConfirmInputValue}
                     ></InputNumber>
                 )}
                 <div style={{ width: "100%" }} ref={containerRef}>
@@ -54,7 +62,7 @@ export default function LabeledSlider(props: LabeledSliderProps): ReactElement {
                         }}
                         style={{
                             width: "calc(100% - 32px)",
-                            margin: "8px 16px",
+                            margin: "8px 14px",
                             ...props.sliderProps.style,
                         }}
                     />

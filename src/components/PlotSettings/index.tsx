@@ -57,15 +57,14 @@ const PlotSettings = (props: PlotSettingsProps): ReactElement => {
                 label="Opacity"
                 labelWidth={SETTINGS_LABEL_WIDTH}
                 sliderProps={{
-                    value: opacity,
-                    onChange: setOpacity,
+                    value: Math.round(opacity * 100),
+                    onChange: (value) => setOpacity(Math.round(value) / 100),
                     min: 0,
-                    max: 1,
-                    step: 0.05,
-                    marks: { 0.5: <></> },
+                    max: 100,
+                    step: 5,
+                    marks: { 50: <></> },
                     tooltip: {
-                        formatter: (value) =>
-                            value !== undefined ? `${Math.round(value * 100)}%` : "",
+                        formatter: (value) => (value !== undefined ? `${value}%` : ""),
                     },
                 }}
             ></LabeledSlider>
@@ -77,7 +76,7 @@ const PlotSettings = (props: PlotSettingsProps): ReactElement => {
                     onChange: setRadius,
                     min: 1,
                     max: 10,
-                    step: 0.5,
+                    step: 1,
                     marks: { 4: <></> },
                     tooltip: {
                         formatter: (value) => (value !== undefined ? value.toFixed(1) : ""),
