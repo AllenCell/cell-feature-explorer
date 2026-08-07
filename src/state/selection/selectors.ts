@@ -448,6 +448,18 @@ export const getFilteredYValues = createSelector(
         measuredData[plotByOnY] || []
 );
 
+export const getFilteredConnectByCategoryValues = createSelector(
+    [getFilteredMeasuredValues, getConnectByCategory],
+    (measuredData: MappingOfMeasuredValuesArrays, connectByCategory: string): (number | null)[] =>
+        measuredData[connectByCategory] || []
+);
+
+export const getFilteredConnectByFeatureValues = createSelector(
+    [getFilteredMeasuredValues, getConnectByFeature],
+    (measuredData: MappingOfMeasuredValuesArrays, connectByFeature: string): (number | null)[] =>
+        measuredData[connectByFeature] || []
+);
+
 export const getFilteredIds = createSelector(
     [getFilteredPerCellLabels],
     (cellLabels: PerCellLabels): string[] => {

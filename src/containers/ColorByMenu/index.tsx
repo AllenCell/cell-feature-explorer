@@ -10,6 +10,7 @@ import FeatureSelectDropdown from "../../components/FeatureSelectDropdown";
 import InteractiveLegend from "../../components/InteractiveLegend";
 import ColorBySwitcher from "../../components/ColorBySwitcher";
 import ColorLegendRow from "../../components/ColorLegend";
+import ConnectByControl from "../../components/ConnectByControl";
 import {
     COLOR_BY_SELECTOR,
     DOWNLOAD_CONFIG_TYPE_PROTEIN,
@@ -254,6 +255,9 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
                             )}
                         />
                     </Col>
+                </Row>
+                <Row className={styles.featureSelectRow}>
+                    <ConnectByControl />
                 </Row>
                 <div className={styles.interactiveLegendContainer}>
                     <div>

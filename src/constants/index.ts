@@ -64,6 +64,7 @@ export const GENERAL_PLOT_SETTINGS = {
     cellName: CELL_ID_KEY,
     chartParent: "ace-scatter-chart",
     circleRadius: 4,
+    connectionLineWidth: 2,
     histogramColor: BASE_PALETTE_COLORS.lightGray,
     legend: {
         font: {
