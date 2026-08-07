@@ -93,7 +93,7 @@ export const initialState: SelectionStateBranch = {
     groupBy: "",
     connectByCategory: "",
     connectByFeature: "",
-    showConnectedPoints: true,
+    showConnectedPoints: false,
     defaultColors: INITIAL_COLORS,
     colorOverrides: [],
     /** Radius of the points in the plot, in pixels. */
