@@ -52,6 +52,7 @@ import {
     PlotlyCustomData,
     GroupedPlotData,
     DataType,
+    LinePlotData,
 } from "../../state/types";
 import { findFeature } from "../../state/util";
 import { getGroupByTitle } from "../ColorByMenu/selectors";
@@ -171,14 +172,12 @@ export const getMainPlotData = createSelector(
 type SortablePlotData = {
     x: (number | null)[];
     y: (number | null)[];
-    ids: string[];
     feature: (number | null)[];
 };
 
 function sortPlotDataByFeature(data: SortablePlotData): {
     x: (number | null)[];
     y: (number | null)[];
-    ids: string[];
     feature: (number | null)[];
 } {
     const indices = Array.from(data.feature.keys());
@@ -198,16 +197,20 @@ function sortPlotDataByFeature(data: SortablePlotData): {
     return {
         x: sortedIndices.map((i) => data.x[i]),
         y: sortedIndices.map((i) => data.y[i]),
-        ids: sortedIndices.map((i) => data.ids[i]),
         feature: sortedIndices.map((i) => data.feature[i]),
     };
 }
 
-export const getConnectionLineData = createSelector(
+/**
+ * Returns the data for the line plot trace. Points in the same category are
+ * connected in the same line, sorted in order of the specified feature value.
+ * All line points are returned in a single trace, with null values separating
+ * the lines for each category.
+ */
+export const getLinePlotData = createSelector(
     [
         getFilteredXValues,
         getFilteredYValues,
-        getFilteredIds,
         getFilteredConnectByCategoryValues,
         getFilteredConnectByFeatureValues,
         getShowConnectedPoints,
@@ -215,44 +218,47 @@ export const getConnectionLineData = createSelector(
     (
         xValues,
         yValues,
-        ids,
         connectByCategoryValues,
         connectByFeatureValues,
         showConnectedPoints
-    ): SortablePlotData[] | null => {
+    ): LinePlotData | null => {
         if (!showConnectedPoints) {
             return null;
         }
-        // Implement the selector logic here
-        console.log(connectByCategoryValues);
-        const dataByCategory: Map<number, SortablePlotData> = new Map();
+        const indicesByGroup: Map<number, number[]> = new Map();
 
         // Group data points by their category
         for (let i = 0; i < connectByCategoryValues.length; i++) {
             const category = connectByCategoryValues[i];
-            if (category === null || category !== 3) {
+            if (category === null) {
                 continue;
             }
-            if (!dataByCategory.has(category)) {
-                dataByCategory.set(category, {
-                    x: [],
-                    y: [],
-                    feature: [],
-                    ids: [],
-                });
+            if (!indicesByGroup.has(category)) {
+                indicesByGroup.set(category, []);
             }
-            const categoryData = dataByCategory.get(category)!;
-            categoryData.x.push(xValues[i]);
-            categoryData.y.push(yValues[i]);
-            categoryData.feature.push(connectByFeatureValues[i]);
-            categoryData.ids.push(ids[i]);
+            const indices = indicesByGroup.get(category)!;
+            indices.push(i);
         }
-        // Sort each category's data by the feature values
-        const sortedData: SortablePlotData[] = [];
-        for (const categoryData of dataByCategory.values()) {
-            sortedData.push(sortPlotDataByFeature(categoryData));
+        // Sort each category's data by the feature values.
+        const lineX: (number | null)[] = [];
+        const lineY: (number | null)[] = [];
+
+        for (const indices of indicesByGroup.values()) {
+            indices.sort((aIndex, bIndex) => {
+                const a = connectByFeatureValues[aIndex] ?? Infinity;
+                const b = connectByFeatureValues[bIndex] ?? Infinity;
+                return a - b;
+            });
+            for (const i of indices) {
+                lineX.push(xValues[i]);
+                lineY.push(yValues[i]);
+            }
+            // Separate each group with null values to separate the lines.
+            lineX.push(null);
+            lineY.push(null);
         }
-        return sortedData;
+
+        return { x: lineX, y: lineY };
     }
 );
 
@@ -300,7 +306,7 @@ const getAnnotationData = createSelector(
 );
 
 export const composePlotlyData = createSelector(
-    [getMainPlotData, getApplyColorToSelections, getSelectedGroupsData, getConnectionLineData],
+    [getMainPlotData, getApplyColorToSelections, getSelectedGroupsData, getLinePlotData],
     (
         mainPlotDataValues: ContinuousPlotData | GroupedPlotData,
         applyColorToSelections,
@@ -309,7 +315,7 @@ export const composePlotlyData = createSelector(
     ): {
         mainPlotData: ContinuousPlotData | GroupedPlotData;
         selectedGroupPlotData: ContinuousPlotData | null;
-        linePlotData: SortablePlotData[] | null;
+        linePlotData: LinePlotData | null;
     } => {
         const mainPlotData = {
             ...mainPlotDataValues,
@@ -332,7 +338,7 @@ export const composePlotlyData = createSelector(
                   plotName: SELECTIONS_PLOT_NAME,
               }
             : null;
-
+        console.log("connectionLineData", connectionLineData);
         return {
             mainPlotData,
             selectedGroupPlotData,
@@ -407,25 +413,20 @@ function makeScatterPlotData(
 }
 
 // TODO: Add the ability to adjust the line settings via an additional selector
-function makeLinePlotData(data: SortablePlotData[]): Partial<PlotData>[] {
-    return data.map((lineData) => {
-        const lineTrace: Partial<PlotData> = {
-            x: lineData.x,
-            y: lineData.y,
-            ids: lineData.ids,
-            hoverinfo: "none",
-            showlegend: false,
-            type: "scattergl",
-            marker: undefined,
-            line: {
-                width: GENERAL_PLOT_SETTINGS.connectionLineWidth,
-                color: PALETTE.brightBlue,
-            },
-            mode: "lines",
-            z: [],
-        };
-        return lineTrace;
-    });
+function makeLinePlotTrace(data: LinePlotData): Partial<PlotData> {
+    return {
+        type: "scattergl",
+        mode: "lines",
+        name: "connection lines",
+        hoverinfo: "skip",
+        x: data.x,
+        y: data.y,
+        showlegend: false,
+        line: {
+            width: 1,
+            color: PALETTE.mediumDarkGray,
+        },
+    };
 }
 
 function makeHistogramPlotX(data: (number | null)[]) {
@@ -513,7 +514,7 @@ export const getScatterPlotDataArray = createSelector(
             data.push(makeScatterPlotData(selectedGroupPlotData, mainPlotSettings));
         }
         if (allPlotData.linePlotData) {
-            data.push(...makeLinePlotData(allPlotData.linePlotData));
+            data.unshift(makeLinePlotTrace(allPlotData.linePlotData));
         }
 
         return data;
