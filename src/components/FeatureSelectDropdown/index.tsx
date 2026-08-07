@@ -11,6 +11,7 @@ interface FeatureSelectDropdownProps {
     tooltip: string;
     onChange: (value: string) => void;
     classKey?: string;
+    className?: string;
 }
 
 export default class FeatureSelectDropdown extends React.Component<FeatureSelectDropdownProps> {
@@ -41,7 +42,7 @@ export default class FeatureSelectDropdown extends React.Component<FeatureSelect
             ?.label?.toString();
 
         return (
-            <div className={styles[classKey]}>
+            <div className={this.props.className ?? styles[classKey]}>
                 <Tooltip title={tooltip}>
                     <Select
                         onChange={this.handleChange}

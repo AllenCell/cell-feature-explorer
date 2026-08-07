@@ -239,11 +239,17 @@ export const getLinePlotData = createSelector(
             const indices = indicesByGroup.get(category)!;
             indices.push(i);
         }
-        // Sort each category's data by the feature values.
+
+        // All line data is combined into a single x and y array, with each
+        // category separated by null values.
+
+        // TODO: Separate out the line traces if the category coloring should
+        // be applied
         const lineX: (number | null)[] = [];
         const lineY: (number | null)[] = [];
 
         for (const indices of indicesByGroup.values()) {
+            // Sort each category's data by the feature values.
             indices.sort((aIndex, bIndex) => {
                 const a = connectByFeatureValues[aIndex] ?? Infinity;
                 const b = connectByFeatureValues[bIndex] ?? Infinity;
@@ -253,7 +259,6 @@ export const getLinePlotData = createSelector(
                 lineX.push(xValues[i]);
                 lineY.push(yValues[i]);
             }
-            // Separate each group with null values to separate the lines.
             lineX.push(null);
             lineY.push(null);
         }

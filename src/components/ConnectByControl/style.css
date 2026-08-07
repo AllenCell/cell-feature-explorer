@@ -1,0 +1,15 @@
+.connect-by-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  gap: 6px;
+  width: 100%;
+}
+
+.connect-by-dropdown {
+  flex-basis: 100px;
+  flex-grow: 1;
+  flex-shrink: 1;
+  max-width: 173px;
+}

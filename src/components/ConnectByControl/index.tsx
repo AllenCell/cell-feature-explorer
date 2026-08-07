@@ -1,14 +1,25 @@
+import { Checkbox, Row } from "antd";
 import React, { ReactElement } from "react";
 import { connect } from "react-redux";
 
-import selectionStateBranch from "../../state/selection";
 import { State } from "../../state";
-import { Row } from "antd";
+import { MeasuredFeatureDef } from "../../state/metadata/types";
+import selectionStateBranch from "../../state/selection";
+import FeatureSelectDropdown from "../FeatureSelectDropdown";
+import { getFeatureDefTooltip } from "../../state/selection/selectors";
+import {
+    getColorByDisplayOptions,
+    getGroupByDisplayOptions,
+} from "../../containers/MainPlotContainer/selectors";
+
+import styles from "./style.css";
 
 type ConnectByControlStateProps = {
     connectByFeature: string;
     connectByCategory: string;
     showConnectedPoints: boolean;
+    featureMenuOptions: MeasuredFeatureDef[];
+    groupByMenuOptions: MeasuredFeatureDef[];
 };
 
 type ConnectByControlDispatchProps = {
@@ -26,10 +37,42 @@ const enum ConnectByControlHtmlIds {
 }
 
 function ConnectByControl(props: ConnectByControlProps): ReactElement {
+    const showConnectionsCheckbox = (
+        <Checkbox
+            checked={props.showConnectedPoints}
+            onChange={(e) => props.handleSetShowConnectedPoints(e.target.checked)}
+        ></Checkbox>
+    );
+
+    const connectByCategoryDropdown = (
+        <FeatureSelectDropdown
+            value={props.connectByCategory}
+            options={props.groupByMenuOptions}
+            onChange={(v: string) => {
+                props.handleChangeConnectByCategory(v);
+            }}
+            tooltip={getFeatureDefTooltip(props.connectByCategory, props.groupByMenuOptions)}
+            className={styles.connectByDropdown}
+        />
+    );
+
+    const connectByFeatureDropdown = (
+        <FeatureSelectDropdown
+            value={props.connectByFeature}
+            options={props.featureMenuOptions}
+            onChange={(v: string) => {
+                props.handleChangeConnectByFeature(v);
+            }}
+            tooltip={getFeatureDefTooltip(props.connectByFeature, props.featureMenuOptions)}
+            className={styles.connectByDropdown}
+        />
+    );
+
     return (
-        <Row>
-            Connect {props.connectByCategory} by {props.connectByFeature}
-        </Row>
+        <div className={styles.connectByRow}>
+            {showConnectionsCheckbox} Connect {connectByCategoryDropdown} by{" "}
+            {connectByFeatureDropdown}
+        </div>
     );
 }
 
@@ -38,6 +81,8 @@ function mapStateToProps(state: any): ConnectByControlStateProps {
         connectByFeature: state.selection.connectByFeature,
         connectByCategory: state.selection.connectByCategory,
         showConnectedPoints: state.selection.showConnectedPoints,
+        featureMenuOptions: getColorByDisplayOptions(state),
+        groupByMenuOptions: getGroupByDisplayOptions(state),
     };
 }
 
