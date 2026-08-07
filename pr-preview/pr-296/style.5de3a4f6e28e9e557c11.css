@@ -1031,7 +1031,7 @@ div.ant-modal-mask.ant-modal-mask {
   flex-basis: 100px;
   flex-grow: 1;
   flex-shrink: 1;
-  max-width: 173px;
+  min-width: 0;
 }
 
 .style__feature-select-row--eh5Bh {
