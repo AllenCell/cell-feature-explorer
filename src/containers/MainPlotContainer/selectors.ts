@@ -40,6 +40,10 @@ import {
     getXValues,
     getYValues,
     getMainPlotSettings,
+    getFilteredConnectByFeatureValues,
+    getConnectByCategory,
+    getShowConnectedPoints,
+    getFilteredConnectByCategoryValues,
 } from "../../state/selection/selectors";
 import { MainPlotSettings, SelectedPointData, TickConversion } from "../../state/selection/types";
 import {
@@ -164,6 +168,94 @@ export const getMainPlotData = createSelector(
     }
 );
 
+type SortablePlotData = {
+    x: (number | null)[];
+    y: (number | null)[];
+    ids: string[];
+    feature: (number | null)[];
+};
+
+function sortPlotDataByFeature(data: SortablePlotData): {
+    x: (number | null)[];
+    y: (number | null)[];
+    ids: string[];
+    feature: (number | null)[];
+} {
+    const indices = Array.from(data.feature.keys());
+    const sortedIndices = indices.sort((aIndex, bIndex) => {
+        const a = data.feature[aIndex];
+        const b = data.feature[bIndex];
+        if (a === null && b === null) {
+            return 0;
+        } else if (a === null) {
+            return 1;
+        } else if (b === null) {
+            return -1;
+        }
+        return a - b;
+    });
+
+    return {
+        x: sortedIndices.map((i) => data.x[i]),
+        y: sortedIndices.map((i) => data.y[i]),
+        ids: sortedIndices.map((i) => data.ids[i]),
+        feature: sortedIndices.map((i) => data.feature[i]),
+    };
+}
+
+export const getConnectionLineData = createSelector(
+    [
+        getFilteredXValues,
+        getFilteredYValues,
+        getFilteredIds,
+        getFilteredConnectByCategoryValues,
+        getFilteredConnectByFeatureValues,
+        getShowConnectedPoints,
+    ],
+    (
+        xValues,
+        yValues,
+        ids,
+        connectByCategoryValues,
+        connectByFeatureValues,
+        showConnectedPoints
+    ): SortablePlotData[] | null => {
+        if (!showConnectedPoints) {
+            return null;
+        }
+        // Implement the selector logic here
+        console.log(connectByCategoryValues);
+        const dataByCategory: Map<number, SortablePlotData> = new Map();
+
+        // Group data points by their category
+        for (let i = 0; i < connectByCategoryValues.length; i++) {
+            const category = connectByCategoryValues[i];
+            if (category === null || category !== 3) {
+                continue;
+            }
+            if (!dataByCategory.has(category)) {
+                dataByCategory.set(category, {
+                    x: [],
+                    y: [],
+                    feature: [],
+                    ids: [],
+                });
+            }
+            const categoryData = dataByCategory.get(category)!;
+            categoryData.x.push(xValues[i]);
+            categoryData.y.push(yValues[i]);
+            categoryData.feature.push(connectByFeatureValues[i]);
+            categoryData.ids.push(ids[i]);
+        }
+        // Sort each category's data by the feature values
+        const sortedData: SortablePlotData[] = [];
+        for (const categoryData of dataByCategory.values()) {
+            sortedData.push(sortPlotDataByFeature(categoryData));
+        }
+        return sortedData;
+    }
+);
+
 const getAnnotationData = createSelector(
     [getFilteredCellData, getClickedCellsFileInfo, getPlotByOnX, getPlotByOnY, getHoveredCardId],
     (
@@ -208,14 +300,16 @@ const getAnnotationData = createSelector(
 );
 
 export const composePlotlyData = createSelector(
-    [getMainPlotData, getApplyColorToSelections, getSelectedGroupsData],
+    [getMainPlotData, getApplyColorToSelections, getSelectedGroupsData, getConnectionLineData],
     (
         mainPlotDataValues: ContinuousPlotData | GroupedPlotData,
         applyColorToSelections,
-        selectedGroups
+        selectedGroups,
+        connectionLineData
     ): {
         mainPlotData: ContinuousPlotData | GroupedPlotData;
         selectedGroupPlotData: ContinuousPlotData | null;
+        linePlotData: SortablePlotData[] | null;
     } => {
         const mainPlotData = {
             ...mainPlotDataValues,
@@ -242,6 +336,7 @@ export const composePlotlyData = createSelector(
         return {
             mainPlotData,
             selectedGroupPlotData,
+            linePlotData: connectionLineData,
         };
     }
 );
@@ -309,6 +404,28 @@ function makeScatterPlotData(
         z: [],
     };
     return colorSettings(plotSettings, plotData, mainPlotSettings);
+}
+
+// TODO: Add the ability to adjust the line settings via an additional selector
+function makeLinePlotData(data: SortablePlotData[]): Partial<PlotData>[] {
+    return data.map((lineData) => {
+        const lineTrace: Partial<PlotData> = {
+            x: lineData.x,
+            y: lineData.y,
+            ids: lineData.ids,
+            hoverinfo: "none",
+            showlegend: false,
+            type: "scattergl",
+            marker: undefined,
+            line: {
+                width: GENERAL_PLOT_SETTINGS.connectionLineWidth,
+                color: PALETTE.brightBlue,
+            },
+            mode: "lines",
+            z: [],
+        };
+        return lineTrace;
+    });
 }
 
 function makeHistogramPlotX(data: (number | null)[]) {
@@ -394,6 +511,9 @@ export const getScatterPlotDataArray = createSelector(
         ];
         if (selectedGroupPlotData) {
             data.push(makeScatterPlotData(selectedGroupPlotData, mainPlotSettings));
+        }
+        if (allPlotData.linePlotData) {
+            data.push(...makeLinePlotData(allPlotData.linePlotData));
         }
 
         return data;
