@@ -13,6 +13,7 @@ import {
 } from "../../containers/MainPlotContainer/selectors";
 
 import styles from "./style.css";
+import VisuallyHidden from "../VisuallyHidden";
 
 type ConnectByControlStateProps = {
     connectByFeature: string;
@@ -38,14 +39,23 @@ const enum ConnectByControlHtmlIds {
 
 function ConnectByControl(props: ConnectByControlProps): ReactElement {
     const showConnectionsCheckbox = (
-        <Checkbox
-            checked={props.showConnectedPoints}
-            onChange={(e) => props.handleSetShowConnectedPoints(e.target.checked)}
-        ></Checkbox>
+        <div>
+            <Checkbox
+                id={ConnectByControlHtmlIds.SHOW_CONNECTIONS_CHECKBOX}
+                checked={props.showConnectedPoints}
+                onChange={(e) => props.handleSetShowConnectedPoints(e.target.checked)}
+            ></Checkbox>
+            <VisuallyHidden>
+                <label htmlFor={ConnectByControlHtmlIds.SHOW_CONNECTIONS_CHECKBOX}>
+                    Show connecting lines between points
+                </label>
+            </VisuallyHidden>
+        </div>
     );
 
     const connectByCategoryDropdown = (
         <FeatureSelectDropdown
+            id={ConnectByControlHtmlIds.CONNECT_BY_CATEGORY_SELECT}
             value={props.connectByCategory}
             options={props.groupByMenuOptions}
             onChange={(v: string) => {
@@ -58,6 +68,7 @@ function ConnectByControl(props: ConnectByControlProps): ReactElement {
 
     const connectByFeatureDropdown = (
         <FeatureSelectDropdown
+            id={ConnectByControlHtmlIds.CONNECT_BY_FEATURE_SELECT}
             value={props.connectByFeature}
             options={props.featureMenuOptions}
             onChange={(v: string) => {

@@ -2,6 +2,7 @@ import { Select, Tooltip } from "antd";
 import { SelectProps, SelectValue } from "antd/es/select";
 import React from "react";
 import { MeasuredFeatureDef } from "../../state/metadata/types";
+import { X_AXIS_ID, Y_AXIS_ID } from "../../constants";
 
 import styles from "./style.css";
 
@@ -10,8 +11,11 @@ interface FeatureSelectDropdownProps {
     options: MeasuredFeatureDef[];
     tooltip: string;
     onChange: (value: string) => void;
-    classKey?: string;
+    /** Key of the CSS class, as named in the local `styles.css`, to use. */
+    classKey?: typeof X_AXIS_ID | typeof Y_AXIS_ID;
+    /** CSS classname. Overrides the `classKey` if provided. */
     className?: string;
+    id?: string;
 }
 
 export default class FeatureSelectDropdown extends React.Component<FeatureSelectDropdownProps> {
@@ -45,6 +49,7 @@ export default class FeatureSelectDropdown extends React.Component<FeatureSelect
             <div className={this.props.className ?? styles[classKey]}>
                 <Tooltip title={tooltip}>
                     <Select
+                        id={this.props.id}
                         onChange={this.handleChange}
                         value={selectedOptionLabel || value}
                         options={selectOptions}
