@@ -11,7 +11,6 @@ import { State } from "../../state";
 import { MeasuredFeatureDef } from "../../state/metadata/types";
 import selectionStateBranch from "../../state/selection";
 import { getFeatureDefTooltip } from "../../state/selection/selectors";
-import VisuallyHidden from "../VisuallyHidden";
 
 import styles from "./style.css";
 
