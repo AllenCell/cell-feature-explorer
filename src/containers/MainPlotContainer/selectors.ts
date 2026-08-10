@@ -190,6 +190,7 @@ export const getLinePlotData = createSelector(
         if (!showConnectedPoints) {
             return null;
         }
+        ({ xValues, yValues } = handleNullValues(xValues, yValues));
         const indicesByGroup: Map<number, number[]> = new Map();
 
         // Group data point indices by their category

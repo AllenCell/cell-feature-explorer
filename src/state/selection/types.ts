@@ -21,7 +21,7 @@ export interface SelectionStateBranch {
     groupBy: string;
     connectByCategory: string;
     connectByFeature: string;
-    showConnectedPoints: boolean;
+    showConnectLines: boolean;
     defaultColors: string[];
     colorOverrides: (string | undefined)[];
     pointRadius: number;
