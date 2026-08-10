@@ -41,7 +41,6 @@ import {
     getYValues,
     getMainPlotSettings,
     getFilteredConnectByFeatureValues,
-    getConnectByCategory,
     getShowConnectedPoints,
     getFilteredConnectByCategoryValues,
 } from "../../state/selection/selectors";
@@ -169,38 +168,6 @@ export const getMainPlotData = createSelector(
     }
 );
 
-type SortablePlotData = {
-    x: (number | null)[];
-    y: (number | null)[];
-    feature: (number | null)[];
-};
-
-function sortPlotDataByFeature(data: SortablePlotData): {
-    x: (number | null)[];
-    y: (number | null)[];
-    feature: (number | null)[];
-} {
-    const indices = Array.from(data.feature.keys());
-    const sortedIndices = indices.sort((aIndex, bIndex) => {
-        const a = data.feature[aIndex];
-        const b = data.feature[bIndex];
-        if (a === null && b === null) {
-            return 0;
-        } else if (a === null) {
-            return 1;
-        } else if (b === null) {
-            return -1;
-        }
-        return a - b;
-    });
-
-    return {
-        x: sortedIndices.map((i) => data.x[i]),
-        y: sortedIndices.map((i) => data.y[i]),
-        feature: sortedIndices.map((i) => data.feature[i]),
-    };
-}
-
 /**
  * Returns the data for the line plot trace. Points in the same category are
  * connected in the same line, sorted in order of the specified feature value.
@@ -236,8 +203,11 @@ export const getLinePlotData = createSelector(
             if (!indicesByGroup.has(category)) {
                 indicesByGroup.set(category, []);
             }
-            const indices = indicesByGroup.get(category)!;
-            indices.push(i);
+            const indices = indicesByGroup.get(category);
+            // should always be truthy
+            if (indices) {
+                indices.push(i);
+            }
         }
 
         // All line data is combined into a single x and y array, with each

@@ -1,4 +1,4 @@
-import { Checkbox, Row } from "antd";
+import { Checkbox } from "antd";
 import React, { ReactElement } from "react";
 import { connect } from "react-redux";
 
