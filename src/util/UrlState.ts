@@ -242,7 +242,7 @@ export default class UrlState {
         [URLSearchParam.plotByOnX]: (plotByOnX) => ({ [X_AXIS_ID]: String(plotByOnX) }),
         [URLSearchParam.plotByOnY]: (plotByOnY) => ({ [Y_AXIS_ID]: String(plotByOnY) }),
         [URLSearchParam.connectBy]: (connectBy) => ({
-            connectBy: connectBy === "true",
+            showConnectLines: connectBy === "true",
         }),
         [URLSearchParam.connectByCategory]: (key) => ({
             connectByCategory: String(key),
@@ -279,7 +279,7 @@ export default class UrlState {
         },
         [X_AXIS_ID]: (value) => ({ [URLSearchParam.plotByOnX]: String(value) }),
         [Y_AXIS_ID]: (value) => ({ [URLSearchParam.plotByOnY]: String(value) }),
-        connectBy: (value) => ({ [URLSearchParam.connectBy]: String(value) }),
+        showConnectLines: (value) => ({ [URLSearchParam.connectBy]: String(value) }),
         connectByCategory: (value) => ({ [URLSearchParam.connectByCategory]: String(value) }),
         connectByFeature: (value) => ({ [URLSearchParam.connectByFeature]: String(value) }),
         colorOverrides: (value: (string | undefined)[]) => ({

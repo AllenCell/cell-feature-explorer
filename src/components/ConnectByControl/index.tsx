@@ -82,11 +82,11 @@ function ConnectByControl(props: ConnectByControlProps): ReactElement {
     );
 }
 
-function mapStateToProps(state: any): ConnectByControlStateProps {
+function mapStateToProps(state: State): ConnectByControlStateProps {
     return {
         connectByFeature: state.selection.connectByFeature,
         connectByCategory: state.selection.connectByCategory,
-        showConnectedPoints: state.selection.showConnectedPoints,
+        showConnectedPoints: state.selection.showConnectLines,
         featureMenuOptions: getColorByDisplayOptions(state),
         groupByMenuOptions: getGroupByDisplayOptions(state),
     };
