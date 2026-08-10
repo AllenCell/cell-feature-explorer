@@ -2,18 +2,18 @@ import { Checkbox } from "antd";
 import React, { ReactElement } from "react";
 import { connect } from "react-redux";
 
-import { State } from "../../state";
-import { MeasuredFeatureDef } from "../../state/metadata/types";
-import selectionStateBranch from "../../state/selection";
-import FeatureSelectDropdown from "../FeatureSelectDropdown";
-import { getFeatureDefTooltip } from "../../state/selection/selectors";
 import {
     getColorByDisplayOptions,
     getGroupByDisplayOptions,
 } from "../../containers/MainPlotContainer/selectors";
+import FeatureSelectDropdown from "../FeatureSelectDropdown";
+import { State } from "../../state";
+import { MeasuredFeatureDef } from "../../state/metadata/types";
+import selectionStateBranch from "../../state/selection";
+import { getFeatureDefTooltip } from "../../state/selection/selectors";
+import VisuallyHidden from "../VisuallyHidden";
 
 import styles from "./style.css";
-import VisuallyHidden from "../VisuallyHidden";
 
 type ConnectByControlStateProps = {
     connectByFeature: string;

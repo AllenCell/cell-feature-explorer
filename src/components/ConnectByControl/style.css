@@ -7,6 +7,10 @@
 }
 
 .connect-by-dropdown {
+  /* 
+   * Force dropdowns to automatically size to take up available space,
+   * regardless of width of contents 
+  */
   flex-basis: 100px;
   flex-grow: 1;
   flex-shrink: 1;
