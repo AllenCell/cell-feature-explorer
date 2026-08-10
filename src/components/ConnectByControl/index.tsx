@@ -45,11 +45,6 @@ function ConnectByControl(props: ConnectByControlProps): ReactElement {
                 checked={props.showConnectedPoints}
                 onChange={(e) => props.handleSetShowConnectedPoints(e.target.checked)}
             ></Checkbox>
-            <VisuallyHidden>
-                <label htmlFor={ConnectByControlHtmlIds.SHOW_CONNECTIONS_CHECKBOX}>
-                    Show connecting lines between points
-                </label>
-            </VisuallyHidden>
         </div>
     );
 
@@ -81,8 +76,9 @@ function ConnectByControl(props: ConnectByControlProps): ReactElement {
 
     return (
         <div className={styles.connectByRow}>
-            {showConnectionsCheckbox} Connect {connectByCategoryDropdown} by{" "}
-            {connectByFeatureDropdown}
+            {showConnectionsCheckbox}{" "}
+            <label htmlFor={ConnectByControlHtmlIds.SHOW_CONNECTIONS_CHECKBOX}>Connect</label>
+            {connectByCategoryDropdown} by {connectByFeatureDropdown}
         </div>
     );
 }

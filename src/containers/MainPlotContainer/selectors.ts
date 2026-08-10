@@ -171,8 +171,6 @@ export const getMainPlotData = createSelector(
 /**
  * Returns the data for the line plot trace. Points in the same category are
  * connected in the same line, sorted in order of the specified feature value.
- * All line points are returned in a single trace, with null values separating
- * the lines for each category.
  */
 export const getLinePlotData = createSelector(
     [
@@ -188,7 +186,7 @@ export const getLinePlotData = createSelector(
         connectByCategoryValues,
         connectByFeatureValues,
         showConnectedPoints
-    ): LinePlotData | null => {
+    ): LinePlotData[] | null => {
         if (!showConnectedPoints) {
             return null;
         }
@@ -215,10 +213,11 @@ export const getLinePlotData = createSelector(
 
         // TODO: Separate out the line traces if the category coloring should
         // be applied
-        const lineX: (number | null)[] = [];
-        const lineY: (number | null)[] = [];
 
+        const lineData: LinePlotData[] = [];
         for (const indices of indicesByGroup.values()) {
+            const x: (number | null)[] = [];
+            const y: (number | null)[] = [];
             // Sort each category's data by the feature values.
             indices.sort((aIndex, bIndex) => {
                 const a = connectByFeatureValues[aIndex] ?? Infinity;
@@ -226,14 +225,13 @@ export const getLinePlotData = createSelector(
                 return a - b;
             });
             for (const i of indices) {
-                lineX.push(xValues[i]);
-                lineY.push(yValues[i]);
+                x.push(xValues[i]);
+                y.push(yValues[i]);
             }
-            lineX.push(null);
-            lineY.push(null);
+            lineData.push({ x: x, y: y });
         }
 
-        return { x: lineX, y: lineY };
+        return lineData;
     }
 );
 
@@ -286,11 +284,11 @@ export const composePlotlyData = createSelector(
         mainPlotDataValues: ContinuousPlotData | GroupedPlotData,
         applyColorToSelections,
         selectedGroups,
-        connectionLineData
+        linePlotData
     ): {
         mainPlotData: ContinuousPlotData | GroupedPlotData;
         selectedGroupPlotData: ContinuousPlotData | null;
-        linePlotData: LinePlotData | null;
+        linePlotData: LinePlotData[] | null;
     } => {
         const mainPlotData = {
             ...mainPlotDataValues,
@@ -313,11 +311,10 @@ export const composePlotlyData = createSelector(
                   plotName: SELECTIONS_PLOT_NAME,
               }
             : null;
-        console.log("connectionLineData", connectionLineData);
         return {
             mainPlotData,
             selectedGroupPlotData,
-            linePlotData: connectionLineData,
+            linePlotData,
         };
     }
 );
@@ -392,13 +389,12 @@ function makeLinePlotTrace(data: LinePlotData): Partial<PlotData> {
     return {
         type: "scattergl",
         mode: "lines",
-        name: "connection lines",
         hoverinfo: "skip",
         x: data.x,
         y: data.y,
         showlegend: false,
         line: {
-            width: 1,
+            width: GENERAL_PLOT_SETTINGS.connectionLineWidth,
             color: PALETTE.mediumDarkGray,
         },
     };
@@ -480,7 +476,7 @@ export const getScatterPlotDataArray = createSelector(
     [composePlotlyData, getMainPlotSettings],
     (allPlotData, mainPlotSettings): Partial<PlotData>[] => {
         const { mainPlotData, selectedGroupPlotData } = allPlotData;
-        const data = [
+        let data = [
             makeHistogramPlotX(mainPlotData.x),
             makeHistogramPlotY(mainPlotData.y),
             makeScatterPlotData(mainPlotData, mainPlotSettings),
@@ -489,7 +485,7 @@ export const getScatterPlotDataArray = createSelector(
             data.push(makeScatterPlotData(selectedGroupPlotData, mainPlotSettings));
         }
         if (allPlotData.linePlotData) {
-            data.unshift(makeLinePlotTrace(allPlotData.linePlotData));
+            data = [...allPlotData.linePlotData.map(makeLinePlotTrace), ...data];
         }
 
         return data;
