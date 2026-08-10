@@ -1027,6 +1027,10 @@ div.ant-modal-mask.ant-modal-mask {
 }
 
 .style__connect-by-dropdown--CvOEJ {
+  /* 
+   * Force dropdowns to automatically size to take up available space,
+   * regardless of width of contents 
+  */
   flex-basis: 100px;
   flex-grow: 1;
   flex-shrink: 1;
