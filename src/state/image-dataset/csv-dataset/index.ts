@@ -479,6 +479,7 @@ class CsvRequest implements ImageDataset {
             defaultYAxis: this.getFeatureKeyClamped(featureKeys, 1),
             defaultColorBy: this.defaultGroupByFeatureKey,
             defaultGroupBy: this.defaultGroupByFeatureKey,
+            // Attempt to find a feature representing time for line drawing.
             defaultConnectBy:
                 this.getFeatureKeysByTerm(featureKeys, "time") ||
                 this.getFeatureKeysByTerm(featureKeys, "frame") ||

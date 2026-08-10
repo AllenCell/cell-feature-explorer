@@ -200,7 +200,7 @@ export default class UrlState {
             toggleGallery(galleryCollapsed === "true"),
         [URLSearchParam.plotByOnX]: (plotByOnX) => changeAxis(X_AXIS_ID, String(plotByOnX)),
         [URLSearchParam.plotByOnY]: (plotByOnY) => changeAxis(Y_AXIS_ID, String(plotByOnY)),
-        [URLSearchParam.connectBy]: (connectBy) => setShowConnectLines(Number(connectBy) === 1),
+        [URLSearchParam.connectBy]: (connectBy) => setShowConnectLines(connectBy === "true"),
         [URLSearchParam.connectByCategory]: (connectByCategory) =>
             changeConnectByCategory(String(connectByCategory)),
         [URLSearchParam.connectByFeature]: (connectByFeature) =>
@@ -242,7 +242,7 @@ export default class UrlState {
         [URLSearchParam.plotByOnX]: (plotByOnX) => ({ [X_AXIS_ID]: String(plotByOnX) }),
         [URLSearchParam.plotByOnY]: (plotByOnY) => ({ [Y_AXIS_ID]: String(plotByOnY) }),
         [URLSearchParam.connectBy]: (connectBy) => ({
-            connectBy: Number(connectBy) === 1,
+            connectBy: connectBy === "true",
         }),
         [URLSearchParam.connectByCategory]: (key) => ({
             connectByCategory: String(key),
@@ -279,7 +279,7 @@ export default class UrlState {
         },
         [X_AXIS_ID]: (value) => ({ [URLSearchParam.plotByOnX]: String(value) }),
         [Y_AXIS_ID]: (value) => ({ [URLSearchParam.plotByOnY]: String(value) }),
-        connectBy: (value) => ({ [URLSearchParam.connectBy]: value ? "1" : "0" }),
+        connectBy: (value) => ({ [URLSearchParam.connectBy]: String(value) }),
         connectByCategory: (value) => ({ [URLSearchParam.connectByCategory]: String(value) }),
         connectByFeature: (value) => ({ [URLSearchParam.connectByFeature]: String(value) }),
         colorOverrides: (value: (string | undefined)[]) => ({

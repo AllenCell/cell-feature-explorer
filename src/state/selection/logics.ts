@@ -113,6 +113,7 @@ const changeDatasetLogic = createLogic({
                     actions.push(changeConnectByFeature(selections.defaultConnectBy));
                 }
                 if (!featureKeys.has(state.selection.connectByCategory)) {
+                    // Default to the groupBy feature for connectByCategory
                     actions.push(changeConnectByCategory(selections.defaultGroupBy));
                 }
                 if (!featureKeys.has(state.selection.colorBy) && selections.defaultColorBy) {
