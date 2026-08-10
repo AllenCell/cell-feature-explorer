@@ -192,7 +192,7 @@ export const getLinePlotData = createSelector(
         }
         const indicesByGroup: Map<number, number[]> = new Map();
 
-        // Group data points by their category
+        // Group data point indices by their category
         for (let i = 0; i < connectByCategoryValues.length; i++) {
             const category = connectByCategoryValues[i];
             if (category === null) {
@@ -202,17 +202,10 @@ export const getLinePlotData = createSelector(
                 indicesByGroup.set(category, []);
             }
             const indices = indicesByGroup.get(category);
-            // should always be truthy
             if (indices) {
                 indices.push(i);
             }
         }
-
-        // All line data is combined into a single x and y array, with each
-        // category separated by null values.
-
-        // TODO: Separate out the line traces if the category coloring should
-        // be applied
 
         const lineData: LinePlotData[] = [];
         for (const indices of indicesByGroup.values()) {
