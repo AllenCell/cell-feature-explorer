@@ -3,7 +3,7 @@ export { default as UrlState } from "./UrlState";
 const ALLEN_FILE_PREFIX = "/allen/";
 const ALLEN_PREFIX_TO_HTTPS: Record<string, string> = {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    "/allen/aics/": "https://dev-aics-dtp-001.int.allencell.org/",
+    "/allen/aics/": "https://vast-files.int.allencell.org/",
 };
 
 const URL_REGEX = /^(https?:\/\/)/;
