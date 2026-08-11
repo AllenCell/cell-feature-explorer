@@ -41,7 +41,7 @@ import {
     getYValues,
     getMainPlotSettings,
     getFilteredConnectByFeatureValues,
-    getShowConnectedPoints,
+    getShowConnectLines,
     getFilteredConnectByCategoryValues,
 } from "../../state/selection/selectors";
 import { MainPlotSettings, SelectedPointData, TickConversion } from "../../state/selection/types";
@@ -178,7 +178,7 @@ export const getLinePlotData = createSelector(
         getFilteredYValues,
         getFilteredConnectByCategoryValues,
         getFilteredConnectByFeatureValues,
-        getShowConnectedPoints,
+        getShowConnectLines,
     ],
     (
         xValues,
