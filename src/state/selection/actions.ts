@@ -61,6 +61,9 @@ import {
     SetColorOverrideAction,
     SetColorOverridesAction,
     SetCsvUrlAction,
+    SetLineAverageWindowAction,
+    SetLineDefaultColorAction,
+    SetLineWidthAction,
     SetPointOpacityAction,
     SetPointRadiusAction,
     SyncStateWithURLAction,
@@ -102,21 +105,21 @@ export function setShowConnectLines(payload: boolean): BoolToggleAction {
     };
 }
 
-export function setConnectLineMovingAverageWindow(payload: number): ChangeSelectionAction {
+export function setConnectLineAverageWindow(payload: number): SetLineAverageWindowAction {
     return {
-        payload: payload.toString(),
+        payload,
         type: SET_CONNECT_LINE_MOVING_AVERAGE_WINDOW,
     };
 }
 
-export function setConnectLineWidth(payload: number): ChangeSelectionAction {
+export function setConnectLineWidth(payload: number): SetLineWidthAction {
     return {
-        payload: payload.toString(),
+        payload,
         type: SET_CONNECT_LINE_WIDTH,
     };
 }
 
-export function setConnectLineDefaultColor(payload: string): ChangeSelectionAction {
+export function setConnectLineDefaultColor(payload: string): SetLineDefaultColorAction {
     return {
         payload,
         type: SET_CONNECT_LINE_DEFAULT_COLOR,
