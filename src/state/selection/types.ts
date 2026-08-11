@@ -22,6 +22,9 @@ export interface SelectionStateBranch {
     connectByCategory: string;
     connectByFeature: string;
     showConnectLines: boolean;
+    connectLineMovingAverageWindow: number;
+    connectLineWidth: number;
+    connectLineDefaultColor: string;
     defaultColors: string[];
     colorOverrides: (string | undefined)[];
     pointRadius: number;

@@ -33,6 +33,9 @@ import {
     CHANGE_CONNECT_BY_CATEGORY,
     CHANGE_CONNECT_BY_FEATURE,
     SET_SHOW_CONNECT_LINES,
+    SET_CONNECT_LINE_MOVING_AVERAGE_WINDOW,
+    SET_CONNECT_LINE_WIDTH,
+    SET_CONNECT_LINE_DEFAULT_COLOR,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -96,6 +99,27 @@ export function setShowConnectLines(payload: boolean): BoolToggleAction {
     return {
         payload,
         type: SET_SHOW_CONNECT_LINES,
+    };
+}
+
+export function setConnectLineMovingAverageWindow(payload: number): ChangeSelectionAction {
+    return {
+        payload: payload.toString(),
+        type: SET_CONNECT_LINE_MOVING_AVERAGE_WINDOW,
+    };
+}
+
+export function setConnectLineWidth(payload: number): ChangeSelectionAction {
+    return {
+        payload: payload.toString(),
+        type: SET_CONNECT_LINE_WIDTH,
+    };
+}
+
+export function setConnectLineDefaultColor(payload: string): ChangeSelectionAction {
+    return {
+        payload,
+        type: SET_CONNECT_LINE_DEFAULT_COLOR,
     };
 }
 
