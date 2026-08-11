@@ -47,6 +47,8 @@ import {
     getXAxisRange,
     getYAxisRange,
     getAnnotations,
+    getConnectByDisplayName,
+    getFormattedHoveredLineValue,
 } from "./selectors";
 import { getFeatureDefTooltip } from "../../state/selection/selectors";
 import { formatThumbnailSrc } from "../../state/util";
@@ -66,11 +68,13 @@ interface PropsFromState {
     hoveredPointData: SelectedPointData | null;
     hoveredXValue: string;
     hoveredYValue: string;
+    hoveredLineValue: string;
     mousePosition: MousePosition;
     plotDataArray: any;
     thumbnailRoot: string;
     xDisplayName: string;
     yDisplayName: string;
+    connectByDisplayName: string;
     xDropDownValue: string;
     yDropDownValue: string;
     yDropDownOptions: MeasuredFeatureDef[];
@@ -203,6 +207,7 @@ class MainPlotContainer extends React.Component<MainPlotContainerProps, MainPlot
                     srcPath: point.customdata.srcPath,
                     xValue: point.x,
                     yValue: point.y,
+                    connectByValue: point.customdata.connectByFeature,
                 });
                 this.loadThumbnailForZarr(point.id, point.customdata.srcPath);
             } else {
@@ -251,6 +256,8 @@ class MainPlotContainer extends React.Component<MainPlotContainerProps, MainPlot
             yDisplayName,
             hoveredXValue,
             hoveredYValue,
+            connectByDisplayName,
+            hoveredLineValue,
         } = this.props;
         let thumbnailSrc: string | undefined = formatThumbnailSrc(
             thumbnailRoot,
@@ -273,6 +280,8 @@ class MainPlotContainer extends React.Component<MainPlotContainerProps, MainPlot
                     xValue={hoveredXValue}
                     yLabel={yDisplayName}
                     yValue={hoveredYValue}
+                    lineLabel={connectByDisplayName}
+                    lineValue={hoveredLineValue}
                 />
             )
         );
@@ -383,6 +392,8 @@ function mapStateToProps(state: State): PropsFromState {
         thumbnailRoot: selectionStateBranch.selectors.getThumbnailRoot(state),
         xDisplayName: getXDisplayName(state),
         yDisplayName: getYDisplayName(state),
+        connectByDisplayName: getConnectByDisplayName(state),
+        hoveredLineValue: getFormattedHoveredLineValue(state),
         xDropDownOptions: getXDisplayOptions(state),
         xDropDownValue: selectionStateBranch.selectors.getPlotByOnX(state),
         xTickConversion: getXTickConversion(state),
