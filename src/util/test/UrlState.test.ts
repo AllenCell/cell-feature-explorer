@@ -8,6 +8,9 @@ import {
     selectCellFor3DViewer,
     selectPoint,
     setColorOverrides,
+    setConnectLineDefaultColor,
+    setConnectLineMovingAverageWindow,
+    setConnectLineWidth,
     setShowConnectLines,
 } from "../../state/selection/actions";
 
@@ -29,6 +32,9 @@ describe("UrlState utility class", () => {
                     [URLSearchParam.connectBy]: "false",
                     [URLSearchParam.connectByCategory]: "feature_a",
                     [URLSearchParam.connectByFeature]: "feature_b",
+                    [URLSearchParam.connectLineDefaultColor]: "#ff0000",
+                    [URLSearchParam.connectLineMovingAverageWindow]: "3",
+                    [URLSearchParam.connectLineWidth]: "2",
                 })
             ).to.deep.equal({
                 cellSelectedFor3D: "2",
@@ -40,6 +46,9 @@ describe("UrlState utility class", () => {
                 showConnectLines: false,
                 connectByCategory: "feature_a",
                 connectByFeature: "feature_b",
+                connectLineDefaultColor: "#ff0000",
+                connectLineMovingAverageWindow: 3,
+                connectLineWidth: 2,
             });
         });
 
@@ -131,6 +140,9 @@ describe("UrlState utility class", () => {
                     [URLSearchParam.connectBy]: "true",
                     [URLSearchParam.connectByCategory]: "feature_a",
                     [URLSearchParam.connectByFeature]: "feature_b",
+                    [URLSearchParam.connectLineDefaultColor]: "#ff00ff",
+                    [URLSearchParam.connectLineMovingAverageWindow]: "5",
+                    [URLSearchParam.connectLineWidth]: "1.5",
                 })
             )
                 .to.be.an("array")
@@ -149,6 +161,9 @@ describe("UrlState utility class", () => {
                     setShowConnectLines(true),
                     changeConnectByCategory("feature_a"),
                     changeConnectByFeature("feature_b"),
+                    setConnectLineDefaultColor("#ff00ff"),
+                    setConnectLineMovingAverageWindow(5),
+                    setConnectLineWidth(1.5),
                 ]);
         });
 
@@ -181,6 +196,9 @@ describe("UrlState utility class", () => {
                 connectByCategory: "feature_a",
                 connectByFeature: "feature_b",
                 showConnectLines: true,
+                connectLineMovingAverageWindow: 3,
+                connectLineWidth: 2,
+                connectLineDefaultColor: "#ff00ff",
             };
             expect(UrlState.toUrlSearchParameterMap(selections)).to.deep.equal({
                 [URLSearchParam.cellSelectedFor3D]: "10",
@@ -192,6 +210,9 @@ describe("UrlState utility class", () => {
                 [URLSearchParam.connectBy]: "true",
                 [URLSearchParam.connectByCategory]: "feature_a",
                 [URLSearchParam.connectByFeature]: "feature_b",
+                [URLSearchParam.connectLineMovingAverageWindow]: "3",
+                [URLSearchParam.connectLineWidth]: "2",
+                [URLSearchParam.connectLineDefaultColor]: "#ff00ff",
             });
         });
 
