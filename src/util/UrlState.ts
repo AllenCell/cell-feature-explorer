@@ -33,7 +33,7 @@ import {
     selectPoint,
     setColorOverrides,
     setConnectLineDefaultColor,
-    setConnectLineMovingAverageWindow,
+    setConnectLineAverageWindow,
     setConnectLineWidth,
     setCsvUrl,
     setPointOpacity,
@@ -213,7 +213,7 @@ export default class UrlState {
         [URLSearchParam.connectByFeature]: (connectByFeature) =>
             changeConnectByFeature(String(connectByFeature)),
         [URLSearchParam.connectLineMovingAverageWindow]: (window) =>
-            setConnectLineMovingAverageWindow(Number(window)),
+            setConnectLineAverageWindow(Number(window)),
         [URLSearchParam.connectLineWidth]: (width) => setConnectLineWidth(Number(width)),
         [URLSearchParam.connectLineDefaultColor]: (color) =>
             setConnectLineDefaultColor(String(color)),

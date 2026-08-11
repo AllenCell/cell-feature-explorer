@@ -9,7 +9,7 @@ import {
     selectPoint,
     setColorOverrides,
     setConnectLineDefaultColor,
-    setConnectLineMovingAverageWindow,
+    setConnectLineAverageWindow,
     setConnectLineWidth,
     setShowConnectLines,
 } from "../../state/selection/actions";
@@ -162,7 +162,7 @@ describe("UrlState utility class", () => {
                     changeConnectByCategory("feature_a"),
                     changeConnectByFeature("feature_b"),
                     setConnectLineDefaultColor("#ff00ff"),
-                    setConnectLineMovingAverageWindow(5),
+                    setConnectLineAverageWindow(5),
                     setConnectLineWidth(1.5),
                 ]);
         });
