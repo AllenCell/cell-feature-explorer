@@ -107,7 +107,7 @@ export const initialState: SelectionStateBranch = {
     /** Opacity of points in the plot, in the [0, 1] range. */
     pointOpacity: 0.5,
     connectLineMovingAverageWindow: 1,
-    connectLineWidth: 1,
+    connectLineWidth: 1.5,
     connectLineDefaultColor: "#808080",
     selectedAlbum: INITIAL_SELECTED_ALBUM_ID,
     selectedAlbumFileInfo: [] as FileInfo[],

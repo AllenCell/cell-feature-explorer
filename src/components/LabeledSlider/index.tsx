@@ -1,10 +1,10 @@
 import { InputNumber, Row } from "antd";
 import Slider, { SliderSingleProps } from "antd/es/slider";
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, ReactNode, useEffect, useState } from "react";
 
 type LabeledSliderProps = {
     sliderProps: SliderSingleProps;
-    label: string;
+    label: string | ReactNode;
     labelWidth?: string;
     id?: string;
     inputMax?: number;
@@ -25,7 +25,8 @@ export default function LabeledSlider(props: LabeledSliderProps): ReactElement {
         }
     };
 
-    const inputId = props.id || `labeled-slider-${props.label.toLowerCase().replace(/\s+/g, "-")}`;
+    const inputId =
+        props.id || `labeled-slider-${props.label?.toString().toLowerCase().replace(/\s+/g, "-")}`;
 
     useEffect(() => {
         setInputValue(props.sliderProps.value);
@@ -43,7 +44,10 @@ export default function LabeledSlider(props: LabeledSliderProps): ReactElement {
             }}
             wrap={false}
         >
-            <label htmlFor={inputId} style={{ width: props.labelWidth }}>
+            <label
+                htmlFor={inputId}
+                style={{ width: props.labelWidth, flexBasis: props.labelWidth, flexShrink: 0 }}
+            >
                 {props.label}
             </label>
 
@@ -61,7 +65,7 @@ export default function LabeledSlider(props: LabeledSliderProps): ReactElement {
                 onBlur={onConfirmInputValue}
             ></InputNumber>
 
-            <div style={{ width: "100%" }} ref={containerRef}>
+            <div style={{ width: "100%", flexGrow: 1, flexShrink: 1 }} ref={containerRef}>
                 <Slider
                     {...props.sliderProps}
                     tooltip={{
