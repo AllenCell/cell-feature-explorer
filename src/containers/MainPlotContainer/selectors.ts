@@ -43,6 +43,7 @@ import {
     getFilteredConnectByFeatureValues,
     getShowConnectLines,
     getFilteredConnectByCategoryValues,
+    getLineMovingAverageWindow,
 } from "../../state/selection/selectors";
 import { MainPlotSettings, SelectedPointData, TickConversion } from "../../state/selection/types";
 import {
@@ -225,6 +226,7 @@ export const getLinePlotData = createSelector(
         getFilteredConnectByCategoryValues,
         getFilteredConnectByFeatureValues,
         getShowConnectLines,
+        getLineMovingAverageWindow,
     ],
     calculateLinePlotData
 );
@@ -234,7 +236,8 @@ export function calculateLinePlotData(
     yValues: (number | null)[],
     connectByCategoryValues: (number | null)[],
     connectByFeatureValues: (number | null)[],
-    showConnectingLines: boolean
+    showConnectingLines: boolean,
+    movingAverageWindow: number
 ): LinePlotData[] | null {
     if (!showConnectingLines) {
         return null;
@@ -272,6 +275,14 @@ export function calculateLinePlotData(
             y.push(yValues[i]);
         }
         lineData.push({ x: x, y: y });
+    }
+
+    // Apply moving average to each line
+    if (movingAverageWindow > 1) {
+        for (const line of lineData) {
+            line.y = getMovingAverage(line.y, movingAverageWindow);
+            line.x = getMovingAverage(line.x, movingAverageWindow);
+        }
     }
 
     return lineData;
@@ -427,7 +438,7 @@ function makeScatterPlotData(
 }
 
 // TODO: Add the ability to adjust the line settings via an additional selector
-function makeLinePlotTrace(data: LinePlotData): Partial<PlotData> {
+function makeLinePlotTrace(data: LinePlotData, settings: MainPlotSettings): Partial<PlotData> {
     return {
         type: "scattergl",
         mode: "lines",
@@ -436,8 +447,8 @@ function makeLinePlotTrace(data: LinePlotData): Partial<PlotData> {
         y: data.y,
         showlegend: false,
         line: {
-            width: GENERAL_PLOT_SETTINGS.connectionLineWidth,
-            color: PALETTE.mediumDarkGray,
+            width: settings.connectionLineWidth,
+            color: settings.connectionLineDefaultColor,
         },
     };
 }
@@ -518,19 +529,22 @@ export const getScatterPlotDataArray = createSelector(
     [composePlotlyData, getMainPlotSettings],
     (allPlotData, mainPlotSettings): Partial<PlotData>[] => {
         const { mainPlotData, selectedGroupPlotData } = allPlotData;
-        let data = [
+        let traces = [
             makeHistogramPlotX(mainPlotData.x),
             makeHistogramPlotY(mainPlotData.y),
             makeScatterPlotData(mainPlotData, mainPlotSettings),
         ];
         if (selectedGroupPlotData) {
-            data.push(makeScatterPlotData(selectedGroupPlotData, mainPlotSettings));
+            traces.push(makeScatterPlotData(selectedGroupPlotData, mainPlotSettings));
         }
         if (allPlotData.linePlotData) {
-            data = [...allPlotData.linePlotData.map(makeLinePlotTrace), ...data];
+            const lineTraces = allPlotData.linePlotData.map((line) =>
+                makeLinePlotTrace(line, mainPlotSettings)
+            );
+            traces = [...lineTraces, ...traces];
         }
 
-        return data;
+        return traces;
     }
 );
 

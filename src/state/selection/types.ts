@@ -223,6 +223,21 @@ export interface SetColorOverridesAction {
     type: string;
 }
 
+export interface SetLineAverageWindowAction {
+    payload: number;
+    type: string;
+}
+
+export interface SetLineWidthAction {
+    payload: number;
+    type: string;
+}
+
+export interface SetLineDefaultColorAction {
+    payload: string;
+    type: string;
+}
+
 export interface SetPointRadiusAction {
     payload: number;
     type: string;
