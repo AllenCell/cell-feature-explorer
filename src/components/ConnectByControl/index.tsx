@@ -9,7 +9,6 @@ import {
 import FeatureSelectDropdown from "../FeatureSelectDropdown";
 import { State } from "../../state";
 import { MeasuredFeatureDef } from "../../state/metadata/types";
-import selectionStateBranch from "../../state/selection";
 import {
     getConnectByCategory,
     getConnectByFeature,
@@ -18,11 +17,16 @@ import {
 } from "../../state/selection/selectors";
 
 import styles from "./style.css";
+import {
+    changeConnectByCategory,
+    changeConnectByFeature,
+    setShowConnectLines,
+} from "../../state/selection/actions";
 
 type ConnectByControlStateProps = {
     connectByFeature: string;
     connectByCategory: string;
-    showConnectedPoints: boolean;
+    showConnectLines: boolean;
     featureMenuOptions: MeasuredFeatureDef[];
     groupByMenuOptions: MeasuredFeatureDef[];
 };
@@ -30,7 +34,7 @@ type ConnectByControlStateProps = {
 type ConnectByControlDispatchProps = {
     handleChangeConnectByFeature: (feature: string) => void;
     handleChangeConnectByCategory: (category: string) => void;
-    handleSetShowConnectedPoints: (visible: boolean) => void;
+    handleSetShowConnectLines: (visible: boolean) => void;
 };
 
 type ConnectByControlProps = ConnectByControlStateProps & ConnectByControlDispatchProps;
@@ -46,8 +50,8 @@ function ConnectByControl(props: ConnectByControlProps): ReactElement {
         <div>
             <Checkbox
                 id={ConnectByControlHtmlIds.SHOW_CONNECTIONS_CHECKBOX}
-                checked={props.showConnectedPoints}
-                onChange={(e) => props.handleSetShowConnectedPoints(e.target.checked)}
+                checked={props.showConnectLines}
+                onChange={(e) => props.handleSetShowConnectLines(e.target.checked)}
             ></Checkbox>
         </div>
     );
@@ -91,16 +95,16 @@ function mapStateToProps(state: State): ConnectByControlStateProps {
     return {
         connectByFeature: getConnectByFeature(state),
         connectByCategory: getConnectByCategory(state),
-        showConnectedPoints: getShowConnectLines(state),
+        showConnectLines: getShowConnectLines(state),
         featureMenuOptions: getColorByDisplayOptions(state),
         groupByMenuOptions: getGroupByDisplayOptions(state),
     };
 }
 
 const dispatchToProps: ConnectByControlDispatchProps = {
-    handleChangeConnectByFeature: selectionStateBranch.actions.changeConnectByFeature,
-    handleChangeConnectByCategory: selectionStateBranch.actions.changeConnectByCategory,
-    handleSetShowConnectedPoints: selectionStateBranch.actions.setShowConnectLines,
+    handleChangeConnectByFeature: changeConnectByFeature,
+    handleChangeConnectByCategory: changeConnectByCategory,
+    handleSetShowConnectLines: setShowConnectLines,
 };
 
 export default connect<ConnectByControlStateProps, ConnectByControlDispatchProps, unknown, State>(
