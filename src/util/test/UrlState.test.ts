@@ -146,7 +146,7 @@ describe("UrlState utility class", () => {
                 })
             )
                 .to.be.an("array")
-                .of.length(13)
+                .of.length(16)
                 .and.to.have.deep.members([
                     selectCellFor3DViewer({ id: "2" }),
                     changeAxis(X_AXIS_ID, "feature_x"),

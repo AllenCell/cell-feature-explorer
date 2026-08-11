@@ -62,6 +62,7 @@ const PlotSettings = (props: PlotSettingsProps): ReactElement => {
                         <InlineHint title="Total number of points to average over, including past and future." />
                     </div>
                 }
+                id={"line-average-window-input"}
                 labelWidth={props.labelWidth}
                 sliderProps={{
                     value: lineAverageWindow,
@@ -79,7 +80,7 @@ const PlotSettings = (props: PlotSettingsProps): ReactElement => {
                 sliderProps={{
                     value: lineWidth,
                     onChange: setLineWidth,
-                    min: 0,
+                    min: 0.1,
                     max: 3.5,
                     step: 0.1,
                     marks: { 1.5: <></> },

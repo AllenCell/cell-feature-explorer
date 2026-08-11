@@ -203,6 +203,7 @@ const actionToConfigMap: TypeToDescriptionMap = {
             if (!Number.isFinite(windowSize) || windowSize < 1) {
                 return state;
             }
+            // Round to next odd integer
             windowSize = Math.round(windowSize);
             const nextOddInteger = Math.floor(windowSize / 2) * 2 + 1;
             return { ...state, connectLineMovingAverageWindow: nextOddInteger };
