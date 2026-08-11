@@ -116,7 +116,7 @@ export const handleNullValues = (
 export function getMovingAverage(
     values: (number | null)[] | Uint32Array | Float32Array,
     windowSize: number,
-    includeEnds: boolean = false
+    includeEnds = false
 ): number[] {
     // Number of values forward and backwards to include in the average.
     // For a window size of 7, the window offset will be 3.

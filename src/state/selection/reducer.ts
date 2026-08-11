@@ -195,7 +195,10 @@ const actionToConfigMap: TypeToDescriptionMap = {
     [SET_CONNECT_LINE_MOVING_AVERAGE_WINDOW]: {
         accepts: (action: Action): action is SetLineAverageWindowAction =>
             action.type === SET_CONNECT_LINE_MOVING_AVERAGE_WINDOW,
-        perform: (state: SelectionStateBranch, action: SetLineAverageWindowAction) => {
+        perform: (
+            state: SelectionStateBranch,
+            action: SetLineAverageWindowAction
+        ): SelectionStateBranch => {
             let windowSize = action.payload;
             if (!Number.isFinite(windowSize) || windowSize < 1) {
                 return state;
@@ -208,9 +211,12 @@ const actionToConfigMap: TypeToDescriptionMap = {
     [SET_CONNECT_LINE_WIDTH]: {
         accepts: (action: Action): action is SetLineWidthAction =>
             action.type === SET_CONNECT_LINE_WIDTH,
-        perform: (state: SelectionStateBranch, action: SetLineWidthAction) => {
-            let lineWidth = action.payload;
-            if (!Number.isFinite(lineWidth) || lineWidth < 1) {
+        perform: (
+            state: SelectionStateBranch,
+            action: SetLineWidthAction
+        ): SelectionStateBranch => {
+            const lineWidth = action.payload;
+            if (!Number.isFinite(lineWidth) || lineWidth < 0) {
                 return state;
             }
             return { ...state, connectLineWidth: lineWidth };
@@ -219,7 +225,10 @@ const actionToConfigMap: TypeToDescriptionMap = {
     [SET_CONNECT_LINE_DEFAULT_COLOR]: {
         accepts: (action: Action): action is SetLineDefaultColorAction =>
             action.type === SET_CONNECT_LINE_DEFAULT_COLOR,
-        perform: (state: SelectionStateBranch, action: SetLineDefaultColorAction) => ({
+        perform: (
+            state: SelectionStateBranch,
+            action: SetLineDefaultColorAction
+        ): SelectionStateBranch => ({
             ...state,
             connectLineDefaultColor: action.payload,
         }),
