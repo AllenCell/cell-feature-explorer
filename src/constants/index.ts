@@ -65,6 +65,7 @@ export const GENERAL_PLOT_SETTINGS = {
     chartParent: "ace-scatter-chart",
     circleRadius: 4,
     connectionLineWidth: 1,
+    connectionLineDefaultColor: BASE_PALETTE_COLORS.mediumDarkGray as string,
     histogramColor: BASE_PALETTE_COLORS.lightGray,
     legend: {
         font: {

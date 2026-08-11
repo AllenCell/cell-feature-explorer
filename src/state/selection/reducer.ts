@@ -40,6 +40,9 @@ import {
     CHANGE_CONNECT_BY_CATEGORY,
     CHANGE_CONNECT_BY_FEATURE,
     SET_SHOW_CONNECT_LINES,
+    SET_CONNECT_LINE_MOVING_AVERAGE_WINDOW,
+    SET_CONNECT_LINE_WIDTH,
+    SET_CONNECT_LINE_DEFAULT_COLOR,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -65,6 +68,9 @@ import {
     SetColorOverrideAction,
     SetColorOverridesAction,
     SetCsvUrlAction,
+    SetLineAverageWindowAction,
+    SetLineDefaultColorAction,
+    SetLineWidthAction,
     SetPointOpacityAction,
     SetPointRadiusAction,
     SetShowConnectLines,
@@ -184,6 +190,38 @@ const actionToConfigMap: TypeToDescriptionMap = {
         ): SelectionStateBranch => ({
             ...state,
             showConnectLines: action.payload,
+        }),
+    },
+    [SET_CONNECT_LINE_MOVING_AVERAGE_WINDOW]: {
+        accepts: (action: Action): action is SetLineAverageWindowAction =>
+            action.type === SET_CONNECT_LINE_MOVING_AVERAGE_WINDOW,
+        perform: (state: SelectionStateBranch, action: SetLineAverageWindowAction) => {
+            let windowSize = action.payload;
+            if (!Number.isFinite(windowSize) || windowSize < 1) {
+                return state;
+            }
+            windowSize = Math.round(windowSize);
+            const nextOddInteger = Math.floor(windowSize / 2) * 2 + 1;
+            return { ...state, connectLineMovingAverageWindow: nextOddInteger };
+        },
+    },
+    [SET_CONNECT_LINE_WIDTH]: {
+        accepts: (action: Action): action is SetLineWidthAction =>
+            action.type === SET_CONNECT_LINE_WIDTH,
+        perform: (state: SelectionStateBranch, action: SetLineWidthAction) => {
+            let lineWidth = action.payload;
+            if (!Number.isFinite(lineWidth) || lineWidth < 1) {
+                return state;
+            }
+            return { ...state, connectLineWidth: lineWidth };
+        },
+    },
+    [SET_CONNECT_LINE_DEFAULT_COLOR]: {
+        accepts: (action: Action): action is SetLineDefaultColorAction =>
+            action.type === SET_CONNECT_LINE_DEFAULT_COLOR,
+        perform: (state: SelectionStateBranch, action: SetLineDefaultColorAction) => ({
+            ...state,
+            connectLineDefaultColor: action.payload,
         }),
     },
     [OPEN_CELL_IN_3D]: {
