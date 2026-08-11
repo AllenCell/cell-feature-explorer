@@ -4,7 +4,7 @@ import type { SelectedGroups } from "..";
 
 import { CELL_ID_KEY } from "../../constants";
 import type { FileInfo } from "../metadata/types";
-import type { TypeToDescriptionMap } from "../types";
+import type { State, TypeToDescriptionMap } from "../types";
 import { makeReducer } from "../util";
 
 import {
@@ -173,11 +173,11 @@ const actionToConfigMap: TypeToDescriptionMap = {
         }),
     },
     [SET_SHOW_CONNECT_LINES]: {
-        accepts: (action: Action): action is SetShowConnectLines =>
+        accepts: (action: Action): action is BoolToggleAction =>
             action.type === SET_SHOW_CONNECT_LINES,
-        perform: (state: SelectionStateBranch, action: SetShowConnectLines) => ({
+        perform: (state: SelectionStateBranch, action: BoolToggleAction): SelectionStateBranch => ({
             ...state,
-            showConnectedPoints: action.payload,
+            showConnectLines: action.payload,
         }),
     },
     [OPEN_CELL_IN_3D]: {
