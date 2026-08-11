@@ -20,7 +20,8 @@ type DispatchProps = {
 };
 
 type PlotSettingsProps = PropsFromState & DispatchProps;
-const SETTINGS_LABEL_WIDTH = "150px";
+const SETTINGS_WIDTH = "280px";
+const SETTINGS_LABEL_WIDTH = "135px";
 
 const PlotSettings = (props: PlotSettingsProps): ReactElement => {
     const { pointOpacity, pointRadius, handleSetPointOpacity, handleSetPointRadius } = props;
@@ -29,7 +30,7 @@ const PlotSettings = (props: PlotSettingsProps): ReactElement => {
     const [radius, setRadius] = useDebouncedSetter(pointRadius, handleSetPointRadius);
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", width: "250px" }}>
+        <div style={{ display: "flex", flexDirection: "column", width: SETTINGS_WIDTH }}>
             <LabeledSlider
                 label="Opacity"
                 labelWidth={SETTINGS_LABEL_WIDTH}

@@ -2,13 +2,10 @@ import React, { ReactElement } from "react";
 import { connect } from "react-redux";
 import { ActionCreator } from "redux";
 
-import selectionStateBranch from "../../state/selection";
 import {
     SetLineAverageWindowAction,
     SetLineDefaultColorAction,
     SetLineWidthAction,
-    SetPointOpacityAction,
-    SetPointRadiusAction,
 } from "../../state/selection/types";
 import { State } from "../../state/types";
 import { useDebouncedSetter } from "../../hooks";
@@ -23,7 +20,9 @@ import {
     setConnectLineAverageWindow,
     setConnectLineWidth,
 } from "../../state/selection/actions";
-import { ColorPicker } from "antd";
+import ResettableColorPicker from "../ResettableColorPicker";
+import { GENERAL_PLOT_SETTINGS, PALETTE } from "../../constants";
+import InlineHint from "../InlineHint";
 
 type PropsFromState = {
     lineAverageWindow: number;
@@ -55,8 +54,14 @@ const PlotSettings = (props: PlotSettingsProps): ReactElement => {
 
     return (
         <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+            <p style={{ fontWeight: 600, marginBottom: 0, color: PALETTE.white }}>Line settings</p>
             <LabeledSlider
-                label="Window size"
+                label={
+                    <div style={{ display: "flex", flexDirection: "row", gap: "6px" }}>
+                        Average window
+                        <InlineHint title="Total number of points to average over, including past and future." />
+                    </div>
+                }
                 labelWidth={props.labelWidth}
                 sliderProps={{
                     value: lineAverageWindow,
@@ -74,23 +79,36 @@ const PlotSettings = (props: PlotSettingsProps): ReactElement => {
                 sliderProps={{
                     value: lineWidth,
                     onChange: setLineWidth,
-                    min: 1,
-                    max: 10,
-                    step: 1,
-                    marks: { 4: <></> },
+                    min: 0,
+                    max: 3.5,
+                    step: 0.1,
+                    marks: { 1.5: <></> },
+                    tooltip: {
+                        formatter: (value) => value?.toFixed(1),
+                    },
                 }}
                 inputMin={0}
                 inputMax={100}
             ></LabeledSlider>
-            <div style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "flex-start",
+                    marginTop: "4px",
+                }}
+            >
                 <label style={{ width: props.labelWidth }}>Default color</label>
-                <ColorPicker
+                <ResettableColorPicker
                     value={lineDefaultColor}
                     onChange={(color) => {
                         setLineDefaultColor(color.toHexString());
                     }}
                     size="small"
-                ></ColorPicker>
+                    onReset={function (): void {
+                        setLineDefaultColor(GENERAL_PLOT_SETTINGS.connectionLineDefaultColor);
+                    }}
+                ></ResettableColorPicker>
             </div>
         </div>
     );
