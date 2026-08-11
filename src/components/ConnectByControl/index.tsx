@@ -10,7 +10,12 @@ import FeatureSelectDropdown from "../FeatureSelectDropdown";
 import { State } from "../../state";
 import { MeasuredFeatureDef } from "../../state/metadata/types";
 import selectionStateBranch from "../../state/selection";
-import { getFeatureDefTooltip } from "../../state/selection/selectors";
+import {
+    getConnectByCategory,
+    getConnectByFeature,
+    getFeatureDefTooltip,
+    getShowConnectLines,
+} from "../../state/selection/selectors";
 
 import styles from "./style.css";
 
@@ -84,9 +89,9 @@ function ConnectByControl(props: ConnectByControlProps): ReactElement {
 
 function mapStateToProps(state: State): ConnectByControlStateProps {
     return {
-        connectByFeature: state.selection.connectByFeature,
-        connectByCategory: state.selection.connectByCategory,
-        showConnectedPoints: state.selection.showConnectLines,
+        connectByFeature: getConnectByFeature(state),
+        connectByCategory: getConnectByCategory(state),
+        showConnectedPoints: getShowConnectLines(state),
         featureMenuOptions: getColorByDisplayOptions(state),
         groupByMenuOptions: getGroupByDisplayOptions(state),
     };
