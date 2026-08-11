@@ -104,12 +104,18 @@ export const handleNullValues = (
 };
 
 export const getPlotlyCustomData = createSelector(
-    [getFilteredCellData, getConnectByFeature],
-    (filteredCellData: DataForPlot, connectByFeature: string): PlotlyCustomData[] => {
+    [getFilteredCellData, getShowConnectLines, getConnectByFeature],
+    (
+        filteredCellData: DataForPlot,
+        showConnectByLines: boolean,
+        connectByFeature: string
+    ): PlotlyCustomData[] => {
         const thumbnailPaths = filteredCellData.labels.thumbnailPaths;
         const srcPaths = filteredCellData.labels.sourcePaths;
         const indices = filteredCellData.indices;
-        const connectByFeatureValues = filteredCellData.values[connectByFeature];
+        const connectByFeatureValues = showConnectByLines
+            ? filteredCellData.values[connectByFeature]
+            : undefined;
         return map(indices, (cellIndex, i) => {
             return {
                 index: cellIndex,
