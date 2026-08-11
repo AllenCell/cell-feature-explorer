@@ -9,6 +9,13 @@ export const CHANGE_GROUP_BY_CATEGORY = makeSelectionConstant("change-group-by-c
 export const CHANGE_CONNECT_BY_CATEGORY = makeSelectionConstant("change-connect-by-category");
 export const CHANGE_CONNECT_BY_FEATURE = makeSelectionConstant("change-connect-by-feature");
 export const SET_SHOW_CONNECT_LINES = makeSelectionConstant("set-show-connect-lines");
+export const SET_CONNECT_LINE_MOVING_AVERAGE_WINDOW = makeSelectionConstant(
+    "set-connect-line-moving-average-window"
+);
+export const SET_CONNECT_LINE_WIDTH = makeSelectionConstant("set-connect-line-width");
+export const SET_CONNECT_LINE_DEFAULT_COLOR = makeSelectionConstant(
+    "set-connect-line-default-color"
+);
 export const SELECT_GROUP_VIA_PLOT = makeSelectionConstant("select_group");
 export const DESELECT_POINT = makeSelectionConstant("deselect-point");
 export const SELECT_POINT = makeSelectionConstant("select-point");
