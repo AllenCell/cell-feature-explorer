@@ -1,6 +1,6 @@
 import { InputNumber, Row } from "antd";
 import Slider, { SliderSingleProps } from "antd/es/slider";
-import React, { ReactElement, ReactNode, useEffect, useState } from "react";
+import React, { ReactElement, ReactNode, useEffect, useId, useState } from "react";
 
 type LabeledSliderProps = {
     sliderProps: SliderSingleProps;
@@ -25,8 +25,8 @@ export default function LabeledSlider(props: LabeledSliderProps): ReactElement {
         }
     };
 
-    const inputId =
-        props.id || `labeled-slider-${props.label?.toString().toLowerCase().replace(/\s+/g, "-")}`;
+    const generatedId = useId();
+    const inputId = props.id || `labeled-slider-${generatedId}`;
 
     useEffect(() => {
         setInputValue(props.sliderProps.value);
