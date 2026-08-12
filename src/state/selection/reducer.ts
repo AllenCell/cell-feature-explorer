@@ -2,7 +2,7 @@ import { filter, pickBy, uniqBy } from "lodash";
 import type { Action } from "redux";
 import type { SelectedGroups } from "..";
 
-import { CELL_ID_KEY } from "../../constants";
+import { CELL_ID_KEY, GENERAL_PLOT_SETTINGS } from "../../constants";
 import type { FileInfo } from "../metadata/types";
 import type { TypeToDescriptionMap } from "../types";
 import { makeReducer } from "../util";
@@ -107,8 +107,8 @@ export const initialState: SelectionStateBranch = {
     /** Opacity of points in the plot, in the [0, 1] range. */
     pointOpacity: 0.5,
     connectLineMovingAverageWindow: 1,
-    connectLineWidth: 1.5,
-    connectLineDefaultColor: "#808080",
+    connectLineWidth: GENERAL_PLOT_SETTINGS.connectionLineWidth,
+    connectLineDefaultColor: GENERAL_PLOT_SETTINGS.connectionLineDefaultColor,
     selectedAlbum: INITIAL_SELECTED_ALBUM_ID,
     selectedAlbumFileInfo: [] as FileInfo[],
     selectedGroupColors: {},
