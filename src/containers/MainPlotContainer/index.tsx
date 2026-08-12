@@ -207,8 +207,8 @@ class MainPlotContainer extends React.Component<MainPlotContainerProps, MainPlot
                     srcPath: point.customdata.srcPath,
                     xValue: point.x,
                     yValue: point.y,
-                    connectByValue: point.customdata.connectByFeature,
-                });
+                    connectByFeatureValue: point.customdata.connectByFeature,
+                } satisfies SelectedPointData);
                 this.loadThumbnailForZarr(point.id, point.customdata.srcPath);
             } else {
                 changeHoveredPoint(null);
