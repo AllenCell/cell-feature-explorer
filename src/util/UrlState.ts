@@ -261,12 +261,18 @@ export default class UrlState {
         [URLSearchParam.connectByFeature]: (key) => ({
             connectByFeature: String(key),
         }),
-        [URLSearchParam.connectLineMovingAverageWindow]: (window) => ({
-            connectLineMovingAverageWindow: Number(window),
-        }),
-        [URLSearchParam.connectLineWidth]: (width) => ({
-            connectLineWidth: Number(width),
-        }),
+        [URLSearchParam.connectLineMovingAverageWindow]: (window) => {
+            if (!isFinite(Number(window))) {
+                return {};
+            }
+            return { connectLineMovingAverageWindow: Number(window) };
+        },
+        [URLSearchParam.connectLineWidth]: (width) => {
+            if (!isFinite(Number(width))) {
+                return {};
+            }
+            return { connectLineWidth: Number(width) };
+        },
         [URLSearchParam.connectLineDefaultColor]: (color) => ({
             connectLineDefaultColor: String(color),
         }),
