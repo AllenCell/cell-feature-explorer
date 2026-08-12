@@ -36,12 +36,12 @@ type DispatchProps = {
     handleSetLineDefaultColor: ActionCreator<SetLineDefaultColorAction>;
 };
 
-type PlotSettingsProps = PropsFromState &
+type PlotLineSettingsProps = PropsFromState &
     DispatchProps & {
         labelWidth?: string;
     };
 
-const PlotSettings = (props: PlotSettingsProps): ReactElement => {
+const PlotLineSettings = (props: PlotLineSettingsProps): ReactElement => {
     const [lineAverageWindow, setLineAverageWindow] = useDebouncedSetter(
         props.lineAverageWindow,
         props.handleSetLineAverageWindow
@@ -131,4 +131,4 @@ const dispatchToPropsMap: DispatchProps = {
 export default connect<PropsFromState, DispatchProps, unknown, State>(
     mapStateToProps,
     dispatchToPropsMap
-)(PlotSettings);
+)(PlotLineSettings);

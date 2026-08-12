@@ -18,7 +18,7 @@ export function getMovingAverage(
     // Number of values forward and backwards to include in the average.
     // For a window size of 7, the window offset will be 3.
     const windowOffset = Math.max(0, Math.floor(windowSize / 2));
-    const ret = [];
+    const ret: number[] = [];
 
     const clampBounds = (value: number): number => Math.max(0, Math.min(value, values.length - 1));
 
