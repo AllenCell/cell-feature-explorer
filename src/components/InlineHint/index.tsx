@@ -17,7 +17,19 @@ export default function InlineHint(props: InlineHintProps): ReactElement {
                 title={props.title}
                 getPopupContainer={() => popupContainerRef.current ?? document.body}
             >
-                <InfoCircleOutlined tabIndex={0}></InfoCircleOutlined>
+                <button
+                    style={{
+                        background: "none",
+                        border: "none",
+                        padding: 0,
+                        margin: 0,
+                        cursor: "help",
+                        color: "unset",
+                    }}
+                    aria-label="More information"
+                >
+                    <InfoCircleOutlined></InfoCircleOutlined>
+                </button>
             </Tooltip>
         </div>
     );
