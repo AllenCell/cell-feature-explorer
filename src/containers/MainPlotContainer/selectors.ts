@@ -577,7 +577,7 @@ export const getYTickConversion = createSelector(
     getFeatureTickConversion
 );
 
-export const getConnectByTickConversion = createSelector(
+export const getConnectByFeatureTickConversion = createSelector(
     [getConnectByFeature, getMeasuredFeaturesDefs],
     getFeatureTickConversion
 );
@@ -641,7 +641,7 @@ export const getYDisplayName = createSelector(
     }
 );
 
-export const getConnectByDisplayName = createSelector(
+export const getConnectByFeatureDisplayName = createSelector(
     [getConnectByFeature, getMeasuredFeaturesDefs],
     (connectByFeature, featureDefs): string => {
         const feature = findFeature(featureDefs, connectByFeature);
@@ -686,16 +686,15 @@ export const getFormattedHoveredYValue = createSelector(
     }
 );
 
-export const getFormattedHoveredLineValue = createSelector(
+export const getFormattedHoveredConnectByFeatureValue = createSelector(
     [
         getHoveredPointData,
         getCategoricalFeatureKeys,
         getConnectByFeature,
-        getConnectByTickConversion,
+        getConnectByFeatureTickConversion,
     ],
     (hoveredPointData, categoricalFeatures, connectByKey, tickConversion): string => {
-        let value = hoveredPointData?.connectByValue;
-        value = value === null ? undefined : value;
+        const value = hoveredPointData?.connectByFeatureValue ?? undefined;
         return formatAxisValue(value, includes(categoricalFeatures, connectByKey), tickConversion);
     }
 );
