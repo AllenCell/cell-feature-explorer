@@ -47,8 +47,8 @@ import {
     getXAxisRange,
     getYAxisRange,
     getAnnotations,
-    getConnectByDisplayName,
-    getFormattedHoveredLineValue,
+    getConnectByFeatureDisplayName,
+    getFormattedHoveredConnectByFeatureValue,
 } from "./selectors";
 import { getFeatureDefTooltip } from "../../state/selection/selectors";
 import { formatThumbnailSrc } from "../../state/util";
@@ -68,13 +68,13 @@ interface PropsFromState {
     hoveredPointData: SelectedPointData | null;
     hoveredXValue: string;
     hoveredYValue: string;
-    hoveredLineValue: string;
+    hoveredConnectByFeatureValue: string;
     mousePosition: MousePosition;
     plotDataArray: any;
     thumbnailRoot: string;
     xDisplayName: string;
     yDisplayName: string;
-    connectByDisplayName: string;
+    connectByFeatureDisplayName: string;
     xDropDownValue: string;
     yDropDownValue: string;
     yDropDownOptions: MeasuredFeatureDef[];
@@ -256,8 +256,8 @@ class MainPlotContainer extends React.Component<MainPlotContainerProps, MainPlot
             yDisplayName,
             hoveredXValue,
             hoveredYValue,
-            connectByDisplayName,
-            hoveredLineValue,
+            connectByFeatureDisplayName,
+            hoveredConnectByFeatureValue,
         } = this.props;
         let thumbnailSrc: string | undefined = formatThumbnailSrc(
             thumbnailRoot,
@@ -280,8 +280,8 @@ class MainPlotContainer extends React.Component<MainPlotContainerProps, MainPlot
                     xValue={hoveredXValue}
                     yLabel={yDisplayName}
                     yValue={hoveredYValue}
-                    lineLabel={connectByDisplayName}
-                    lineValue={hoveredLineValue}
+                    lineLabel={connectByFeatureDisplayName}
+                    lineValue={hoveredConnectByFeatureValue}
                 />
             )
         );
@@ -392,8 +392,8 @@ function mapStateToProps(state: State): PropsFromState {
         thumbnailRoot: selectionStateBranch.selectors.getThumbnailRoot(state),
         xDisplayName: getXDisplayName(state),
         yDisplayName: getYDisplayName(state),
-        connectByDisplayName: getConnectByDisplayName(state),
-        hoveredLineValue: getFormattedHoveredLineValue(state),
+        connectByFeatureDisplayName: getConnectByFeatureDisplayName(state),
+        hoveredConnectByFeatureValue: getFormattedHoveredConnectByFeatureValue(state),
         xDropDownOptions: getXDisplayOptions(state),
         xDropDownValue: selectionStateBranch.selectors.getPlotByOnX(state),
         xTickConversion: getXTickConversion(state),

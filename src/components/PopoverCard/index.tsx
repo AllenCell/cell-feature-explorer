@@ -52,19 +52,19 @@ const PopoverCard: React.FC<PopoverCardProps> = (props) => {
                 props.yValue !== undefined ||
                 props.lineValue !== undefined) && (
                 <div className={styles.axisValues}>
-                    {props.xValue && (
+                    {props.xValue !== undefined && (
                         <div className={styles.axisRow}>
                             <span className={styles.axisLabel}>x:{props.xLabel}</span>
                             <span className={styles.axisValue}>{props.xValue}</span>
                         </div>
                     )}
-                    {props.yValue && (
+                    {props.yValue !== undefined && (
                         <div className={styles.axisRow}>
                             <span className={styles.axisLabel}>y:{props.yLabel}</span>
                             <span className={styles.axisValue}>{props.yValue}</span>
                         </div>
                     )}
-                    {props.lineValue && (
+                    {props.lineValue !== undefined && (
                         <div className={styles.axisRow}>
                             <span className={styles.axisLabel}>{props.lineLabel}</span>
                             <span className={styles.axisValue}>{props.lineValue}</span>

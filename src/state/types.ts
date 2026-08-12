@@ -69,7 +69,7 @@ export interface PlotlyCustomData {
     thumbnailPath: string;
     index: number;
     srcPath?: string;
-    connectFeature?: number | null;
+    connectByFeatureValue?: number | null;
 }
 
 export enum DataType {
