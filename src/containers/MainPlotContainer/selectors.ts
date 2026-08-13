@@ -197,7 +197,7 @@ export const getLinePlotData = createSelector(
         getFilteredConnectByFeatureValues,
         getShowConnectLines,
         getLineMovingAverageWindow,
-        // Line appearance
+        // Line group coloring
         getCategoryGroupColorsAndNames,
         getColorBySelection,
         getConnectByCategory,
