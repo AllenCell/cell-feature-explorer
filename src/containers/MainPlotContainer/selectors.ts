@@ -45,8 +45,14 @@ import {
     getFilteredConnectByCategoryValues,
     getLineMovingAverageWindow,
     getConnectByFeature,
+    getConnectByCategory,
 } from "../../state/selection/selectors";
-import { MainPlotSettings, SelectedPointData, TickConversion } from "../../state/selection/types";
+import {
+    ColorForPlot,
+    MainPlotSettings,
+    SelectedPointData,
+    TickConversion,
+} from "../../state/selection/types";
 import {
     AnnotationData,
     ContinuousPlotData,
@@ -191,6 +197,10 @@ export const getLinePlotData = createSelector(
         getFilteredConnectByFeatureValues,
         getShowConnectLines,
         getLineMovingAverageWindow,
+        // Line appearance
+        getCategoryGroupColorsAndNames,
+        getColorBySelection,
+        getConnectByCategory,
     ],
     calculateLinePlotData
 );
@@ -201,7 +211,10 @@ export function calculateLinePlotData(
     connectByCategoryValues: (number | null)[],
     connectByFeatureValues: (number | null)[],
     showConnectingLines: boolean,
-    movingAverageWindow: number
+    movingAverageWindow: number,
+    colorsForPlot: ColorForPlot[],
+    colorByFeature: string,
+    connectByCategory: string
 ): LinePlotData[] | null {
     if (!showConnectingLines) {
         return null;
@@ -225,7 +238,7 @@ export function calculateLinePlotData(
     }
 
     const lineData: LinePlotData[] = [];
-    for (const indices of indicesByGroup.values()) {
+    for (const [group, indices] of indicesByGroup.entries()) {
         const x: (number | null)[] = [];
         const y: (number | null)[] = [];
         // Sort each category's data by the feature values.
@@ -238,7 +251,7 @@ export function calculateLinePlotData(
             x.push(xValues[i]);
             y.push(yValues[i]);
         }
-        lineData.push({ x: x, y: y });
+        lineData.push({ x: x, y: y, groupIndex: group });
     }
 
     // Apply moving average to each line
@@ -246,6 +259,17 @@ export function calculateLinePlotData(
         for (const line of lineData) {
             line.y = getMovingAverage(line.y, movingAverageWindow, true);
             line.x = getMovingAverage(line.x, movingAverageWindow, true);
+        }
+    }
+
+    if (colorByFeature === connectByCategory) {
+        // Apply group colors to the lines
+        const groupToColors: { [key: number]: string } = {};
+        for (const colorSetting of colorsForPlot) {
+            groupToColors[colorSetting.key] = colorSetting.color;
+        }
+        for (const line of lineData) {
+            line.color = groupToColors[line.groupIndex];
         }
     }
 
@@ -403,6 +427,12 @@ function makeScatterPlotData(
 
 // TODO: Add the ability to adjust the line settings via an additional selector
 function makeLinePlotTrace(data: LinePlotData, settings: MainPlotSettings): Partial<PlotData> {
+    let color = settings.connectionLineDefaultColor;
+    if (data.color) {
+        // Color is a hex string; apply transparency
+        const opacityHex = Math.round(settings.unselectedCircleOpacity * 255);
+        color = data.color + opacityHex.toString(16).padStart(2, "0");
+    }
     return {
         type: "scattergl",
         mode: "lines",
@@ -412,7 +442,7 @@ function makeLinePlotTrace(data: LinePlotData, settings: MainPlotSettings): Part
         showlegend: false,
         line: {
             width: settings.connectionLineWidth,
-            color: settings.connectionLineDefaultColor,
+            color: color,
         },
     };
 }
