@@ -159,6 +159,11 @@ export interface ColorForPlot {
     color: string;
     name: string;
     label: string;
+    /**
+     * Original numeric value that corresponds with this group in the feature
+     * data.
+     */
+    key: number;
 }
 
 export interface RequestFileInfoByCellIDAction {

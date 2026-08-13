@@ -188,6 +188,7 @@ export const getCategoryGroupColorsAndNames = createSelector(
                         color: option.color,
                         name: id,
                         label: option.name,
+                        key: Number.parseFloat(key),
                     };
                 });
 
@@ -211,6 +212,7 @@ export const getCategoryGroupColorsAndNames = createSelector(
                     color: MISSING_CATEGORY_COLOR,
                     label: MISSING_CATEGORY_LABEL,
                     name: categoryToGroupBy === categoryToColorBy ? "" : "null",
+                    key: NaN,
                 };
                 return [...colorForPlot, missingColorOption];
             }
