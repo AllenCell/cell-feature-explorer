@@ -35,6 +35,8 @@ import {
     SET_CSV_URL,
     SET_COLOR_OVERRIDE,
     SET_COLOR_OVERRIDES,
+    SET_POINT_RADIUS,
+    SET_POINT_OPACITY,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -58,6 +60,8 @@ import {
     SetColorOverrideAction,
     SetColorOverridesAction,
     SetCsvUrlAction,
+    SetPointOpacityAction,
+    SetPointRadiusAction,
 } from "./types";
 
 export const initialState = {
@@ -83,6 +87,10 @@ export const initialState = {
     groupBy: "",
     defaultColors: INITIAL_COLORS,
     colorOverrides: [],
+    /** Radius of the points in the plot, in pixels. */
+    pointRadius: 4,
+    /** Opacity of points in the plot, in the [0, 1] range. */
+    pointOpacity: 0.5,
     selectedAlbum: INITIAL_SELECTED_ALBUM_ID,
     selectedAlbumFileInfo: [] as FileInfo[],
     selectedGroupColors: {},
@@ -201,6 +209,32 @@ const actionToConfigMap: TypeToDescriptionMap = {
                 ...state,
                 colorOverrides: newColorOverrides,
             };
+        },
+    },
+    [SET_POINT_RADIUS]: {
+        accepts: (action: Action): action is SetPointRadiusAction =>
+            action.type === SET_POINT_RADIUS,
+        perform: (state: SelectionStateBranch, action: SetPointRadiusAction) => {
+            if (Number.isFinite(action.payload)) {
+                return {
+                    ...state,
+                    pointRadius: Math.max(0, action.payload),
+                };
+            }
+            return state;
+        },
+    },
+    [SET_POINT_OPACITY]: {
+        accepts: (action: Action): action is SetPointOpacityAction =>
+            action.type === SET_POINT_OPACITY,
+        perform: (state: SelectionStateBranch, action: SetPointOpacityAction) => {
+            if (Number.isFinite(action.payload)) {
+                return {
+                    ...state,
+                    pointOpacity: Math.max(0, Math.min(1, action.payload)),
+                };
+            }
+            return state;
         },
     },
     [SET_COLOR_OVERRIDES]: {

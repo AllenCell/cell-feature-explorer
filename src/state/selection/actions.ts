@@ -28,6 +28,8 @@ import {
     SET_CSV_URL,
     SET_COLOR_OVERRIDE,
     SET_COLOR_OVERRIDES,
+    SET_POINT_RADIUS,
+    SET_POINT_OPACITY,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -53,6 +55,8 @@ import {
     SetColorOverrideAction,
     SetColorOverridesAction,
     SetCsvUrlAction,
+    SetPointOpacityAction,
+    SetPointRadiusAction,
     SyncStateWithURLAction,
 } from "./types";
 
@@ -123,6 +127,20 @@ export function setColorOverrides(payload: (string | undefined)[]): SetColorOver
     return {
         payload,
         type: SET_COLOR_OVERRIDES,
+    };
+}
+
+export function setPointRadius(payload: number): SetPointRadiusAction {
+    return {
+        payload,
+        type: SET_POINT_RADIUS,
+    };
+}
+
+export function setPointOpacity(payload: number): SetPointOpacityAction {
+    return {
+        payload,
+        type: SET_POINT_OPACITY,
     };
 }
 

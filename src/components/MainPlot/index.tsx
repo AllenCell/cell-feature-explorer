@@ -6,7 +6,7 @@ import type {
     PlotMouseEvent,
     PlotSelectionEvent,
 } from "plotly.js";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Plot from "react-plotly.js";
 
@@ -14,6 +14,10 @@ import { GENERAL_PLOT_SETTINGS } from "../../constants";
 import { TickConversion } from "../../state/selection/types";
 
 import styles from "./style.css";
+import { Button, Popover, Row } from "antd";
+import PlotSettings from "../PlotSettings";
+import { ICON_SVG_PATH_PLOT_SETTINGS } from "./constants";
+import { CloseOutlined } from "@ant-design/icons";
 
 interface MainPlotProps {
     annotations: PlotlyAnnotation[];
@@ -54,6 +58,8 @@ function padAxisRange(range: [number, number]): [number, number] {
     return [range[0] - padding, range[1] + padding];
 }
 
+const PLOT_SETTINGS_ATTRIBUTE = "plot-settings-button";
+
 const PLOT_CONFIG: Partial<Config> = {
     responsive: true,
     displayModeBar: true,
@@ -82,13 +88,35 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
     const showFullAnnotationRef = React.useRef(showFullAnnotation);
     showFullAnnotationRef.current = showFullAnnotation;
 
+    // Used to position the popup settings menu under the config button in the
+    // Plotly mode bar.
+    const [configButtonPosition, setConfigButtonPosition] = useState<{
+        top: number;
+        right: number;
+    }>({ top: 0, right: 0 });
+
+    const updateConfigButtonPosition = React.useCallback(() => {
+        const configButton = document.querySelector(`[data-attr=${PLOT_SETTINGS_ATTRIBUTE}]`);
+        if (!configButton) {
+            return;
+        }
+        const rect = configButton.getBoundingClientRect();
+        setConfigButtonPosition({
+            top: rect.bottom - rect.height / 2 + 4,
+            right: window.innerWidth - rect.right + rect.width / 2,
+        });
+    }, []);
+
     React.useEffect(() => {
         // Using Plotly's relayout-function with graph-name and
         // the variable with the new height and width
-        const resize = () => setHeight(window.innerHeight);
+        const resize = (): void => {
+            setHeight(window.innerHeight);
+            updateConfigButtonPosition();
+        };
         window.addEventListener("resize", resize);
         return () => window.removeEventListener("resize", resize);
-    }, []);
+    }, [updateConfigButtonPosition]);
 
     const { annotations } = props;
 
@@ -125,6 +153,11 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
             setHelpTextPos(null);
         }
     }, []); // stable — reads live values through refs
+
+    const onAfterPlotRender = React.useCallback(() => {
+        computeHelpTextPos();
+        updateConfigButtonPosition();
+    }, [computeHelpTextPos, updateConfigButtonPosition]);
 
     const updatedAnnotations = React.useMemo((): PlotlyAnnotation[] => {
         // on first load show the help text for one annotation, but the user can dismiss it by clicking on
@@ -215,20 +248,54 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
     const { onPointHovered, onPointUnhovered, onGroupSelected, plotDataArray } = props;
     const lastAnnotation = annotations.length > 0 ? annotations[annotations.length - 1] : null;
 
+    const [showConfigPopup, setShowConfigPopup] = useState(false);
+    const onClickConfigButton = React.useCallback((): void => {
+        if (!showConfigPopup) {
+            setShowConfigPopup(true);
+        }
+    }, [showConfigPopup]);
+
+    // Add config button to Plotly mode bar.
+    const config = React.useMemo(
+        (): Partial<Plotly.Config> => ({
+            ...PLOT_CONFIG,
+            modeBarButtonsToAdd: [
+                {
+                    name: "config",
+                    title: "Configure plot",
+                    icon: {
+                        width: 1000,
+                        height: 1000,
+                        path: ICON_SVG_PATH_PLOT_SETTINGS,
+                    },
+                    // TODO: There is a bug where clicking on the plotly button
+                    // will cause the popup menu to only temporarily close
+                    // instead of fully closing it. This is because Ant's
+                    // Popover reacts to the click on mouse down, closing the
+                    // popup, while Plotly reacts to the click on mouse up,
+                    // reopening it again.
+                    click: onClickConfigButton,
+                    attr: PLOT_SETTINGS_ATTRIBUTE,
+                },
+            ],
+        }),
+        [onClickConfigButton]
+    );
+
     return (
         <>
             <Plot
                 data={plotDataArray}
                 useResizeHandler={true}
                 layout={layout}
-                config={PLOT_CONFIG}
+                config={config}
                 onClick={handlePointClick}
                 onClickAnnotation={handleAnnotationClick}
                 onHover={onPointHovered}
                 onUnhover={onPointUnhovered}
                 onSelected={onGroupSelected}
                 onInitialized={handleInitialized}
-                onAfterPlot={computeHelpTextPos}
+                onAfterPlot={onAfterPlotRender}
             />
             {showFullAnnotation &&
                 lastAnnotation &&
@@ -260,6 +327,45 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
                     </div>,
                     document.body
                 )}
+            <Popover
+                content={<PlotSettings />}
+                title={
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        Plot settings
+                        <Button
+                            onClick={() => setShowConfigPopup(false)}
+                            type="text"
+                            size="small"
+                            style={{ padding: "0px 4px" }}
+                            title="Close plot settings"
+                        >
+                            <CloseOutlined />
+                        </Button>
+                    </div>
+                }
+                open={showConfigPopup}
+                placement={"bottom"}
+                onOpenChange={setShowConfigPopup}
+                trigger={["click", "focus"]}
+            >
+                <div
+                    style={{
+                        position: "fixed",
+                        top: `${configButtonPosition.top}px`,
+                        right: `${configButtonPosition.right}px`,
+                        width: "1px",
+                        height: "1px",
+                        pointerEvents: "none",
+                    }}
+                ></div>
+            </Popover>
         </>
     );
 };

@@ -12,6 +12,8 @@ export const SELECT_POINT = makeSelectionConstant("select-point");
 export const DESELECT_ALL_POINTS = makeSelectionConstant("deselect-all-points");
 export const SET_COLOR_OVERRIDE = makeSelectionConstant("set-color-override");
 export const SET_COLOR_OVERRIDES = makeSelectionConstant("set-color-overrides");
+export const SET_POINT_RADIUS = makeSelectionConstant("set-point-radius");
+export const SET_POINT_OPACITY = makeSelectionConstant("set-point-opacity");
 export const TOGGLE_FILTER_BY_CATEGORY_NAME = makeSelectionConstant(
     "toggle-filter-by-category-name"
 );

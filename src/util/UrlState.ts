@@ -31,6 +31,8 @@ import {
     selectPoint,
     setColorOverrides,
     setCsvUrl,
+    setPointOpacity,
+    setPointRadius,
     toggleGallery,
 } from "../state/selection/actions";
 import { initialState } from "../state/selection/reducer";
@@ -48,6 +50,8 @@ export enum URLSearchParam {
     galleryCollapsed = "galleryCollapsed",
     csvUrl = "csvUrl",
     colorOverrides = "colorOverrides",
+    plotPointRadius = "ptRadius",
+    plotPointOpacity = "ptOpacity",
 }
 
 type StateValue = any; // types are narrowed in mappings
@@ -203,6 +207,8 @@ export default class UrlState {
             const parsedColorOverrides = UrlState.parseColorOverridesParam(String(colorOverrides));
             return setColorOverrides(parsedColorOverrides);
         },
+        [URLSearchParam.plotPointRadius]: (pointRadius) => setPointRadius(Number(pointRadius)),
+        [URLSearchParam.plotPointOpacity]: (pointOpacity) => setPointOpacity(Number(pointOpacity)),
     };
 
     private static urlParamToStateMap: URLSearchParamToStateMap = {
@@ -231,6 +237,12 @@ export default class UrlState {
         [URLSearchParam.colorOverrides]: (colorOverrides) => ({
             colorOverrides: UrlState.parseColorOverridesParam(String(colorOverrides)),
         }),
+        [URLSearchParam.plotPointRadius]: (pointRadius) => ({
+            pointRadius: Number(pointRadius),
+        }),
+        [URLSearchParam.plotPointOpacity]: (pointOpacity) => ({
+            pointOpacity: Number(pointOpacity),
+        }),
     };
 
     private static stateToUrlParamMap: StateToUrlSearchParamMap = {
@@ -250,6 +262,8 @@ export default class UrlState {
         colorOverrides: (value: (string | undefined)[]) => ({
             [URLSearchParam.colorOverrides]: UrlState.serializeColorOverridesParam(value),
         }),
+        pointRadius: (value) => ({ [URLSearchParam.plotPointRadius]: String(value) }),
+        pointOpacity: (value) => ({ [URLSearchParam.plotPointOpacity]: String(value) }),
     };
 
     private static valueIsMeaningfulToSerialize(selection: any): boolean {
