@@ -3,6 +3,7 @@ import { describe, it, expect } from "vitest";
 import { mockState, selectedCellFileInfo } from "../../../state/test/mocks";
 import type { State, AnnotationData } from "../../../state/types";
 import {
+    calculateLinePlotData,
     getAnnotations,
     getFormattedHoveredXValue,
     getFormattedHoveredYValue,
@@ -118,7 +119,10 @@ describe("MainPlotContainer selectors", () => {
         it("returns the displayName for a discrete feature", () => {
             const state: State = {
                 ...newMockState,
-                selection: { ...newMockState.selection, plotByOnY: "anaphase-segmentation-complete" },
+                selection: {
+                    ...newMockState.selection,
+                    plotByOnY: "anaphase-segmentation-complete",
+                },
             };
             expect(getYDisplayName(state)).to.equal("Anaphase segmentation complete");
         });
@@ -226,9 +230,7 @@ describe("MainPlotContainer selectors", () => {
                     },
                 },
             };
-            expect(getFormattedHoveredYValue(state)).to.equal(
-                Number(702.3191).toPrecision(4)
-            );
+            expect(getFormattedHoveredYValue(state)).to.equal(Number(702.3191).toPrecision(4));
         });
 
         it("resolves a categorical value to its display label", () => {
@@ -309,6 +311,52 @@ describe("MainPlotContainer selectors", () => {
             expect(annotation.cellID).to.equal(baseAnnotation.cellID);
             expect(annotation.fovID).to.equal(baseAnnotation.fovID);
             expect(annotation.pointIndex).to.equal(baseAnnotation.pointIndex);
+        });
+    });
+
+    describe("calculateLinePlotData", () => {
+        it("handles empty data", () => {
+            const result = calculateLinePlotData([], [], [], [], true);
+            expect(result).to.deep.equal([]);
+        });
+
+        it("returns null when connecting lines are disabled", () => {
+            const result = calculateLinePlotData([1, 2], [3, 4], [1, 1], [5, 6], false);
+            expect(result).to.equal(null);
+        });
+
+        it("splits data by groups", () => {
+            const xValues = [1, 2, 3, 4, 5];
+            const yValues = [6, 7, 8, 9, 10];
+            const connectByCategoryValues = [1, 1, 2, 2, 3];
+            const connectByFeatureValues = [1, 2, 3, 4, 5];
+            const result = calculateLinePlotData(
+                xValues,
+                yValues,
+                connectByCategoryValues,
+                connectByFeatureValues,
+                true
+            );
+            expect(result).to.deep.equal([
+                { x: [1, 2], y: [6, 7] },
+                { x: [3, 4], y: [8, 9] },
+                { x: [5], y: [10] },
+            ]);
+        });
+
+        it("sorts by connecting feature value", () => {
+            const xValues = [1, 2, 3, 4, 5];
+            const yValues = [1, 2, 3, 4, 5];
+            const connectByCategoryValues = [1, 1, 1, 1, 1];
+            const connectByFeatureValues = [5, 4, 3, 2, 1];
+            const result = calculateLinePlotData(
+                xValues,
+                yValues,
+                connectByCategoryValues,
+                connectByFeatureValues,
+                true
+            );
+            expect(result).to.deep.equal([{ x: [5, 4, 3, 2, 1], y: [5, 4, 3, 2, 1] }]);
         });
     });
 });

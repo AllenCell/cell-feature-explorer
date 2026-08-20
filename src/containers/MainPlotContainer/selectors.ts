@@ -180,54 +180,56 @@ export const getLinePlotData = createSelector(
         getFilteredConnectByFeatureValues,
         getShowConnectLines,
     ],
-    (
-        xValues,
-        yValues,
-        connectByCategoryValues,
-        connectByFeatureValues,
-        showConnectedPoints
-    ): LinePlotData[] | null => {
-        if (!showConnectedPoints) {
-            return null;
-        }
-        ({ xValues, yValues } = handleNullValues(xValues, yValues));
-        const indicesByGroup: Map<number, number[]> = new Map();
-
-        // Group data point indices by their category
-        for (let i = 0; i < connectByCategoryValues.length; i++) {
-            const category = connectByCategoryValues[i];
-            if (category === null) {
-                continue;
-            }
-            if (!indicesByGroup.has(category)) {
-                indicesByGroup.set(category, []);
-            }
-            const indices = indicesByGroup.get(category);
-            if (indices) {
-                indices.push(i);
-            }
-        }
-
-        const lineData: LinePlotData[] = [];
-        for (const indices of indicesByGroup.values()) {
-            const x: (number | null)[] = [];
-            const y: (number | null)[] = [];
-            // Sort each category's data by the feature values.
-            indices.sort((aIndex, bIndex) => {
-                const a = connectByFeatureValues[aIndex] ?? Infinity;
-                const b = connectByFeatureValues[bIndex] ?? Infinity;
-                return a - b;
-            });
-            for (const i of indices) {
-                x.push(xValues[i]);
-                y.push(yValues[i]);
-            }
-            lineData.push({ x: x, y: y });
-        }
-
-        return lineData;
-    }
+    calculateLinePlotData
 );
+
+export function calculateLinePlotData(
+    xValues: (number | null)[],
+    yValues: (number | null)[],
+    connectByCategoryValues: (number | null)[],
+    connectByFeatureValues: (number | null)[],
+    showConnectingLines: boolean
+): LinePlotData[] | null {
+    if (!showConnectingLines) {
+        return null;
+    }
+    ({ xValues, yValues } = handleNullValues(xValues, yValues));
+    const indicesByGroup: Map<number, number[]> = new Map();
+
+    // Group data point indices by their category
+    for (let i = 0; i < connectByCategoryValues.length; i++) {
+        const category = connectByCategoryValues[i];
+        if (category === null) {
+            continue;
+        }
+        if (!indicesByGroup.has(category)) {
+            indicesByGroup.set(category, []);
+        }
+        const indices = indicesByGroup.get(category);
+        if (indices) {
+            indices.push(i);
+        }
+    }
+
+    const lineData: LinePlotData[] = [];
+    for (const indices of indicesByGroup.values()) {
+        const x: (number | null)[] = [];
+        const y: (number | null)[] = [];
+        // Sort each category's data by the feature values.
+        indices.sort((aIndex, bIndex) => {
+            const a = connectByFeatureValues[aIndex] ?? Infinity;
+            const b = connectByFeatureValues[bIndex] ?? Infinity;
+            return a - b;
+        });
+        for (const i of indices) {
+            x.push(xValues[i]);
+            y.push(yValues[i]);
+        }
+        lineData.push({ x: x, y: y });
+    }
+
+    return lineData;
+}
 
 const getAnnotationData = createSelector(
     [getFilteredCellData, getClickedCellsFileInfo, getPlotByOnX, getPlotByOnY, getHoveredCardId],
