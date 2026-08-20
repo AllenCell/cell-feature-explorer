@@ -24,6 +24,7 @@ export interface InitialDatasetSelections {
     defaultYAxis: string;
     defaultColorBy: string;
     defaultGroupBy: string;
+    defaultConnectBy: string;
     thumbnailRoot: string;
     downloadRoot: string;
     volumeViewerDataRoot: string;

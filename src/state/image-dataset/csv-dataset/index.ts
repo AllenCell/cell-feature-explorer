@@ -205,6 +205,10 @@ class CsvRequest implements ImageDataset {
         return featureKeys[Math.min(Math.max(index, 0), lastIndex)];
     }
 
+    private getFeatureKeysByTerm(featureKeys: string[], term: string): string {
+        return featureKeys.find((key) => key.toLowerCase().includes(term.toLowerCase())) ?? "";
+    }
+
     /**
      * Returns the feature data as a map from the feature name to a array of either
      * numeric or string values.
@@ -475,6 +479,11 @@ class CsvRequest implements ImageDataset {
             defaultYAxis: this.getFeatureKeyClamped(featureKeys, 1),
             defaultColorBy: this.defaultGroupByFeatureKey,
             defaultGroupBy: this.defaultGroupByFeatureKey,
+            // Attempt to find a feature representing time for line drawing.
+            defaultConnectBy:
+                this.getFeatureKeysByTerm(featureKeys, "time") ||
+                this.getFeatureKeysByTerm(featureKeys, "frame") ||
+                this.getFeatureKeyClamped(featureKeys, 2),
             // TODO: Provide the containing folder of the CSV if the values for the columns (thumbnails,
             // downloads, volumes) are relative paths and not HTTPS URLs.
             thumbnailRoot: "",

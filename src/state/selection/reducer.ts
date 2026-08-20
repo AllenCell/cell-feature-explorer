@@ -37,9 +37,14 @@ import {
     SET_COLOR_OVERRIDES,
     SET_POINT_RADIUS,
     SET_POINT_OPACITY,
+    CHANGE_CONNECT_BY_CATEGORY,
+    CHANGE_CONNECT_BY_FEATURE,
+    SET_SHOW_CONNECT_LINES,
 } from "./constants";
 import {
     BoolToggleAction,
+    ChangeConnectByCategory,
+    ChangeConnectByFeature,
     ChangeDownloadConfigAction,
     ChangeGroupByCategory,
     ChangeHoveredPointAction,
@@ -62,9 +67,10 @@ import {
     SetCsvUrlAction,
     SetPointOpacityAction,
     SetPointRadiusAction,
+    SetShowConnectLines,
 } from "./types";
 
-export const initialState = {
+export const initialState: SelectionStateBranch = {
     applySelectionSetColoring: true,
     cellSelectedFor3D: "",
     colorBy: "",
@@ -85,6 +91,9 @@ export const initialState = {
     plotByOnX: "",
     plotByOnY: "",
     groupBy: "",
+    connectByCategory: "",
+    connectByFeature: "",
+    showConnectLines: false,
     defaultColors: INITIAL_COLORS,
     colorOverrides: [],
     /** Radius of the points in the plot, in pixels. */
@@ -145,6 +154,33 @@ const actionToConfigMap: TypeToDescriptionMap = {
         perform: (state: SelectionStateBranch, action: ChangeGroupByCategory) => ({
             ...state,
             groupBy: action.payload,
+        }),
+    },
+    [CHANGE_CONNECT_BY_CATEGORY]: {
+        accepts: (action: Action): action is ChangeConnectByCategory =>
+            action.type === CHANGE_CONNECT_BY_CATEGORY,
+        perform: (state: SelectionStateBranch, action: ChangeConnectByCategory) => ({
+            ...state,
+            connectByCategory: action.payload,
+        }),
+    },
+    [CHANGE_CONNECT_BY_FEATURE]: {
+        accepts: (action: Action): action is ChangeConnectByFeature =>
+            action.type === CHANGE_CONNECT_BY_FEATURE,
+        perform: (state: SelectionStateBranch, action: ChangeConnectByFeature) => ({
+            ...state,
+            connectByFeature: action.payload,
+        }),
+    },
+    [SET_SHOW_CONNECT_LINES]: {
+        accepts: (action: Action): action is SetShowConnectLines =>
+            action.type === SET_SHOW_CONNECT_LINES,
+        perform: (
+            state: SelectionStateBranch,
+            action: SetShowConnectLines
+        ): SelectionStateBranch => ({
+            ...state,
+            showConnectLines: action.payload,
         }),
     },
     [OPEN_CELL_IN_3D]: {

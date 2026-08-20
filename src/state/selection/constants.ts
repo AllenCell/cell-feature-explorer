@@ -6,6 +6,9 @@ const makeSelectionConstant = <A extends string>(constant: A) =>
 
 export const CHANGE_AXIS = makeSelectionConstant("deselect-file");
 export const CHANGE_GROUP_BY_CATEGORY = makeSelectionConstant("change-group-by-category");
+export const CHANGE_CONNECT_BY_CATEGORY = makeSelectionConstant("change-connect-by-category");
+export const CHANGE_CONNECT_BY_FEATURE = makeSelectionConstant("change-connect-by-feature");
+export const SET_SHOW_CONNECT_LINES = makeSelectionConstant("set-show-connect-lines");
 export const SELECT_GROUP_VIA_PLOT = makeSelectionConstant("select_group");
 export const DESELECT_POINT = makeSelectionConstant("deselect-point");
 export const SELECT_POINT = makeSelectionConstant("select-point");

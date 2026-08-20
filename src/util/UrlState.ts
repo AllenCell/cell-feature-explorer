@@ -24,6 +24,8 @@ import {
 import type { FileInfo } from "../state/metadata/types";
 import {
     changeAxis,
+    changeConnectByCategory,
+    changeConnectByFeature,
     changeDataset,
     changeGroupByCategory,
     selectAlbum,
@@ -33,6 +35,7 @@ import {
     setCsvUrl,
     setPointOpacity,
     setPointRadius,
+    setShowConnectLines,
     toggleGallery,
 } from "../state/selection/actions";
 import { initialState } from "../state/selection/reducer";
@@ -45,6 +48,9 @@ export enum URLSearchParam {
     dataset = "dataset",
     plotByOnX = "plotByOnX",
     plotByOnY = "plotByOnY",
+    connectBy = "connectBy",
+    connectByCategory = "connectByCategory",
+    connectByFeature = "connectByFeature",
     selectedPoint = "selectedPoint",
     selectedAlbum = "selectedAlbum",
     galleryCollapsed = "galleryCollapsed",
@@ -194,6 +200,11 @@ export default class UrlState {
             toggleGallery(galleryCollapsed === "true"),
         [URLSearchParam.plotByOnX]: (plotByOnX) => changeAxis(X_AXIS_ID, String(plotByOnX)),
         [URLSearchParam.plotByOnY]: (plotByOnY) => changeAxis(Y_AXIS_ID, String(plotByOnY)),
+        [URLSearchParam.connectBy]: (connectBy) => setShowConnectLines(connectBy === "true"),
+        [URLSearchParam.connectByCategory]: (connectByCategory) =>
+            changeConnectByCategory(String(connectByCategory)),
+        [URLSearchParam.connectByFeature]: (connectByFeature) =>
+            changeConnectByFeature(String(connectByFeature)),
         [URLSearchParam.selectedAlbum]: (album) => selectAlbum(Number(album)),
         [URLSearchParam.selectedPoint]: (selection) => {
             if (Array.isArray(selection)) {
@@ -230,6 +241,15 @@ export default class UrlState {
         }),
         [URLSearchParam.plotByOnX]: (plotByOnX) => ({ [X_AXIS_ID]: String(plotByOnX) }),
         [URLSearchParam.plotByOnY]: (plotByOnY) => ({ [Y_AXIS_ID]: String(plotByOnY) }),
+        [URLSearchParam.connectBy]: (connectBy) => ({
+            showConnectLines: connectBy === "true",
+        }),
+        [URLSearchParam.connectByCategory]: (key) => ({
+            connectByCategory: String(key),
+        }),
+        [URLSearchParam.connectByFeature]: (key) => ({
+            connectByFeature: String(key),
+        }),
         [URLSearchParam.selectedAlbum]: (album) => ({ selectedAlbum: Number(album) }),
         [URLSearchParam.selectedPoint]: (selection) => ({
             initSelectedPoints: map(castArray(selection), String),
@@ -259,6 +279,9 @@ export default class UrlState {
         },
         [X_AXIS_ID]: (value) => ({ [URLSearchParam.plotByOnX]: String(value) }),
         [Y_AXIS_ID]: (value) => ({ [URLSearchParam.plotByOnY]: String(value) }),
+        showConnectLines: (value) => ({ [URLSearchParam.connectBy]: String(value) }),
+        connectByCategory: (value) => ({ [URLSearchParam.connectByCategory]: String(value) }),
+        connectByFeature: (value) => ({ [URLSearchParam.connectByFeature]: String(value) }),
         colorOverrides: (value: (string | undefined)[]) => ({
             [URLSearchParam.colorOverrides]: UrlState.serializeColorOverridesParam(value),
         }),

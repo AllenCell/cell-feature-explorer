@@ -104,6 +104,12 @@ export interface GroupedPlotData {
     groupSettings: GroupSettings[];
 }
 
+export interface LinePlotData {
+    x: (number | null)[];
+    y: (number | null)[];
+    // TODO: Add additional per-line options here, like group color
+}
+
 export interface SelectedGroup {
     groupColor: Color[];
     x: number[];
