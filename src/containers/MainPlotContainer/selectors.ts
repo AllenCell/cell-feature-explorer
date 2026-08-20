@@ -202,7 +202,18 @@ export const getLinePlotData = createSelector(
         getColorBySelection,
         getConnectByCategory,
     ],
-    calculateLinePlotData
+    (xValues, yValues, catValues, featValues, showLines, window, colors, colorBy, connectBy) =>
+        calculateLinePlotData(
+            xValues,
+            yValues,
+            catValues,
+            featValues,
+            showLines,
+            window,
+            colors,
+            colorBy,
+            connectBy
+        )
 );
 
 export function calculateLinePlotData(
@@ -213,7 +224,7 @@ export function calculateLinePlotData(
     showConnectingLines: boolean,
     movingAverageWindow: number,
     colorsForPlot: ColorForPlot[],
-    colorByFeature: string,
+    colorByFeature: string | number,
     connectByCategory: string
 ): LinePlotData[] | null {
     if (!showConnectingLines) {
