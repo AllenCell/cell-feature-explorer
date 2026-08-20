@@ -235,8 +235,8 @@ export function calculateLinePlotData(
     // Apply moving average to each line
     if (movingAverageWindow > 1) {
         for (const line of lineData) {
-            line.y = getMovingAverage(line.y, movingAverageWindow);
-            line.x = getMovingAverage(line.x, movingAverageWindow);
+            line.y = getMovingAverage(line.y, movingAverageWindow, true);
+            line.x = getMovingAverage(line.x, movingAverageWindow, true);
         }
     }
 

@@ -316,12 +316,12 @@ describe("MainPlotContainer selectors", () => {
 
     describe("calculateLinePlotData", () => {
         it("handles empty data", () => {
-            const result = calculateLinePlotData([], [], [], [], true);
+            const result = calculateLinePlotData([], [], [], [], true, 1);
             expect(result).to.deep.equal([]);
         });
 
         it("returns null when connecting lines are disabled", () => {
-            const result = calculateLinePlotData([1, 2], [3, 4], [1, 1], [5, 6], false);
+            const result = calculateLinePlotData([1, 2], [3, 4], [1, 1], [5, 6], false, 1);
             expect(result).to.equal(null);
         });
 
@@ -335,7 +335,8 @@ describe("MainPlotContainer selectors", () => {
                 yValues,
                 connectByCategoryValues,
                 connectByFeatureValues,
-                true
+                true,
+                1
             );
             expect(result).to.deep.equal([
                 { x: [1, 2], y: [6, 7] },
@@ -354,9 +355,26 @@ describe("MainPlotContainer selectors", () => {
                 yValues,
                 connectByCategoryValues,
                 connectByFeatureValues,
-                true
+                true,
+                1
             );
             expect(result).to.deep.equal([{ x: [5, 4, 3, 2, 1], y: [5, 4, 3, 2, 1] }]);
+        });
+
+        it("applies moving average to x and y values", () => {
+            const xValues = [10, 20, 30, 40, 50];
+            const yValues = [10, 20, 30, 40, 50];
+            const connectByCategoryValues = [1, 1, 1, 1, 1];
+            const connectByFeatureValues = [1, 2, 3, 4, 5];
+            const result = calculateLinePlotData(
+                xValues,
+                yValues,
+                connectByCategoryValues,
+                connectByFeatureValues,
+                true,
+                3
+            );
+            expect(result).to.deep.equal([{ x: [15, 20, 30, 40, 45], y: [15, 20, 30, 40, 45] }]);
         });
     });
 });
