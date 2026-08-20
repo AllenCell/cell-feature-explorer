@@ -47,6 +47,8 @@ import {
     getXAxisRange,
     getYAxisRange,
     getAnnotations,
+    getConnectByFeatureDisplayName,
+    getFormattedHoveredConnectByFeatureValue,
 } from "./selectors";
 import { getFeatureDefTooltip } from "../../state/selection/selectors";
 import { formatThumbnailSrc } from "../../state/util";
@@ -66,11 +68,13 @@ interface PropsFromState {
     hoveredPointData: SelectedPointData | null;
     hoveredXValue: string;
     hoveredYValue: string;
+    hoveredConnectByFeatureValue: string;
     mousePosition: MousePosition;
     plotDataArray: any;
     thumbnailRoot: string;
     xDisplayName: string;
     yDisplayName: string;
+    connectByFeatureDisplayName: string;
     xDropDownValue: string;
     yDropDownValue: string;
     yDropDownOptions: MeasuredFeatureDef[];
@@ -203,7 +207,8 @@ class MainPlotContainer extends React.Component<MainPlotContainerProps, MainPlot
                     srcPath: point.customdata.srcPath,
                     xValue: point.x,
                     yValue: point.y,
-                });
+                    connectByFeatureValue: point.customdata.connectByFeature,
+                } satisfies SelectedPointData);
                 this.loadThumbnailForZarr(point.id, point.customdata.srcPath);
             } else {
                 changeHoveredPoint(null);
@@ -251,6 +256,8 @@ class MainPlotContainer extends React.Component<MainPlotContainerProps, MainPlot
             yDisplayName,
             hoveredXValue,
             hoveredYValue,
+            connectByFeatureDisplayName,
+            hoveredConnectByFeatureValue,
         } = this.props;
         let thumbnailSrc: string | undefined = formatThumbnailSrc(
             thumbnailRoot,
@@ -273,6 +280,8 @@ class MainPlotContainer extends React.Component<MainPlotContainerProps, MainPlot
                     xValue={hoveredXValue}
                     yLabel={yDisplayName}
                     yValue={hoveredYValue}
+                    lineLabel={connectByFeatureDisplayName}
+                    lineValue={hoveredConnectByFeatureValue}
                 />
             )
         );
@@ -383,6 +392,8 @@ function mapStateToProps(state: State): PropsFromState {
         thumbnailRoot: selectionStateBranch.selectors.getThumbnailRoot(state),
         xDisplayName: getXDisplayName(state),
         yDisplayName: getYDisplayName(state),
+        connectByFeatureDisplayName: getConnectByFeatureDisplayName(state),
+        hoveredConnectByFeatureValue: getFormattedHoveredConnectByFeatureValue(state),
         xDropDownOptions: getXDisplayOptions(state),
         xDropDownValue: selectionStateBranch.selectors.getPlotByOnX(state),
         xTickConversion: getXTickConversion(state),

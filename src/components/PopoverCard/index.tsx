@@ -14,6 +14,8 @@ export interface PopoverCardProps {
     xValue?: string;
     yLabel?: string;
     yValue?: string;
+    lineLabel?: string;
+    lineValue?: string;
 }
 
 const PopoverCard: React.FC<PopoverCardProps> = (props) => {
@@ -46,7 +48,7 @@ const PopoverCard: React.FC<PopoverCardProps> = (props) => {
     return (
         <Card className={styles.container} cover={cover} variant="borderless">
             <Meta description={props.description} title={props.title} />
-            {(props.xValue || props.yValue) && (
+            {(props.xValue || props.yValue || props.lineValue !== undefined) && (
                 <div className={styles.axisValues}>
                     {props.xValue && (
                         <div className={styles.axisRow}>
@@ -58,6 +60,12 @@ const PopoverCard: React.FC<PopoverCardProps> = (props) => {
                         <div className={styles.axisRow}>
                             <span className={styles.axisLabel}>y:{props.yLabel}</span>
                             <span className={styles.axisValue}>{props.yValue}</span>
+                        </div>
+                    )}
+                    {props.lineValue && (
+                        <div className={styles.axisRow}>
+                            <span className={styles.axisLabel}>{props.lineLabel}</span>
+                            <span className={styles.axisValue}>{props.lineValue}</span>
                         </div>
                     )}
                 </div>
