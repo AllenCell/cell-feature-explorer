@@ -22,6 +22,9 @@ export interface SelectionStateBranch {
     connectByCategory: string;
     connectByFeature: string;
     showConnectLines: boolean;
+    connectLineMovingAverageWindow: number;
+    connectLineWidth: number;
+    connectLineDefaultColor: string;
     defaultColors: string[];
     colorOverrides: (string | undefined)[];
     pointRadius: number;
@@ -217,6 +220,21 @@ export interface SetColorOverrideAction {
 
 export interface SetColorOverridesAction {
     payload: (string | undefined)[];
+    type: string;
+}
+
+export interface SetLineAverageWindowAction {
+    payload: number;
+    type: string;
+}
+
+export interface SetLineWidthAction {
+    payload: number;
+    type: string;
+}
+
+export interface SetLineDefaultColorAction {
+    payload: string;
     type: string;
 }
 

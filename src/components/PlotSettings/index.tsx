@@ -7,6 +7,7 @@ import { SetPointOpacityAction, SetPointRadiusAction } from "../../state/selecti
 import { State } from "../../state/types";
 import { useDebouncedSetter } from "../../hooks";
 import LabeledSlider from "../LabeledSlider";
+import PlotLineSettings from "../PlotLineSettings";
 
 type PropsFromState = {
     pointOpacity: number;
@@ -19,7 +20,8 @@ type DispatchProps = {
 };
 
 type PlotSettingsProps = PropsFromState & DispatchProps;
-const SETTINGS_LABEL_WIDTH = "110px";
+const SETTINGS_WIDTH = "280px";
+const SETTINGS_LABEL_WIDTH = "135px";
 
 const PlotSettings = (props: PlotSettingsProps): ReactElement => {
     const { pointOpacity, pointRadius, handleSetPointOpacity, handleSetPointRadius } = props;
@@ -28,7 +30,7 @@ const PlotSettings = (props: PlotSettingsProps): ReactElement => {
     const [radius, setRadius] = useDebouncedSetter(pointRadius, handleSetPointRadius);
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", width: "250px" }}>
+        <div style={{ display: "flex", flexDirection: "column", width: SETTINGS_WIDTH }}>
             <LabeledSlider
                 label="Opacity"
                 labelWidth={SETTINGS_LABEL_WIDTH}
@@ -58,6 +60,7 @@ const PlotSettings = (props: PlotSettingsProps): ReactElement => {
                 inputMin={0}
                 inputMax={100}
             ></LabeledSlider>
+            <PlotLineSettings labelWidth={SETTINGS_LABEL_WIDTH} />
         </div>
     );
 };

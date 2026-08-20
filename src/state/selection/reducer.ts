@@ -2,7 +2,7 @@ import { filter, pickBy, uniqBy } from "lodash";
 import type { Action } from "redux";
 import type { SelectedGroups } from "..";
 
-import { CELL_ID_KEY } from "../../constants";
+import { CELL_ID_KEY, GENERAL_PLOT_SETTINGS } from "../../constants";
 import type { FileInfo } from "../metadata/types";
 import type { TypeToDescriptionMap } from "../types";
 import { makeReducer } from "../util";
@@ -40,6 +40,9 @@ import {
     CHANGE_CONNECT_BY_CATEGORY,
     CHANGE_CONNECT_BY_FEATURE,
     SET_SHOW_CONNECT_LINES,
+    SET_CONNECT_LINE_MOVING_AVERAGE_WINDOW,
+    SET_CONNECT_LINE_WIDTH,
+    SET_CONNECT_LINE_DEFAULT_COLOR,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -65,6 +68,9 @@ import {
     SetColorOverrideAction,
     SetColorOverridesAction,
     SetCsvUrlAction,
+    SetLineAverageWindowAction,
+    SetLineDefaultColorAction,
+    SetLineWidthAction,
     SetPointOpacityAction,
     SetPointRadiusAction,
     SetShowConnectLines,
@@ -100,6 +106,9 @@ export const initialState: SelectionStateBranch = {
     pointRadius: 4,
     /** Opacity of points in the plot, in the [0, 1] range. */
     pointOpacity: 0.5,
+    connectLineMovingAverageWindow: 1,
+    connectLineWidth: GENERAL_PLOT_SETTINGS.connectionLineWidth,
+    connectLineDefaultColor: GENERAL_PLOT_SETTINGS.connectionLineDefaultColor,
     selectedAlbum: INITIAL_SELECTED_ALBUM_ID,
     selectedAlbumFileInfo: [] as FileInfo[],
     selectedGroupColors: {},
@@ -181,6 +190,48 @@ const actionToConfigMap: TypeToDescriptionMap = {
         ): SelectionStateBranch => ({
             ...state,
             showConnectLines: action.payload,
+        }),
+    },
+    [SET_CONNECT_LINE_MOVING_AVERAGE_WINDOW]: {
+        accepts: (action: Action): action is SetLineAverageWindowAction =>
+            action.type === SET_CONNECT_LINE_MOVING_AVERAGE_WINDOW,
+        perform: (
+            state: SelectionStateBranch,
+            action: SetLineAverageWindowAction
+        ): SelectionStateBranch => {
+            let windowSize = action.payload;
+            if (!Number.isFinite(windowSize) || windowSize < 1) {
+                return state;
+            }
+            // Round to next odd integer
+            windowSize = Math.round(windowSize);
+            const nextOddInteger = Math.floor(windowSize / 2) * 2 + 1;
+            return { ...state, connectLineMovingAverageWindow: nextOddInteger };
+        },
+    },
+    [SET_CONNECT_LINE_WIDTH]: {
+        accepts: (action: Action): action is SetLineWidthAction =>
+            action.type === SET_CONNECT_LINE_WIDTH,
+        perform: (
+            state: SelectionStateBranch,
+            action: SetLineWidthAction
+        ): SelectionStateBranch => {
+            const lineWidth = action.payload;
+            if (!Number.isFinite(lineWidth) || lineWidth < 0) {
+                return state;
+            }
+            return { ...state, connectLineWidth: lineWidth };
+        },
+    },
+    [SET_CONNECT_LINE_DEFAULT_COLOR]: {
+        accepts: (action: Action): action is SetLineDefaultColorAction =>
+            action.type === SET_CONNECT_LINE_DEFAULT_COLOR,
+        perform: (
+            state: SelectionStateBranch,
+            action: SetLineDefaultColorAction
+        ): SelectionStateBranch => ({
+            ...state,
+            connectLineDefaultColor: action.payload,
         }),
     },
     [OPEN_CELL_IN_3D]: {
