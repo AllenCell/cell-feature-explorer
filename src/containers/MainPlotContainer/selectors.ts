@@ -44,6 +44,7 @@ import {
     getShowConnectLines,
     getFilteredConnectByCategoryValues,
     getLineMovingAverageWindow,
+    getConnectByFeature,
 } from "../../state/selection/selectors";
 import { MainPlotSettings, SelectedPointData, TickConversion } from "../../state/selection/types";
 import {
@@ -103,16 +104,24 @@ export const handleNullValues = (
 };
 
 export const getPlotlyCustomData = createSelector(
-    [getFilteredCellData],
-    (filteredCellData: DataForPlot): PlotlyCustomData[] => {
+    [getFilteredCellData, getShowConnectLines, getConnectByFeature],
+    (
+        filteredCellData: DataForPlot,
+        showConnectByLines: boolean,
+        connectByFeature: string
+    ): PlotlyCustomData[] => {
         const thumbnailPaths = filteredCellData.labels.thumbnailPaths;
         const srcPaths = filteredCellData.labels.sourcePaths;
         const indices = filteredCellData.indices;
+        const connectByFeatureValues = showConnectByLines
+            ? filteredCellData.values[connectByFeature]
+            : undefined;
         return map(indices, (cellIndex, i) => {
             return {
                 index: cellIndex,
                 thumbnailPath: thumbnailPaths[i],
                 srcPath: srcPaths?.[i],
+                connectByFeature: connectByFeatureValues?.[i],
             };
         });
     }
@@ -549,26 +558,30 @@ const makeNumberAxis = (): TickConversion => {
     };
 };
 
+const getFeatureTickConversion = (
+    featureKey: string,
+    featureDefs: MeasuredFeatureDef[]
+): TickConversion => {
+    const feature = find(featureDefs, { key: featureKey });
+    if (feature && feature.discrete) {
+        return makeNumberToTextConversion(feature.options);
+    }
+    return makeNumberAxis();
+};
+
 export const getXTickConversion = createSelector(
     [getPlotByOnX, getMeasuredFeaturesDefs],
-    (plotByOnX, measuredFeaturesDefs: MeasuredFeatureDef[]): TickConversion => {
-        const feature = findFeature(measuredFeaturesDefs, plotByOnX);
-        if (feature && feature.discrete) {
-            return makeNumberToTextConversion(feature.options);
-        }
-        return makeNumberAxis();
-    }
+    getFeatureTickConversion
 );
 
 export const getYTickConversion = createSelector(
     [getPlotByOnY, getMeasuredFeaturesDefs],
-    (plotByOnY, measuredFeaturesDefs: MeasuredFeatureDef[]): TickConversion => {
-        const feature = find(measuredFeaturesDefs, { key: plotByOnY });
-        if (feature && feature.discrete) {
-            return makeNumberToTextConversion(feature.options);
-        }
-        return makeNumberAxis();
-    }
+    getFeatureTickConversion
+);
+
+export const getConnectByFeatureTickConversion = createSelector(
+    [getConnectByFeature, getMeasuredFeaturesDefs],
+    getFeatureTickConversion
 );
 
 export const getDataForOverlayCard = createSelector(
@@ -630,6 +643,14 @@ export const getYDisplayName = createSelector(
     }
 );
 
+export const getConnectByFeatureDisplayName = createSelector(
+    [getConnectByFeature, getMeasuredFeaturesDefs],
+    (connectByFeature, featureDefs): string => {
+        const feature = findFeature(featureDefs, connectByFeature);
+        return feature?.displayName ?? connectByFeature;
+    }
+);
+
 function formatAxisValue(
     value: number | string | undefined,
     isCategorical: boolean,
@@ -664,5 +685,18 @@ export const getFormattedHoveredYValue = createSelector(
             includes(categoricalFeatures, yKey),
             yTickConversion
         );
+    }
+);
+
+export const getFormattedHoveredConnectByFeatureValue = createSelector(
+    [
+        getHoveredPointData,
+        getCategoricalFeatureKeys,
+        getConnectByFeature,
+        getConnectByFeatureTickConversion,
+    ],
+    (hoveredPointData, categoricalFeatures, connectByKey, tickConversion): string => {
+        const value = hoveredPointData?.connectByFeatureValue ?? undefined;
+        return formatAxisValue(value, includes(categoricalFeatures, connectByKey), tickConversion);
     }
 );

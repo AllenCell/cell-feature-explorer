@@ -127,6 +127,7 @@ export interface SelectedPointData {
     groupBy?: string;
     xValue?: number | string;
     yValue?: number | string;
+    connectByFeatureValue?: number | string | null;
 }
 
 export interface ChangeHoveredPointAction {

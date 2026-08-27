@@ -68,6 +68,8 @@ export interface SelectedGroupDatum {
 export interface PlotlyCustomData {
     thumbnailPath: string;
     index: number;
+    srcPath?: string;
+    connectByFeatureValue?: number | null;
 }
 
 export enum DataType {
