@@ -200,12 +200,12 @@ class CsvRequest implements ImageDataset {
      * Used for default initialization. Returns the feature key at the given index,
      * clamped to the length of the features array.
      */
-    private getFeatureKeyClamped(featureKeys: string[], index: number): string {
+    private getFeatureKeyAtIndexClamped(featureKeys: string[], index: number): string {
         const lastIndex = featureKeys.length - 1;
         return featureKeys[Math.min(Math.max(index, 0), lastIndex)];
     }
 
-    private getFeatureKeysByTerm(featureKeys: string[], term: string): string {
+    private getAnyFeatureKeyWithKeyword(featureKeys: string[], term: string): string {
         return featureKeys.find((key) => key.toLowerCase().includes(term.toLowerCase())) ?? "";
     }
 
@@ -475,15 +475,15 @@ class CsvRequest implements ImageDataset {
     selectDataset(): Promise<InitialDatasetSelections> {
         const featureKeys = Array.from(this.featureInfo.keys());
         return Promise.resolve({
-            defaultXAxis: this.getFeatureKeyClamped(featureKeys, 0),
-            defaultYAxis: this.getFeatureKeyClamped(featureKeys, 1),
+            defaultXAxis: this.getFeatureKeyAtIndexClamped(featureKeys, 0),
+            defaultYAxis: this.getFeatureKeyAtIndexClamped(featureKeys, 1),
             defaultColorBy: this.defaultGroupByFeatureKey,
             defaultGroupBy: this.defaultGroupByFeatureKey,
             // Attempt to find a feature representing time for line drawing.
             defaultConnectBy:
-                this.getFeatureKeysByTerm(featureKeys, "time") ||
-                this.getFeatureKeysByTerm(featureKeys, "frame") ||
-                this.getFeatureKeyClamped(featureKeys, 2),
+                this.getAnyFeatureKeyWithKeyword(featureKeys, "time") ||
+                this.getAnyFeatureKeyWithKeyword(featureKeys, "frame") ||
+                this.getFeatureKeyAtIndexClamped(featureKeys, 2),
             // TODO: Provide the containing folder of the CSV if the values for the columns (thumbnails,
             // downloads, volumes) are relative paths and not HTTPS URLs.
             thumbnailRoot: "",

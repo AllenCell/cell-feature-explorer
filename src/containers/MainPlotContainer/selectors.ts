@@ -217,8 +217,8 @@ export function calculateLinePlotData(
         const y: (number | null)[] = [];
         // Sort each category's data by the feature values.
         indices.sort((aIndex, bIndex) => {
-            const a = connectByFeatureValues[aIndex] ?? Infinity;
-            const b = connectByFeatureValues[bIndex] ?? Infinity;
+            const a = connectByFeatureValues[aIndex] ?? Number.MAX_VALUE;
+            const b = connectByFeatureValues[bIndex] ?? Number.MAX_VALUE;
             return a - b;
         });
         for (const i of indices) {
