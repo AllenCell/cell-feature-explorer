@@ -6,7 +6,7 @@ import type {
     PlotMouseEvent,
     PlotSelectionEvent,
 } from "plotly.js";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import Plot from "react-plotly.js";
 
@@ -14,7 +14,7 @@ import { GENERAL_PLOT_SETTINGS } from "../../constants";
 import { TickConversion } from "../../state/selection/types";
 
 import styles from "./style.css";
-import { Button, Popover, Row } from "antd";
+import { Button, Popover } from "antd";
 import PlotSettings from "../PlotSettings";
 import { ICON_SVG_PATH_PLOT_SETTINGS } from "./constants";
 import { CloseOutlined } from "@ant-design/icons";

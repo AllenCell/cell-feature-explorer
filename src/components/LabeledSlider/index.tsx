@@ -2,8 +2,6 @@ import { InputNumber, Row } from "antd";
 import Slider, { SliderSingleProps } from "antd/es/slider";
 import React, { ReactElement, useEffect, useState } from "react";
 
-type ValueType = number | number[];
-
 type LabeledSliderProps = {
     sliderProps: SliderSingleProps;
     label: string;

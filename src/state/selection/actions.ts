@@ -30,6 +30,9 @@ import {
     SET_COLOR_OVERRIDES,
     SET_POINT_RADIUS,
     SET_POINT_OPACITY,
+    CHANGE_CONNECT_BY_CATEGORY,
+    CHANGE_CONNECT_BY_FEATURE,
+    SET_SHOW_CONNECT_LINES,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -72,6 +75,27 @@ export function changeGroupByCategory(payload: string): ChangeGroupByCategory {
     return {
         payload,
         type: CHANGE_GROUP_BY_CATEGORY,
+    };
+}
+
+export function changeConnectByCategory(payload: string): ChangeSelectionAction {
+    return {
+        payload,
+        type: CHANGE_CONNECT_BY_CATEGORY,
+    };
+}
+
+export function changeConnectByFeature(payload: string): ChangeSelectionAction {
+    return {
+        payload,
+        type: CHANGE_CONNECT_BY_FEATURE,
+    };
+}
+
+export function setShowConnectLines(payload: boolean): BoolToggleAction {
+    return {
+        payload,
+        type: SET_SHOW_CONNECT_LINES,
     };
 }
 
