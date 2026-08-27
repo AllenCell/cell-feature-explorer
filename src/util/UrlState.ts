@@ -32,6 +32,9 @@ import {
     selectCellFor3DViewer,
     selectPoint,
     setColorOverrides,
+    setConnectLineDefaultColor,
+    setConnectLineAverageWindow,
+    setConnectLineWidth,
     setCsvUrl,
     setPointOpacity,
     setPointRadius,
@@ -51,6 +54,9 @@ export enum URLSearchParam {
     connectBy = "connectBy",
     connectByCategory = "connectByCategory",
     connectByFeature = "connectByFeature",
+    connectLineMovingAverageWindow = "lineWindow",
+    connectLineWidth = "lineWidth",
+    connectLineDefaultColor = "lineColor",
     selectedPoint = "selectedPoint",
     selectedAlbum = "selectedAlbum",
     galleryCollapsed = "galleryCollapsed",
@@ -205,6 +211,11 @@ export default class UrlState {
             changeConnectByCategory(String(connectByCategory)),
         [URLSearchParam.connectByFeature]: (connectByFeature) =>
             changeConnectByFeature(String(connectByFeature)),
+        [URLSearchParam.connectLineMovingAverageWindow]: (window) =>
+            setConnectLineAverageWindow(Number(window)),
+        [URLSearchParam.connectLineWidth]: (width) => setConnectLineWidth(Number(width)),
+        [URLSearchParam.connectLineDefaultColor]: (color) =>
+            setConnectLineDefaultColor(String(color)),
         [URLSearchParam.selectedAlbum]: (album) => selectAlbum(Number(album)),
         [URLSearchParam.selectedPoint]: (selection) => {
             if (Array.isArray(selection)) {
@@ -250,6 +261,21 @@ export default class UrlState {
         [URLSearchParam.connectByFeature]: (key) => ({
             connectByFeature: String(key),
         }),
+        [URLSearchParam.connectLineMovingAverageWindow]: (window) => {
+            if (!isFinite(Number(window))) {
+                return {};
+            }
+            return { connectLineMovingAverageWindow: Number(window) };
+        },
+        [URLSearchParam.connectLineWidth]: (width) => {
+            if (!isFinite(Number(width))) {
+                return {};
+            }
+            return { connectLineWidth: Number(width) };
+        },
+        [URLSearchParam.connectLineDefaultColor]: (color) => ({
+            connectLineDefaultColor: String(color),
+        }),
         [URLSearchParam.selectedAlbum]: (album) => ({ selectedAlbum: Number(album) }),
         [URLSearchParam.selectedPoint]: (selection) => ({
             initSelectedPoints: map(castArray(selection), String),
@@ -282,6 +308,15 @@ export default class UrlState {
         showConnectLines: (value) => ({ [URLSearchParam.connectBy]: String(value) }),
         connectByCategory: (value) => ({ [URLSearchParam.connectByCategory]: String(value) }),
         connectByFeature: (value) => ({ [URLSearchParam.connectByFeature]: String(value) }),
+        connectLineMovingAverageWindow: (value) => ({
+            [URLSearchParam.connectLineMovingAverageWindow]: String(value),
+        }),
+        connectLineWidth: (value) => ({
+            [URLSearchParam.connectLineWidth]: String(value),
+        }),
+        connectLineDefaultColor: (value) => ({
+            [URLSearchParam.connectLineDefaultColor]: String(value),
+        }),
         colorOverrides: (value: (string | undefined)[]) => ({
             [URLSearchParam.colorOverrides]: UrlState.serializeColorOverridesParam(value),
         }),

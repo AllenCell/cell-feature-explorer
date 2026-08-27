@@ -44,6 +44,11 @@ export const getGroupByCategory = (state: State): string => state.selection.grou
 export const getConnectByCategory = (state: State): string => state.selection.connectByCategory;
 export const getConnectByFeature = (state: State): string => state.selection.connectByFeature;
 export const getShowConnectLines = (state: State): boolean => state.selection.showConnectLines;
+export const getLineMovingAverageWindow = (state: State): number =>
+    state.selection.connectLineMovingAverageWindow;
+export const getLineWidth = (state: State): number => state.selection.connectLineWidth;
+export const getLineDefaultColor = (state: State): string =>
+    state.selection.connectLineDefaultColor;
 export const getClickedCellsFileInfo = (state: State): FileInfo[] => state.selection.selectedPoints;
 export const getSelectedGroups = (state: State): SelectedGroups => state.selection.selectedGroups;
 export const getColorBySelection = (state: State): keyof MappingOfMeasuredValuesArrays =>
@@ -256,12 +261,19 @@ export const getGroupingCategoryNamesAsArray = createSelector(
 );
 
 export const getMainPlotSettings = createSelector(
-    [getPointOpacity, getPointRadius],
-    (pointOpacity: number, pointRadius: number): MainPlotSettings => {
+    [getPointOpacity, getPointRadius, getLineDefaultColor, getLineWidth],
+    (
+        pointOpacity: number,
+        pointRadius: number,
+        lineDefaultColor: string,
+        lineWidth: number
+    ): MainPlotSettings => {
         return {
             ...GENERAL_PLOT_SETTINGS,
             circleRadius: pointRadius,
             unselectedCircleOpacity: pointOpacity,
+            connectionLineDefaultColor: lineDefaultColor,
+            connectionLineWidth: lineWidth,
         };
     }
 );
