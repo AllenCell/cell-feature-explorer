@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 
 import { mockState, selectedCellFileInfo } from "../../../state/test/mocks";
-import type { State, AnnotationData } from "../../../state/types";
+import type { State, AnnotationData, LinePlotData } from "../../../state/types";
 import {
     calculateLinePlotData,
     getAnnotations,
@@ -14,6 +14,7 @@ import {
 } from "../selectors";
 import type { PlotlyAnnotation } from "../../../components/MainPlot";
 import { CELL_ID_KEY, PALETTE } from "../../../constants";
+import type { ColorForPlot } from "../../../state/selection/types";
 
 describe("MainPlotContainer selectors", () => {
     const newMockState = mockState;
@@ -315,13 +316,66 @@ describe("MainPlotContainer selectors", () => {
     });
 
     describe("calculateLinePlotData", () => {
+        const defaultParams = {
+            xValues: [],
+            yValues: [],
+            connectByCategoryValues: [],
+            connectByFeatureValues: [],
+            showConnectingLines: true,
+            movingAverageWindow: 1,
+            colorsForPlot: [],
+            colorByFeature: "color_feature",
+            connectByCategory: "category_feature",
+        };
+
+        function calculate(
+            params: Partial<{
+                xValues: (number | null)[];
+                yValues: (number | null)[];
+                connectByCategoryValues: (number | null)[];
+                connectByFeatureValues: (number | null)[];
+                showConnectingLines: boolean;
+                movingAverageWindow: number;
+                colorsForPlot: ColorForPlot[];
+                colorByFeature: string;
+                connectByCategory: string;
+            }>
+        ): LinePlotData[] | null {
+            const paramsWithDefaults = { ...defaultParams, ...params };
+            return calculateLinePlotData(
+                paramsWithDefaults.xValues,
+                paramsWithDefaults.yValues,
+                paramsWithDefaults.connectByCategoryValues,
+                paramsWithDefaults.connectByFeatureValues,
+                paramsWithDefaults.showConnectingLines,
+                paramsWithDefaults.movingAverageWindow,
+                paramsWithDefaults.colorsForPlot,
+                paramsWithDefaults.colorByFeature,
+                paramsWithDefaults.connectByCategory
+            );
+        }
+
         it("handles empty data", () => {
-            const result = calculateLinePlotData([], [], [], [], true, 1);
+            const result = calculate({
+                xValues: [],
+                yValues: [],
+                connectByCategoryValues: [],
+                connectByFeatureValues: [],
+                showConnectingLines: true,
+                movingAverageWindow: 1,
+            });
             expect(result).to.deep.equal([]);
         });
 
         it("returns null when connecting lines are disabled", () => {
-            const result = calculateLinePlotData([1, 2], [3, 4], [1, 1], [5, 6], false, 1);
+            const result = calculate({
+                xValues: [1, 2],
+                yValues: [3, 4],
+                connectByCategoryValues: [1, 1],
+                connectByFeatureValues: [5, 6],
+                showConnectingLines: false,
+                movingAverageWindow: 1,
+            });
             expect(result).to.equal(null);
         });
 
@@ -330,18 +384,18 @@ describe("MainPlotContainer selectors", () => {
             const yValues = [6, 7, 8, 9, 10];
             const connectByCategoryValues = [1, 1, 2, 2, 3];
             const connectByFeatureValues = [1, 2, 3, 4, 5];
-            const result = calculateLinePlotData(
+            const result = calculate({
                 xValues,
                 yValues,
                 connectByCategoryValues,
                 connectByFeatureValues,
-                true,
-                1
-            );
+                showConnectingLines: true,
+                movingAverageWindow: 1,
+            });
             expect(result).to.deep.equal([
-                { x: [1, 2], y: [6, 7] },
-                { x: [3, 4], y: [8, 9] },
-                { x: [5], y: [10] },
+                { x: [1, 2], y: [6, 7], groupIndex: 1 },
+                { x: [3, 4], y: [8, 9], groupIndex: 2 },
+                { x: [5], y: [10], groupIndex: 3 },
             ]);
         });
 
@@ -350,15 +404,17 @@ describe("MainPlotContainer selectors", () => {
             const yValues = [1, 2, 3, 4, 5];
             const connectByCategoryValues = [1, 1, 1, 1, 1];
             const connectByFeatureValues = [5, 4, 3, 2, 1];
-            const result = calculateLinePlotData(
+            const result = calculate({
                 xValues,
                 yValues,
                 connectByCategoryValues,
                 connectByFeatureValues,
-                true,
-                1
-            );
-            expect(result).to.deep.equal([{ x: [5, 4, 3, 2, 1], y: [5, 4, 3, 2, 1] }]);
+                showConnectingLines: true,
+                movingAverageWindow: 1,
+            });
+            expect(result).to.deep.equal([
+                { x: [5, 4, 3, 2, 1], y: [5, 4, 3, 2, 1], groupIndex: 1 },
+            ]);
         });
 
         it("applies moving average to x and y values", () => {
@@ -366,15 +422,52 @@ describe("MainPlotContainer selectors", () => {
             const yValues = [10, 20, 30, 40, 50];
             const connectByCategoryValues = [1, 1, 1, 1, 1];
             const connectByFeatureValues = [1, 2, 3, 4, 5];
-            const result = calculateLinePlotData(
+            const result = calculate({
                 xValues,
                 yValues,
                 connectByCategoryValues,
                 connectByFeatureValues,
-                true,
-                3
-            );
-            expect(result).to.deep.equal([{ x: [15, 20, 30, 40, 45], y: [15, 20, 30, 40, 45] }]);
+                showConnectingLines: true,
+                movingAverageWindow: 3,
+            });
+            expect(result).to.deep.equal([
+                { x: [15, 20, 30, 40, 45], y: [15, 20, 30, 40, 45], groupIndex: 1 },
+            ]);
+        });
+
+        it("applies colors when colorby feature matches category", () => {
+            const xValues = [1, 2, 3, 4, 5];
+            const yValues = [1, 2, 3, 4, 5];
+            const connectByCategoryValues = [1, 2, 3, 4, 5];
+            const connectByFeatureValues = [1, 2, 3, 4, 5];
+            const connectByCategory = "category_feature";
+            const colorByFeature = "category_feature";
+            const colorsForPlot: ColorForPlot[] = [
+                { color: "red", name: "Group 1", label: "Group 1", key: 1 },
+                { color: "green", name: "Group 2", label: "Group 2", key: 2 },
+                { color: "#FF00FF", name: "Group 5", label: "Group 5", key: 5 },
+                { color: "#FFFF00", name: "Group 4", label: "Group 4", key: 4 },
+                { color: "#0000FF", name: "Group 3", label: "Group 3", key: 3 },
+            ];
+
+            const result = calculate({
+                xValues,
+                yValues,
+                connectByCategoryValues,
+                connectByFeatureValues,
+                showConnectingLines: true,
+                movingAverageWindow: 1,
+                connectByCategory,
+                colorByFeature,
+                colorsForPlot,
+            });
+            expect(result).to.deep.equal([
+                { x: [1], y: [1], groupIndex: 1, color: "red" },
+                { x: [2], y: [2], groupIndex: 2, color: "green" },
+                { x: [3], y: [3], groupIndex: 3, color: "#0000FF" },
+                { x: [4], y: [4], groupIndex: 4, color: "#FFFF00" },
+                { x: [5], y: [5], groupIndex: 5, color: "#FF00FF" },
+            ]);
         });
     });
 });
