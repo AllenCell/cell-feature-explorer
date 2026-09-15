@@ -218,6 +218,8 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
             xaxis2: histogramAxis,
             yaxis: makeAxis(yAxisType, yTickConversion, yAxisRange && padAxisRange(yAxisRange)),
             yaxis2: histogramAxis,
+            // Constant value prevents the plot from resetting on
+            // selection/annotation changes.
             uirevision: "constant",
         };
     }, [
