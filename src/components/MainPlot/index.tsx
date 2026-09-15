@@ -6,7 +6,7 @@ import type {
     PlotMouseEvent,
     PlotSelectionEvent,
 } from "plotly.js";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Plot from "react-plotly.js";
 
@@ -218,6 +218,7 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
             xaxis2: histogramAxis,
             yaxis: makeAxis(yAxisType, yTickConversion, yAxisRange && padAxisRange(yAxisRange)),
             yaxis2: histogramAxis,
+            uirevision: "constant",
         };
     }, [
         height,
