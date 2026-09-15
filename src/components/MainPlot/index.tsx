@@ -6,7 +6,7 @@ import type {
     PlotMouseEvent,
     PlotSelectionEvent,
 } from "plotly.js";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import Plot from "react-plotly.js";
 
