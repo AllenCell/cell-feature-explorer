@@ -205,6 +205,8 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
             range,
         });
 
+        // Fake comment
+
         return {
             annotations: updatedAnnotations,
             autosize: true,
