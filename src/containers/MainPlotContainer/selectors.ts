@@ -1,4 +1,4 @@
-import { includes, map, find, findIndex, isEmpty } from "lodash";
+import { includes, map, find, findIndex, isEmpty, filter } from "lodash";
 import { PlotData } from "plotly.js";
 import { createSelector } from "reselect";
 
@@ -13,7 +13,11 @@ import {
     SELECTIONS_PLOT_NAME,
     THUMBNAIL_PATH,
 } from "../../constants";
-import { getCategoricalFeatureKeys, getMeasuredFeaturesDefs } from "../../state/metadata/selectors";
+import {
+    getCategoricalFeatureKeys,
+    getMeasuredFeaturesDefs,
+    getPerCellDataForPlot,
+} from "../../state/metadata/selectors";
 import {
     DataForPlot,
     FileInfo,
@@ -46,6 +50,7 @@ import {
     getLineMovingAverageWindow,
     getConnectByFeature,
     getConnectByCategory,
+    getFiltersToExclude,
 } from "../../state/selection/selectors";
 import {
     ColorForPlot,
@@ -288,15 +293,25 @@ export function calculateLinePlotData(
 }
 
 const getAnnotationData = createSelector(
-    [getFilteredCellData, getClickedCellsFileInfo, getPlotByOnX, getPlotByOnY, getHoveredCardId],
+    [
+        getPerCellDataForPlot,
+        getClickedCellsFileInfo,
+        getFiltersToExclude,
+        getPlotByOnX,
+        getPlotByOnY,
+        getGroupingCategoryNamesAsArray,
+        getHoveredCardId,
+    ],
     (
-        filteredCellData: DataForPlot,
+        allCellData: DataForPlot,
         clickedCellsFileInfo: FileInfo[],
+        filtersToExclude: string[],
         xAxis,
         yAxis,
+        groupByCategoryNames,
         currentHoveredCellId
     ): AnnotationData[] => {
-        if (isEmpty(filteredCellData.values) || isEmpty(filteredCellData.labels)) {
+        if (isEmpty(allCellData.values) || isEmpty(allCellData.labels)) {
             return [];
         }
         const initAcc: AnnotationData[] = [];
@@ -305,10 +320,23 @@ const getAnnotationData = createSelector(
             const fovID = data[FOV_ID_KEY] || "";
             const thumbnailPath = data[THUMBNAIL_PATH] || "";
 
-            const cellIds = filteredCellData.labels[ARRAY_OF_CELL_IDS_KEY];
-            const pointIndex = cellIds.indexOf(cellID);
-            const x = filteredCellData.values[xAxis][pointIndex] ?? null;
-            const y = filteredCellData.values[yAxis][pointIndex] ?? null;
+            const cellIds = allCellData.labels[ARRAY_OF_CELL_IDS_KEY];
+            // `FileInfo.index` is typed as optional because it is added from
+            // the database, but it will always be defined here. Note that
+            // `index` is the position in the full array of cell IDs, and does
+            // not account for filtering, so filtering needs to be done
+            // manually.
+            const pointIndex =
+                data.index !== undefined ? data.index : findIndex(cellIds, (id) => id === cellID);
+            const x = allCellData.values[xAxis][pointIndex] ?? null;
+            const y = allCellData.values[yAxis][pointIndex] ?? null;
+
+            // Apply filtering
+            const groupName = groupByCategoryNames[pointIndex] ?? null;
+            if (filtersToExclude.includes(groupName)) {
+                return acc;
+            }
+
             if (pointIndex >= 0 && x !== null && y !== null) {
                 acc.push({
                     cellID,
