@@ -1,4 +1,4 @@
-import { includes, map, find, findIndex, isEmpty, filter } from "lodash";
+import { includes, map, find, findIndex, isEmpty } from "lodash";
 import { PlotData } from "plotly.js";
 import { createSelector } from "reselect";
 
