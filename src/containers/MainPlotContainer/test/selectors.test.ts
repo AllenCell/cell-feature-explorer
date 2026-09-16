@@ -51,8 +51,7 @@ describe("MainPlotContainer selectors", () => {
             const result: PlotlyAnnotation[] = getAnnotations(state);
             expect(result).to.have.lengthOf(2);
         });
-    });
-    describe("getAnnotations selector", () => {
+
         it("it filters out non visible points", () => {
             const state: State = {
                 ...newMockState,
@@ -66,8 +65,26 @@ describe("MainPlotContainer selectors", () => {
             const result: PlotlyAnnotation[] = getAnnotations(state);
             expect(result).to.have.lengthOf(0);
         });
-    });
-    describe("getAnnotations selector", () => {
+
+        it("it excludes filtered groups from annotations", () => {
+            const state: State = {
+                ...newMockState,
+                selection: {
+                    ...newMockState.selection,
+                    plotByOnX: "apical-proximity",
+                    plotByOnY: "apical-proximity",
+                    // 2 cells are selected, but the first (cell ID 1) will be
+                    // excluded by filtering
+                    selectedPoints: selectedCellFileInfo,
+                    filterExclude: ["Paxillin"],
+                },
+            };
+            const result: PlotlyAnnotation[] = getAnnotations(state);
+            expect(result).to.have.lengthOf(1);
+            expect(result[0].pointIndex).to.equal(1);
+            expect(result[0].cellID).to.equal("2");
+        });
+
         it("it still shows points whose values are zero", () => {
             const state: State = {
                 ...newMockState,
@@ -82,6 +99,7 @@ describe("MainPlotContainer selectors", () => {
             expect(result).to.have.lengthOf(2);
         });
     });
+
     describe("getXDisplayName", () => {
         it("returns the displayName for a continuous feature", () => {
             const state: State = {
