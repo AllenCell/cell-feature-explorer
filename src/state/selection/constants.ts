@@ -16,6 +16,7 @@ export const SET_CONNECT_LINE_WIDTH = makeSelectionConstant("set-connect-line-wi
 export const SET_CONNECT_LINE_DEFAULT_COLOR = makeSelectionConstant(
     "set-connect-line-default-color"
 );
+export const SET_CONNECT_LINE_OPACITY = makeSelectionConstant("set-connect-line-opacity");
 export const SELECT_GROUP_VIA_PLOT = makeSelectionConstant("select_group");
 export const DESELECT_POINT = makeSelectionConstant("deselect-point");
 export const SELECT_POINT = makeSelectionConstant("select-point");

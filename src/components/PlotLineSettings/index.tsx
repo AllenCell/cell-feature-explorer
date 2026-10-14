@@ -5,6 +5,7 @@ import { ActionCreator } from "redux";
 import {
     SetLineAverageWindowAction,
     SetLineDefaultColorAction,
+    SetLineOpacityAction,
     SetLineWidthAction,
 } from "../../state/selection/types";
 import { State } from "../../state/types";
@@ -13,12 +14,14 @@ import LabeledSlider from "../LabeledSlider";
 import {
     getLineDefaultColor,
     getLineMovingAverageWindow,
+    getLineOpacity,
     getLineWidth,
 } from "../../state/selection/selectors";
 import {
     setConnectLineDefaultColor,
     setConnectLineAverageWindow,
     setConnectLineWidth,
+    setConnectLineOpacity,
 } from "../../state/selection/actions";
 import ResettableColorPicker from "../ResettableColorPicker";
 import { GENERAL_PLOT_SETTINGS, PALETTE } from "../../constants";
@@ -28,10 +31,12 @@ type PropsFromState = {
     lineAverageWindow: number;
     lineWidth: number;
     lineDefaultColor: string;
+    lineOpacity: number;
 };
 
 type DispatchProps = {
     handleSetLineAverageWindow: ActionCreator<SetLineAverageWindowAction>;
+    handleSetLineOpacity: ActionCreator<SetLineOpacityAction>;
     handleSetLineWidth: ActionCreator<SetLineWidthAction>;
     handleSetLineDefaultColor: ActionCreator<SetLineDefaultColorAction>;
 };
@@ -47,6 +52,10 @@ const PlotLineSettings = (props: PlotLineSettingsProps): ReactElement => {
         props.handleSetLineAverageWindow
     );
     const [lineWidth, setLineWidth] = useDebouncedSetter(props.lineWidth, props.handleSetLineWidth);
+    const [lineOpacity, setLineOpacity] = useDebouncedSetter(
+        props.lineOpacity,
+        props.handleSetLineOpacity
+    );
     const [lineDefaultColor, setLineDefaultColor] = useDebouncedSetter(
         props.lineDefaultColor,
         props.handleSetLineDefaultColor
@@ -73,6 +82,21 @@ const PlotLineSettings = (props: PlotLineSettingsProps): ReactElement => {
                 }}
                 inputMin={1}
                 inputMax={101}
+            ></LabeledSlider>
+            <LabeledSlider
+                label="Opacity"
+                labelWidth={props.labelWidth}
+                sliderProps={{
+                    value: Math.round(lineOpacity * 100),
+                    onChange: (value) => setLineOpacity(Math.round(value) / 100),
+                    min: 0,
+                    max: 100,
+                    step: 5,
+                    marks: { 50: <></> },
+                    tooltip: {
+                        formatter: (value) => (value !== undefined ? `${value}%` : ""),
+                    },
+                }}
             ></LabeledSlider>
             <LabeledSlider
                 label="Line width"
@@ -119,6 +143,7 @@ function mapStateToProps(state: State): PropsFromState {
     return {
         lineAverageWindow: getLineMovingAverageWindow(state),
         lineWidth: getLineWidth(state),
+        lineOpacity: getLineOpacity(state),
         lineDefaultColor: getLineDefaultColor(state),
     };
 }
@@ -127,6 +152,7 @@ const dispatchToPropsMap: DispatchProps = {
     handleSetLineAverageWindow: setConnectLineAverageWindow,
     handleSetLineDefaultColor: setConnectLineDefaultColor,
     handleSetLineWidth: setConnectLineWidth,
+    handleSetLineOpacity: setConnectLineOpacity,
 };
 export default connect<PropsFromState, DispatchProps, unknown, State>(
     mapStateToProps,

@@ -43,6 +43,7 @@ import {
     SET_CONNECT_LINE_MOVING_AVERAGE_WINDOW,
     SET_CONNECT_LINE_WIDTH,
     SET_CONNECT_LINE_DEFAULT_COLOR,
+    SET_CONNECT_LINE_OPACITY,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -70,6 +71,7 @@ import {
     SetCsvUrlAction,
     SetLineAverageWindowAction,
     SetLineDefaultColorAction,
+    SetLineOpacityAction,
     SetLineWidthAction,
     SetPointOpacityAction,
     SetPointRadiusAction,
@@ -109,6 +111,7 @@ export const initialState: SelectionStateBranch = {
     connectLineMovingAverageWindow: 1,
     connectLineWidth: GENERAL_PLOT_SETTINGS.connectionLineWidth,
     connectLineDefaultColor: GENERAL_PLOT_SETTINGS.connectionLineDefaultColor,
+    connectLineOpacity: GENERAL_PLOT_SETTINGS.connectionLineOpacity,
     selectedAlbum: INITIAL_SELECTED_ALBUM_ID,
     selectedAlbumFileInfo: [] as FileInfo[],
     selectedGroupColors: {},
@@ -233,6 +236,20 @@ const actionToConfigMap: TypeToDescriptionMap = {
             ...state,
             connectLineDefaultColor: action.payload,
         }),
+    },
+    [SET_CONNECT_LINE_OPACITY]: {
+        accepts: (action: Action): action is SetLineOpacityAction =>
+            action.type === SET_CONNECT_LINE_OPACITY,
+        perform: (
+            state: SelectionStateBranch,
+            action: SetLineOpacityAction
+        ): SelectionStateBranch => {
+            const lineOpacity = action.payload;
+            if (!Number.isFinite(lineOpacity) || lineOpacity < 0 || lineOpacity > 1) {
+                return state;
+            }
+            return { ...state, connectLineOpacity: lineOpacity };
+        },
     },
     [OPEN_CELL_IN_3D]: {
         accepts: (action: Action): action is SelectPointAction => action.type === OPEN_CELL_IN_3D,

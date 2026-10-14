@@ -463,10 +463,11 @@ function makeScatterPlotData(
 function makeLinePlotTrace(data: LinePlotData, settings: MainPlotSettings): Partial<PlotData> {
     let color = settings.connectionLineDefaultColor;
     if (data.color) {
-        // Color is a hex string; apply transparency
-        const opacityHex = Math.round(settings.unselectedCircleOpacity * 255);
-        color = data.color + opacityHex.toString(16).padStart(2, "0");
+        color = data.color;
     }
+    // Color is a hex string; apply transparency
+    const opacityHex = Math.round(settings.connectionLineOpacity * 255);
+    color = color + opacityHex.toString(16).padStart(2, "0");
     return {
         type: "scattergl",
         mode: "lines",

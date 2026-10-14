@@ -66,6 +66,7 @@ export const GENERAL_PLOT_SETTINGS = {
     circleRadius: 4,
     connectionLineWidth: 1.5,
     connectionLineDefaultColor: BASE_PALETTE_COLORS.mediumDarkGray as string,
+    connectionLineOpacity: 0.5,
     histogramColor: BASE_PALETTE_COLORS.lightGray,
     legend: {
         font: {

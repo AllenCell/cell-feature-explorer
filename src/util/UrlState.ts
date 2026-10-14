@@ -40,6 +40,7 @@ import {
     setPointRadius,
     setShowConnectLines,
     toggleGallery,
+    setConnectLineOpacity,
 } from "../state/selection/actions";
 import { initialState } from "../state/selection/reducer";
 import type { SelectionStateBranch } from "../state/selection/types";
@@ -57,6 +58,7 @@ export enum URLSearchParam {
     connectLineMovingAverageWindow = "lineWindow",
     connectLineWidth = "lineWidth",
     connectLineDefaultColor = "lineColor",
+    connectLineOpacity = "lineOpacity",
     selectedPoint = "selectedPoint",
     selectedAlbum = "selectedAlbum",
     galleryCollapsed = "galleryCollapsed",
@@ -216,6 +218,7 @@ export default class UrlState {
         [URLSearchParam.connectLineWidth]: (width) => setConnectLineWidth(Number(width)),
         [URLSearchParam.connectLineDefaultColor]: (color) =>
             setConnectLineDefaultColor(String(color)),
+        [URLSearchParam.connectLineOpacity]: (opacity) => setConnectLineOpacity(Number(opacity)),
         [URLSearchParam.selectedAlbum]: (album) => selectAlbum(Number(album)),
         [URLSearchParam.selectedPoint]: (selection) => {
             if (Array.isArray(selection)) {
@@ -273,6 +276,12 @@ export default class UrlState {
             }
             return { connectLineWidth: Number(width) };
         },
+        [URLSearchParam.connectLineOpacity]: (opacity) => {
+            if (!isFinite(Number(opacity))) {
+                return {};
+            }
+            return { connectLineOpacity: Math.max(Math.min(Number(opacity), 1), 0) };
+        },
         [URLSearchParam.connectLineDefaultColor]: (color) => ({
             connectLineDefaultColor: String(color),
         }),
@@ -313,6 +322,9 @@ export default class UrlState {
         }),
         connectLineWidth: (value) => ({
             [URLSearchParam.connectLineWidth]: String(value),
+        }),
+        connectLineOpacity: (value) => ({
+            [URLSearchParam.connectLineOpacity]: String(value),
         }),
         connectLineDefaultColor: (value) => ({
             [URLSearchParam.connectLineDefaultColor]: String(value),

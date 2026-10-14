@@ -25,6 +25,8 @@ export interface SelectionStateBranch {
     connectLineMovingAverageWindow: number;
     connectLineWidth: number;
     connectLineDefaultColor: string;
+    /** Opacity of the plot connection lines, in a [0, 1] range. */
+    connectLineOpacity: number;
     defaultColors: string[];
     colorOverrides: (string | undefined)[];
     pointRadius: number;
@@ -241,6 +243,11 @@ export interface SetLineWidthAction {
 
 export interface SetLineDefaultColorAction {
     payload: string;
+    type: string;
+}
+
+export interface SetLineOpacityAction {
+    payload: number;
     type: string;
 }
 

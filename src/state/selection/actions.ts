@@ -36,6 +36,7 @@ import {
     SET_CONNECT_LINE_MOVING_AVERAGE_WINDOW,
     SET_CONNECT_LINE_WIDTH,
     SET_CONNECT_LINE_DEFAULT_COLOR,
+    SET_CONNECT_LINE_OPACITY,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -63,6 +64,7 @@ import {
     SetCsvUrlAction,
     SetLineAverageWindowAction,
     SetLineDefaultColorAction,
+    SetLineOpacityAction,
     SetLineWidthAction,
     SetPointOpacityAction,
     SetPointRadiusAction,
@@ -123,6 +125,13 @@ export function setConnectLineDefaultColor(payload: string): SetLineDefaultColor
     return {
         payload,
         type: SET_CONNECT_LINE_DEFAULT_COLOR,
+    };
+}
+
+export function setConnectLineOpacity(payload: number): SetLineOpacityAction {
+    return {
+        payload,
+        type: SET_CONNECT_LINE_OPACITY,
     };
 }
 

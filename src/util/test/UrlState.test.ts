@@ -12,6 +12,7 @@ import {
     setConnectLineAverageWindow,
     setConnectLineWidth,
     setShowConnectLines,
+    setConnectLineOpacity,
 } from "../../state/selection/actions";
 
 import { initialState } from "../../state/selection/reducer";
@@ -35,6 +36,7 @@ describe("UrlState utility class", () => {
                     [URLSearchParam.connectLineDefaultColor]: "#ff0000",
                     [URLSearchParam.connectLineMovingAverageWindow]: "3",
                     [URLSearchParam.connectLineWidth]: "2",
+                    [URLSearchParam.connectLineOpacity]: "0.5",
                 })
             ).to.deep.equal({
                 cellSelectedFor3D: "2",
@@ -49,6 +51,7 @@ describe("UrlState utility class", () => {
                 connectLineDefaultColor: "#ff0000",
                 connectLineMovingAverageWindow: 3,
                 connectLineWidth: 2,
+                connectLineOpacity: 0.5,
             });
         });
 
@@ -143,10 +146,11 @@ describe("UrlState utility class", () => {
                     [URLSearchParam.connectLineDefaultColor]: "#ff00ff",
                     [URLSearchParam.connectLineMovingAverageWindow]: "5",
                     [URLSearchParam.connectLineWidth]: "1.5",
+                    [URLSearchParam.connectLineOpacity]: "0.65",
                 })
             )
                 .to.be.an("array")
-                .of.length(16)
+                .of.length(17)
                 .and.to.have.deep.members([
                     selectCellFor3DViewer({ id: "2" }),
                     changeAxis(X_AXIS_ID, "feature_x"),
@@ -164,6 +168,7 @@ describe("UrlState utility class", () => {
                     setConnectLineDefaultColor("#ff00ff"),
                     setConnectLineAverageWindow(5),
                     setConnectLineWidth(1.5),
+                    setConnectLineOpacity(0.65),
                 ]);
         });
 
@@ -199,6 +204,7 @@ describe("UrlState utility class", () => {
                 connectLineMovingAverageWindow: 3,
                 connectLineWidth: 2,
                 connectLineDefaultColor: "#ff00ff",
+                connectLineOpacity: 0.65,
             };
             expect(UrlState.toUrlSearchParameterMap(selections)).to.deep.equal({
                 [URLSearchParam.cellSelectedFor3D]: "10",
@@ -213,6 +219,7 @@ describe("UrlState utility class", () => {
                 [URLSearchParam.connectLineMovingAverageWindow]: "3",
                 [URLSearchParam.connectLineWidth]: "2",
                 [URLSearchParam.connectLineDefaultColor]: "#ff00ff",
+                [URLSearchParam.connectLineOpacity]: "0.65",
             });
         });
 

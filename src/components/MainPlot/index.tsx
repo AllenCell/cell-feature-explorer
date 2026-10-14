@@ -341,7 +341,7 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
                             justifyContent: "space-between",
                         }}
                     >
-                        Plot settings
+                        Point settings
                         <Button
                             onClick={() => setShowConfigPopup(false)}
                             type="text"
