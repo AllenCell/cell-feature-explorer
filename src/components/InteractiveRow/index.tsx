@@ -4,10 +4,10 @@ import { CheckboxChangeEvent } from "antd/es/checkbox";
 import React, { MouseEvent } from "react";
 
 import { DownloadConfig } from "../../state/selection/types";
+import ColorPickerBadge from "../ColorPickerBadge";
 import DownloadDropDownMenu from "../DownloadDropDownMenu";
 
-import styles from "./style.css";
-import ColorPickerBadge from "../ColorPickerBadge";
+import styles from "./style.module.css";
 
 interface InteractiveRowProps {
     color: string;

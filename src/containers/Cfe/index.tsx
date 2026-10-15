@@ -1,12 +1,12 @@
 import { ConfigProvider, Layout, Menu } from "antd";
 import { Header } from "antd/es/layout/layout";
 import { ItemType } from "antd/es/menu/interface";
+import classNames from "classnames";
 import { uniq } from "lodash";
 import { MenuInfo } from "rc-menu/lib/interface";
 import * as React from "react";
 import { connect } from "react-redux";
 import type { ActionCreator } from "redux";
-import classNames from "classnames";
 
 import CellViewer from "../../components/CellViewer/index";
 import SmallScreenWarning from "../../components/SmallScreenWarning";
@@ -21,7 +21,7 @@ import AlignControl from "../../components/AlignControl";
 import { SetSmallScreenWarningAction, RequestAction } from "../../state/metadata/types";
 import { getPropsForVolumeViewer, getViewerHeader, VolumeViewerProps } from "./selectors";
 
-import styles from "./style.css";
+import styles from "./style.module.css";
 
 const { Content, Sider } = Layout;
 

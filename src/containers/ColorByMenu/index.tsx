@@ -1,6 +1,5 @@
 import { Checkbox, Col, Collapse, Row } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
-// import { RadioChangeEvent } from "antd/es/radio";
 import { filter, includes } from "lodash";
 import React from "react";
 import { connect } from "react-redux";
@@ -20,7 +19,6 @@ import metadataStateBranch from "../../state/metadata";
 import { MappingOfMeasuredValuesArrays, MeasuredFeatureDef } from "../../state/metadata/types";
 import selectionStateBranch from "../../state/selection";
 import { getFeatureDefTooltip, getDownloadRoot } from "../../state/selection/selectors";
-
 import {
     BoolToggleAction,
     ChangeDownloadConfigAction,
@@ -34,6 +32,7 @@ import {
 } from "../../state/selection/types";
 import { State } from "../../state/types";
 import { getColorByDisplayOptions, getGroupByDisplayOptions } from "../MainPlotContainer/selectors";
+import { MISSING_CATEGORY_COLOR, MISSING_CATEGORY_LABEL } from "../../state/selection/constants";
 
 import {
     createUrlFromListOfIds,
@@ -45,8 +44,7 @@ import {
 } from "./selectors";
 import { PanelData } from "./types";
 
-import styles from "./style.css";
-import { MISSING_CATEGORY_COLOR, MISSING_CATEGORY_LABEL } from "../../state/selection/constants";
+import styles from "./style.module.css";
 
 // const initIndex = 2;
 

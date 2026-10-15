@@ -1,10 +1,11 @@
 import { Select, Tooltip } from "antd";
 import { SelectProps, SelectValue } from "antd/es/select";
 import React from "react";
+
 import { MeasuredFeatureDef } from "../../state/metadata/types";
 import { X_AXIS_ID, Y_AXIS_ID } from "../../constants";
 
-import styles from "./style.css";
+import styles from "./style.module.css";
 
 interface FeatureSelectDropdownProps {
     value: string;

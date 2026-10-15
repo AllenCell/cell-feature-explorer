@@ -16,9 +16,9 @@ import { ChangeSelectionAction } from "../../state/selection/types";
 import { LoadCsvDatasetAction, Megaset } from "../../state/image-dataset/types";
 import { RequestAction } from "../../state/metadata/types";
 import { fetchCsvText } from "../../util";
-
-import styles from "./style.css";
 import { CSV_DATASET_NAME } from "../../state/selection/constants";
+
+import styles from "./style.module.css";
 
 const { Header } = Layout;
 

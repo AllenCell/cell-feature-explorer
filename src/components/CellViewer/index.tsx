@@ -1,10 +1,8 @@
 import { ImageViewerApp } from "@aics/vole-app";
 import React from "react";
-
-import styles from "./style.css";
-
 import { VolumeViewerProps } from "../../containers/Cfe/selectors";
 
+import styles from "./style.module.css";
 
 const CellViewer: React.FunctionComponent<VolumeViewerProps> = (props) => {
     if (!props.cellId) {
@@ -12,7 +10,7 @@ const CellViewer: React.FunctionComponent<VolumeViewerProps> = (props) => {
     }
 
     return (
-        <div className={styles.cellViewerContainer} >
+        <div className={styles.cellViewerContainer}>
             <ImageViewerApp
                 cellId={props.cellId}
                 imageUrl={props.baseUrl + props.cellPath}

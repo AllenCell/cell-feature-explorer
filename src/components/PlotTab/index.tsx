@@ -7,7 +7,7 @@ import MainPlotContainer from "../../containers/MainPlotContainer";
 
 const { Content, Sider } = Layout;
 
-import styles from "./style.css";
+import styles from "./style.module.css";
 
 class PlotTab extends React.Component {
     private static panelKeys = ["groupings", "selections"];

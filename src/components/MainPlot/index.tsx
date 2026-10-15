@@ -1,3 +1,5 @@
+import { CloseOutlined } from "@ant-design/icons";
+import { Button, Popover } from "antd";
 import type {
     Annotations,
     Config,
@@ -12,12 +14,10 @@ import Plot from "react-plotly.js";
 
 import { GENERAL_PLOT_SETTINGS } from "../../constants";
 import { TickConversion } from "../../state/selection/types";
-
-import styles from "./style.css";
-import { Button, Popover } from "antd";
 import PlotSettings from "../PlotSettings";
 import { ICON_SVG_PATH_PLOT_SETTINGS } from "./constants";
-import { CloseOutlined } from "@ant-design/icons";
+
+import styles from "./style.module.css";
 
 interface MainPlotProps {
     annotations: PlotlyAnnotation[];

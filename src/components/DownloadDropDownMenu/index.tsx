@@ -1,16 +1,15 @@
-import { Button, Dropdown, MenuProps, Tooltip } from "antd";
 import { CheckOutlined, DownloadOutlined } from "@ant-design/icons";
+import { Button, Dropdown, MenuProps, Tooltip } from "antd";
 import { ItemType } from "antd/es/menu/interface";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
-import { MenuInfo } from "rc-menu/lib/interface";
-
 import { includes, uniq } from "lodash";
+import { MenuInfo } from "rc-menu/lib/interface";
 import React, { MouseEvent } from "react";
 
+import { NO_DOWNLOADS_TOOLTIP } from "../../constants";
 import { DownloadConfig } from "../../state/selection/types";
 
-import styles from "./style.css";
-import { NO_DOWNLOADS_TOOLTIP } from "../../constants";
+import styles from "./style.module.css";
 
 interface DownloadDropDownMenuProps {
     color: string;

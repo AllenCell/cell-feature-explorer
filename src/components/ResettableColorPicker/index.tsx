@@ -1,8 +1,8 @@
+import { UndoOutlined } from "@ant-design/icons";
 import { Button, ColorPicker, ColorPickerProps, Tooltip } from "antd";
 import React, { PropsWithChildren, ReactElement, useRef } from "react";
 
-import styles from "./styles.css";
-import { UndoOutlined } from "@ant-design/icons";
+import styles from "./styles.module.css";
 
 type ResettableColorPickerProps = ColorPickerProps & {
     onReset: () => void;

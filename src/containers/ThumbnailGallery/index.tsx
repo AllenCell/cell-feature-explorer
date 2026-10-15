@@ -9,7 +9,6 @@ import type { ActionCreator } from "redux";
 import GalleryCard from "../../components/GalleryCard";
 import MinGalleryCard from "../../components/MinGalleryCard";
 import GalleryCardSlider from "../../components/GalleryCardSlider";
-
 import { MY_SELECTIONS_ID } from "../../constants";
 import { requestAlbumData } from "../../state/metadata/actions";
 import { getAllAlbumData } from "../../state/metadata/selectors";
@@ -41,7 +40,7 @@ import { getSelectedAlbumName, getThumbnails } from "./selectors";
 
 const Search = Input.Search;
 
-import styles from "./style.css";
+import styles from "./style.module.css";
 
 interface PropsFromState {
     albumData: Album[];

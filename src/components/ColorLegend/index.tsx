@@ -1,7 +1,8 @@
 import React from "react";
 
-import styles from "./style.css";
 import ColorPickerBadge from "../ColorPickerBadge";
+
+import styles from "./style.module.css";
 
 interface InteractiveRowProps {
     color: string;

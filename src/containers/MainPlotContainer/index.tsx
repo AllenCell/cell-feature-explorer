@@ -52,9 +52,9 @@ import {
 } from "./selectors";
 import { getFeatureDefTooltip } from "../../state/selection/selectors";
 import { formatThumbnailSrc } from "../../state/util";
-
-import styles from "./style.css";
 import { createThumbnailImageSrc } from "../../util/thumbnails";
+
+import styles from "./style.module.css";
 
 /** Maximum number of auto-generated thumbnails to store. */
 const MAX_GENERATED_THUMBNAILS = 250;

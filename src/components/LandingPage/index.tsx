@@ -6,7 +6,7 @@ import MegasetCard from "../../components/MegasetCard";
 import { Megaset } from "../../state/image-dataset/types";
 import downloadData, { DownloadInfo } from "./download-data";
 
-import styles from "./style.css";
+import styles from "./style.module.css";
 
 interface LandingPageProps {
     handleSelectDataset: (id: string) => void;

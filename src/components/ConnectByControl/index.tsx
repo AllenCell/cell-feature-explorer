@@ -15,13 +15,13 @@ import {
     getFeatureDefTooltip,
     getShowConnectLines,
 } from "../../state/selection/selectors";
-
-import styles from "./style.css";
 import {
     changeConnectByCategory,
     changeConnectByFeature,
     setShowConnectLines,
 } from "../../state/selection/actions";
+
+import styles from "./style.module.css";
 
 type ConnectByControlStateProps = {
     connectByFeature: string;

@@ -2,7 +2,7 @@ import { Button, Checkbox, Modal } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import React from "react";
 
-import styles from "./style.css";
+import styles from "./style.module.css";
 
 interface SmallScreenWarningProps {
     handleClose: () => void;

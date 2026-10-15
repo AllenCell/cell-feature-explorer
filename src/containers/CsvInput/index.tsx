@@ -7,13 +7,13 @@ import { connect } from "react-redux";
 import { ActionCreator } from "redux";
 
 import { State } from "../../state";
+import { ImageDataset, LoadCsvDatasetAction } from "../../state/image-dataset/types";
 import selectionStateBranch from "../../state/selection";
 import imageDatasetStateBranch from "../../state/image-dataset";
-import { ImageDataset, LoadCsvDatasetAction } from "../../state/image-dataset/types";
+import { SetCsvUrlAction } from "../../state/selection/types";
 import { fetchCsvText, isAllenPath, isUrl } from "../../util";
 
-import styles from "./styles.css";
-import { SetCsvUrlAction } from "../../state/selection/types";
+import styles from "./styles.module.css";
 
 type DispatchProps = {
     loadCsvDataset: ActionCreator<LoadCsvDatasetAction>;
