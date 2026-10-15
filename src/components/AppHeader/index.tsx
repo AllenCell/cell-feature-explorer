@@ -19,8 +19,8 @@ class AppHeader extends React.Component<AppHeaderProps> {
                 <Row align={"middle"}>
                     <a
                         href="https://allencell.org"
-                        title="Allen Institute for Cell Science"
-                        style={{ height: "41px" }}
+                        title="Cell science accelerator at the Allen Institute"
+                        style={{ height: "36px" }}
                     >
                         {AicsLogo}
                     </a>
