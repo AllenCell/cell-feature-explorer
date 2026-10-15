@@ -305,7 +305,7 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
                 helpTextPos &&
                 createPortal(
                     <div
-                        className={styles["help-text-overlay"]}
+                        className={styles.helpTextOverlay}
                         style={{
                             left: helpTextPos.x,
                             top: helpTextPos.y - POPUP_ANNOTATION_OFFSET_PX,

@@ -2,6 +2,8 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import { FirebaseFirestore } from "@firebase/firestore-types";
 
+import { USE_DEV_DB } from "../../../constants";
+
 const firebaseConfig = {
     apiKey: "AIzaSyD691xhXsWl-8QU_9htjZnMUd7siWVCTAE",
     appId: "1:40711248674:web:511cb4cede47191274237b",
@@ -23,7 +25,7 @@ const firebaseDevConfig = {
     measurementId: "G-9J5TY9YYVE",
 };
 // Initialize Firebase
-firebase.initializeApp(process.env.USE_DEV_DB ? firebaseDevConfig : firebaseConfig);
+firebase.initializeApp(USE_DEV_DB ? firebaseDevConfig : firebaseConfig);
 
 const firestore: FirebaseFirestore = firebase.firestore();
 

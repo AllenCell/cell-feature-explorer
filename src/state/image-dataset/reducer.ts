@@ -5,11 +5,12 @@ import { ImageDataset, ImageDatasetStateBranch, ReceiveImageDatasetAction } from
 import { makeReducer } from "../util";
 import FirebaseRequest from "./firebase";
 import JsonRequest from "./json-dataset";
+import { USE_JSON_DATASET } from "../../constants";
 
 // by default will use Firebase for dataset, can be switched to JSON dataset using ENV
 // variable
 function getImageDatasetInstance(): ImageDataset {
-    return process.env.USE_JSON_DATASET ? new JsonRequest() : new FirebaseRequest();
+    return USE_JSON_DATASET ? new JsonRequest() : new FirebaseRequest();
 }
 
 export const initialState: ImageDatasetStateBranch = {

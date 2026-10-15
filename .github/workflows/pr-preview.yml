@@ -31,7 +31,10 @@ jobs:
               run: npm ci
 
             - name: Build
-              run: npm run build
+              run: npx vite build --base=/${GITHUB_EVENT_REPOSITORY_NAME}/pr-preview/pr-${PR_NUMBER}/
+              env:
+                  GITHUB_EVENT_REPOSITORY_NAME: ${{ github.event.repository.name }}
+                  PR_NUMBER: ${{ github.event.number }}
 
             - name: Deploy preview
               uses: rossjrw/pr-preview-action@8ff09e486b4c23709012eedd3b42e9f0b95dd0c5 #v1.6.3

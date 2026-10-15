@@ -4,20 +4,6 @@ Style
 CSS files live alongside the component they style, and the classes they declare are imported into those components.
 
 
-### Tooling
-
-CSS assets are parsed, transformed, and concatenated together to form a single stylesheet. This is accomplished by a series
-of webpack loaders:
-
-1. First, `postcss-loader` applies a number of plugins: 
-    - one to parse and resolve [`@import`](https://github.com/postcss/postcss-import), 
-    - another to make available [cssnext](cssnext.io) (which by default also auto-prefixes CSS declarations), 
-2. Next, `css-loader` makes the CSS classes available as an exported module to be consumed within JS/TS, and transforms the
-classname that will be applied in the browser to be hyper-local. That this, this loader provides [CSS Modules](https://github.com/css-modules/css-modules).
-3. Last, `extract-text-webpack-plugin` concatenates together the individual CSS files into a single stylesheet. That stylesheet,
-along with all other webpack generated assets, is auto-included in the `index.html` file served to the browser.
-
-
 ### Staying DRY
 
 The `src/styles` directory holds base CSS classes and shared [CSS variables](http://cssnext.io/features/#custom-properties-var) 
