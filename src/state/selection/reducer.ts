@@ -23,7 +23,7 @@ import {
     SET_DOWNLOAD_CONFIG,
     SET_MOUSE_POSITION,
     TOGGLE_APPLY_SELECTION_SET_COLOR,
-    TOGGLE_FILTER_BY_CATEGORY_NAME,
+    SET_FILTERED_VALUES,
     TOGGLE_GALLERY_OPEN_CLOSE,
     SET_DATASET,
     RECEIVE_FILE_INFO_FOR_ALBUM_CELLS,
@@ -50,6 +50,7 @@ import {
     ChangeConnectByCategory,
     ChangeConnectByFeature,
     ChangeDownloadConfigAction,
+    ChangeFilterSelectionAction,
     ChangeGroupByCategory,
     ChangeHoveredPointAction,
     ChangeMousePositionAction,
@@ -349,10 +350,10 @@ const actionToConfigMap: TypeToDescriptionMap = {
             colorOverrides: action.payload,
         }),
     },
-    [TOGGLE_FILTER_BY_CATEGORY_NAME]: {
-        accepts: (action: Action): action is ChangeSelectionAction =>
-            action.type === TOGGLE_FILTER_BY_CATEGORY_NAME,
-        perform: (state: SelectionStateBranch, action: ChangeSelectionAction) => ({
+    [SET_FILTERED_VALUES]: {
+        accepts: (action: Action): action is ChangeFilterSelectionAction =>
+            action.type === SET_FILTERED_VALUES,
+        perform: (state: SelectionStateBranch, action: ChangeFilterSelectionAction) => ({
             ...state,
             filterExclude: action.payload,
         }),

@@ -107,6 +107,12 @@ export interface ChangeSelectionAction {
     type: string;
 }
 
+export interface ChangeFilterSelectionAction {
+    payload: string[];
+    type: string;
+}
+
+
 export interface ChangeDownloadConfigAction {
     payload: DownloadConfig;
     type: string;
