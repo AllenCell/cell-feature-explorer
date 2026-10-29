@@ -37,6 +37,8 @@ import {
     SET_CONNECT_LINE_WIDTH,
     SET_CONNECT_LINE_DEFAULT_COLOR,
     SET_CONNECT_LINE_OPACITY,
+    SET_FILTER_ACTIVE,
+    SET_FEATURE_FILTER,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -50,6 +52,7 @@ import {
     DeselectGroupOfPointsAction,
     DeselectPointAction,
     DownloadConfig,
+    FilterData,
     LassoOrBoxSelectAction,
     LassoOrBoxSelectPointData,
     MousePosition,
@@ -63,6 +66,8 @@ import {
     SetColorOverrideAction,
     SetColorOverridesAction,
     SetCsvUrlAction,
+    SetFilterActiveAction,
+    SetFilterByFeatureAction,
     SetLineAverageWindowAction,
     SetLineDefaultColorAction,
     SetLineOpacityAction,
@@ -209,6 +214,26 @@ export function setFilteredValues(payload: string[]): ChangeFilterSelectionActio
     return {
         payload,
         type: SET_FILTERED_VALUES,
+    };
+}
+
+export function setFeatureFilter(
+    feature: string,
+    filter: FilterData | null
+): SetFilterByFeatureAction {
+    return {
+        payload: { feature, filter },
+        type: SET_FEATURE_FILTER,
+    };
+}
+
+export function setFilterActive(payload: {
+    feature: string;
+    active: boolean;
+}): SetFilterActiveAction {
+    return {
+        payload,
+        type: SET_FILTER_ACTIVE,
     };
 }
 

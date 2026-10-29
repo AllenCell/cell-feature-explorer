@@ -23,7 +23,6 @@ import {
     getColorBySelection,
     getDownloadConfig,
     getDownloadRoot,
-    getFiltersToExclude,
     getSelectedGroupKeys,
     getSelectedGroups,
     getSelectedSetTotals,
@@ -36,8 +35,13 @@ import {
     getYValues,
     getXValues,
     getColorOverrides,
+    getGroupByFilter,
 } from "../../state/selection/selectors";
-import { ColorForPlot, LassoOrBoxSelectPointData } from "../../state/selection/types";
+import {
+    ColorForPlot,
+    DiscreteFilterData,
+    LassoOrBoxSelectPointData,
+} from "../../state/selection/types";
 import { convertSingleImageIdToDownloadId } from "../../state/util";
 
 import { PanelData } from "./types";
@@ -114,7 +118,7 @@ export const getInteractivePanelData = createSelector(
         getGroupByCategory,
         getColorBySelection,
         getGroupByFeatureOptionsAsList,
-        getFiltersToExclude,
+        getGroupByFilter,
         getDisplayableGroups,
         getGroupingCategoryNamesAsArray,
         getColorOverrides,
@@ -123,7 +127,7 @@ export const getInteractivePanelData = createSelector(
         categoryToGroupBy: keyof MappingOfMeasuredValuesArrays,
         categoryToColorBy: keyof MappingOfMeasuredValuesArrays,
         categories: MeasuredFeaturesOption[],
-        filtersToExclude: string[],
+        groupByFilter: DiscreteFilterData | undefined,
         displayableGroups: string[],
         categoryNamesArray: string[],
         colorOverrides: (string | undefined)[]
