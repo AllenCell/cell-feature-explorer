@@ -22,8 +22,8 @@ import { getFeatureDefTooltip, getDownloadRoot } from "../../state/selection/sel
 import {
     BoolToggleAction,
     ChangeDownloadConfigAction,
+    ChangeFilterSelectionAction,
     ChangeGroupByCategory,
-    ChangeSelectionAction,
     ColorForPlot,
     DeselectGroupOfPointsAction,
     DownloadConfig,
@@ -74,7 +74,7 @@ interface DispatchProps {
     handleChangeAxis: ActionCreator<SelectAxisAction>;
     handleChangeGroupByCategory: ActionCreator<ChangeGroupByCategory>;
     handleCloseSelectionSet: ActionCreator<DeselectGroupOfPointsAction>;
-    handleFilterByCategoryName: ActionCreator<ChangeSelectionAction>;
+    handleSetFilteredValues: ActionCreator<ChangeFilterSelectionAction>;
     handleChangeDownloadSettings: ActionCreator<ChangeDownloadConfigAction>;
     handleSetColorOverride: ActionCreator<SetColorOverrideAction>;
 }
@@ -108,8 +108,9 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
     }
 
     public onBarClicked({ target }: CheckboxChangeEvent) {
-        const { handleFilterByCategoryName, filtersToExclude } = this.props;
-        const newFilterList = includes(filtersToExclude, target.value)
+        const { handleSetFilteredValues: handleFilterByCategoryName, filtersToExclude } =
+            this.props;
+        const newFilterList: string[] = includes(filtersToExclude, target.value)
             ? filter(filtersToExclude, (e) => e !== target.value)
             : [...filtersToExclude, target.value];
         handleFilterByCategoryName(newFilterList);
@@ -132,7 +133,8 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
     }
 
     public allOnOff({ target }: CheckboxChangeEvent) {
-        const { handleFilterByCategoryName, interactivePanelData } = this.props;
+        const { handleSetFilteredValues: handleFilterByCategoryName, interactivePanelData } =
+            this.props;
         if (target.checked) {
             return handleFilterByCategoryName([]);
         }
@@ -367,7 +369,7 @@ const dispatchToPropsMap: DispatchProps = {
     handleChangeGroupByCategory: selectionStateBranch.actions.changeGroupByCategory,
     handleChangeDownloadSettings: selectionStateBranch.actions.changeDownloadSettings,
     handleCloseSelectionSet: selectionStateBranch.actions.deselectGroupOfPoints,
-    handleFilterByCategoryName: selectionStateBranch.actions.toggleFilterByCategoryName,
+    handleSetFilteredValues: selectionStateBranch.actions.setFilteredValues,
     handleSetColorOverride: selectionStateBranch.actions.setColorOverride,
 };
 export default connect<PropsFromState, DispatchProps, PropsFromApp, State>(

@@ -16,7 +16,7 @@ import {
     SET_MOUSE_POSITION,
     SYNC_STATE_WITH_URL,
     TOGGLE_APPLY_SELECTION_SET_COLOR,
-    TOGGLE_FILTER_BY_CATEGORY_NAME,
+    SET_FILTERED_VALUES,
     TOGGLE_GALLERY_OPEN_CLOSE,
     CHANGE_DATASET,
     RECEIVE_FILE_INFO,
@@ -41,6 +41,7 @@ import {
 import {
     BoolToggleAction,
     ChangeDownloadConfigAction,
+    ChangeFilterSelectionAction,
     ChangeGroupByCategory,
     ChangeHoveredPointAction,
     ChangeMousePositionAction,
@@ -204,10 +205,10 @@ export function setPointOpacity(payload: number): SetPointOpacityAction {
     };
 }
 
-export function toggleFilterByCategoryName(payload: string): ChangeSelectionAction {
+export function setFilteredValues(payload: string[]): ChangeFilterSelectionAction {
     return {
         payload,
-        type: TOGGLE_FILTER_BY_CATEGORY_NAME,
+        type: SET_FILTERED_VALUES,
     };
 }
 
