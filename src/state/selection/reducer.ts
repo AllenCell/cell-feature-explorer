@@ -44,6 +44,8 @@ import {
     SET_CONNECT_LINE_WIDTH,
     SET_CONNECT_LINE_DEFAULT_COLOR,
     SET_CONNECT_LINE_OPACITY,
+    SET_FEATURE_FILTER,
+    SET_FILTER_ACTIVE,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -70,6 +72,8 @@ import {
     SetColorOverrideAction,
     SetColorOverridesAction,
     SetCsvUrlAction,
+    SetFilterActiveAction,
+    SetFilterByFeatureAction,
     SetLineAverageWindowAction,
     SetLineDefaultColorAction,
     SetLineOpacityAction,
@@ -90,6 +94,8 @@ export const initialState: SelectionStateBranch = {
         type: "",
     },
     filterExclude: [] as string[],
+    filters: new Map(),
+    activeFilters: new Set(),
     galleryCollapsed: true,
     hoveredCardId: "",
     hoveredPointData: null,
@@ -357,6 +363,47 @@ const actionToConfigMap: TypeToDescriptionMap = {
             ...state,
             filterExclude: action.payload,
         }),
+    },
+    [SET_FEATURE_FILTER]: {
+        accepts: (action: Action): action is SetFilterByFeatureAction =>
+            action.type === SET_FEATURE_FILTER,
+        perform: (state: SelectionStateBranch, action: SetFilterByFeatureAction) => {
+            const newFilters = new Map(state.filters);
+            if (action.payload.filter === null) {
+                newFilters.delete(action.payload.feature);
+            } else {
+                newFilters.set(action.payload.feature, action.payload.filter);
+            }
+            console.log(
+                "Setting filter for feature:",
+                action.payload.feature,
+                "with filter:",
+                action.payload.filter,
+                "from action",
+                action
+            );
+            console.log("New filters map:", newFilters);
+            return {
+                ...state,
+                filters: newFilters,
+            };
+        },
+    },
+    [SET_FILTER_ACTIVE]: {
+        accepts: (action: Action): action is SetFilterActiveAction =>
+            action.type === SET_FILTER_ACTIVE,
+        perform: (state: SelectionStateBranch, action: SetFilterActiveAction) => {
+            const newActiveFilters = new Set(state.activeFilters);
+            if (action.payload.active) {
+                newActiveFilters.add(action.payload.feature);
+            } else {
+                newActiveFilters.delete(action.payload.feature);
+            }
+            return {
+                ...state,
+                activeFilters: newActiveFilters,
+            };
+        },
     },
     [TOGGLE_APPLY_SELECTION_SET_COLOR]: {
         accepts: (action: Action): action is BoolToggleAction =>

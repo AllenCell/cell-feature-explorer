@@ -3,6 +3,25 @@ import { CELL_ID_KEY, GENERAL_PLOT_SETTINGS } from "../../constants";
 import type { URLSearchParamMap } from "../../util/UrlState";
 import type { FileInfo } from "../metadata/types";
 
+export type DiscreteFilterData = {
+    discrete: true;
+    excluded: Set<string>;
+};
+
+export type ContinuousFilterData = {
+    discrete: false;
+    min: number;
+    max: number;
+};
+
+export type FilterData = DiscreteFilterData | ContinuousFilterData;
+
+export type NumericFilter = {
+    featureKey: string;
+    excludedLUT?: boolean[];
+    range?: [number, number];
+};
+
 export interface SelectionStateBranch {
     applySelectionSetColoring: boolean;
     cellSelectedFor3D: string;
@@ -12,6 +31,8 @@ export interface SelectionStateBranch {
     csvUrl: string;
     downloadConfig: DownloadConfig;
     filterExclude: string[];
+    filters: Map<string, FilterData>;
+    activeFilters: Set<string>;
     galleryCollapsed: boolean;
     hoveredCardId: string;
     hoveredPointData: SelectedPointData | null;
@@ -112,6 +133,21 @@ export interface ChangeFilterSelectionAction {
     type: string;
 }
 
+export interface SetFilterByFeatureAction {
+    payload: {
+        feature: string;
+        filter: FilterData | null;
+    };
+    type: string;
+}
+
+export interface SetFilterActiveAction {
+    payload: {
+        feature: string;
+        active: boolean;
+    };
+    type: string;
+}
 
 export interface ChangeDownloadConfigAction {
     payload: DownloadConfig;

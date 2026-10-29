@@ -37,8 +37,13 @@ import {
     getYValues,
     getXValues,
     getColorOverrides,
+    getGroupByFilter,
 } from "../../state/selection/selectors";
-import { ColorForPlot, LassoOrBoxSelectPointData } from "../../state/selection/types";
+import {
+    ColorForPlot,
+    DiscreteFilterData,
+    LassoOrBoxSelectPointData,
+} from "../../state/selection/types";
 import { convertSingleImageIdToDownloadId } from "../../state/util";
 
 import { PanelData } from "./types";
@@ -65,9 +70,12 @@ export const getGroupByTitle = createSelector(
 );
 
 export const getCheckAllCheckboxIsIntermediate = createSelector(
-    [getFiltersToExclude, getGroupingCategoryNames],
-    (filtersToExclude, categoryNames: string[]): boolean => {
-        return filtersToExclude.length > 0 && filtersToExclude.length !== categoryNames.length;
+    [getGroupByFilter, getGroupingCategoryNames],
+    (groupByFilter, categoryNames: string[]): boolean => {
+        const excluded = groupByFilter?.excluded;
+        return (
+            excluded !== undefined && excluded.size > 0 && excluded.size !== categoryNames.length
+        );
     }
 );
 
@@ -126,7 +134,7 @@ export const getInteractivePanelData = createSelector(
         getGroupByCategory,
         getColorBySelection,
         getGroupByFeatureOptionsAsList,
-        getFiltersToExclude,
+        getGroupByFilter,
         getDisplayableGroups,
         getGroupingCategoryNamesAsArray,
         getColorOverrides,
@@ -135,7 +143,7 @@ export const getInteractivePanelData = createSelector(
         categoryToGroupBy: keyof MappingOfMeasuredValuesArrays,
         categoryToColorBy: keyof MappingOfMeasuredValuesArrays,
         categories: MeasuredFeaturesOption[],
-        filtersToExclude: string[],
+        groupByFilter: DiscreteFilterData | undefined,
         displayableGroups: string[],
         categoryNamesArray: string[],
         colorOverrides: (string | undefined)[]
@@ -168,15 +176,17 @@ export const getInteractivePanelData = createSelector(
             const id = category.key ?? category.name;
             const total: number = countsByCategory[id] || category.count || 0;
             const disabled = !displayableGroups.includes(id);
+            const excluded = groupByFilter?.excluded.has(id) ?? false;
+            console.log("Groupbyfilter:", groupByFilter, "excluded: ", excluded);
             const color = getColorForCategory(
                 categoryToColorBy === categoryToGroupBy,
-                includes(filtersToExclude, id),
+                excluded,
                 disabled,
                 category.color,
                 colorOverrides[index]
             );
             return {
-                checked: !includes(filtersToExclude, id),
+                checked: !excluded,
                 color: color,
                 id: id,
                 name: names[index],

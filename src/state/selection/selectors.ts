@@ -30,10 +30,13 @@ import { findFeature, getCategoryString, getFileInfoDatumFromCellId, sortNumeric
 import { MISSING_CATEGORY_COLOR, MISSING_CATEGORY_LABEL } from "./constants";
 import {
     ColorForPlot,
+    DiscreteFilterData,
     DownloadConfig,
+    FilterData,
     LassoOrBoxSelectPointData,
     MainPlotSettings,
     MousePosition,
+    NumericFilter,
     SelectedPointData,
 } from "./types";
 
@@ -65,6 +68,8 @@ export const getPointOpacity = (state: State): number => state.selection.pointOp
 export const getSelectionSetColors = (state: State): { [key: string]: string } =>
     state.selection.selectedGroupColors;
 export const getFiltersToExclude = (state: State): string[] => state.selection.filterExclude;
+export const getActiveFilters = (state: State): Set<string> => state.selection.activeFilters;
+export const getFilters = (state: State): Map<string, FilterData> => state.selection.filters;
 export const getSelected3DCell = (state: State): string => state.selection.cellSelectedFor3D;
 export const getApplyColorToSelections = (state: State): boolean =>
     state.selection.applySelectionSetColoring;
@@ -373,6 +378,70 @@ export const getColorByCategoryCounts = createSelector(
 // FILTERED DATA
 // =============
 
+const getNumericFilterFromFeature = (
+    featureDef: MeasuredFeatureDef,
+    filter: FilterData | undefined
+): NumericFilter | undefined => {
+    if (!filter) {
+        return undefined;
+    }
+    if (featureDef.discrete && filter.discrete) {
+        const orderedValues = Object.values(featureDef.options).map(
+            (option) => option.key ?? option.name
+        );
+        const excludedLUT = orderedValues.map((value) => filter.excluded.has(value));
+        return {
+            featureKey: featureDef.key,
+            excludedLUT,
+        };
+    } else if (!featureDef.discrete && !filter.discrete) {
+        return {
+            featureKey: featureDef.key,
+            range: [filter.min, filter.max],
+        };
+    } else {
+        console.error(
+            `Feature '${featureDef.displayName} (${featureDef.key})' type and filter type are mismatched.`,
+            featureDef,
+            filter
+        );
+        return undefined;
+    }
+};
+
+export const getGroupByFilter = createSelector(
+    [getFilters, getGroupByCategory],
+    (filters, groupByCategory): DiscreteFilterData | undefined => {
+        return filters.get(groupByCategory) as DiscreteFilterData;
+    }
+);
+
+export const getNumericFilters = createSelector(
+    [getActiveFilters, getFilters, getMeasuredFeaturesDefs, getGroupByCategory],
+    (
+        activeFilters,
+        filters,
+        featureDefs,
+        groupByCategory
+    ): Map<string, NumericFilter | undefined> => {
+        // Add the group by category to the set of active filters.
+        activeFilters = new Set(activeFilters);
+        activeFilters.add(groupByCategory);
+
+        const numericFilters: Map<string, NumericFilter | undefined> = new Map();
+        for (const featureDef of featureDefs) {
+            if (activeFilters.has(featureDef.key)) {
+                const numericFilter = getNumericFilterFromFeature(
+                    featureDef,
+                    filters.get(featureDef.key)
+                );
+                numericFilters.set(featureDef.key, numericFilter);
+            }
+        }
+        return numericFilters;
+    }
+);
+
 export const getFilteredCellData = createSelector(
     /**
      * Takes the full data and filters it based on the selected checkboxes and
@@ -384,14 +453,17 @@ export const getFilteredCellData = createSelector(
         getPerCellDataForPlot,
         getGroupByCategory,
         getGroupingCategoryNamesAsArray,
+        getNumericFilters,
     ],
     (
         measuredFeatureKeys,
         filtersToExclude,
         perCellDataForPlot: DataForPlot,
         categoryKey: string,
-        groupingNames
+        groupingNames,
+        numericFilters
     ): DataForPlot => {
+        console.log(numericFilters);
         if (!filtersToExclude.length) {
             return {
                 ...perCellDataForPlot,
@@ -408,8 +480,28 @@ export const getFilteredCellData = createSelector(
         const srcPaths: string[] = [];
         const indices: number[] = [];
         for (let i = 0; i < perCellDataForPlot.labels.cellIds.length; i++) {
+            let isExcluded = false;
+            for (const [featureKey, numericFilter] of numericFilters) {
+                const value = perCellDataForPlot.values[featureKey][i];
+                if (numericFilter && value !== null) {
+                    if (numericFilter.range !== undefined) {
+                        if (value < numericFilter.range[0] || value > numericFilter.range[1]) {
+                            isExcluded = true;
+                            break;
+                        }
+                    } else if (numericFilter.excludedLUT) {
+                        if (numericFilter.excludedLUT[value]) {
+                            isExcluded = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (isExcluded) {
+                continue;
+            }
             const categoryName: string = groupingNames[i];
-            if (!includes(filtersToExclude, categoryName)) {
+            if (true) {
                 const cellId = perCellDataForPlot.labels.cellIds[i];
                 cellIds.push(cellId);
                 categoryNameArray.push(categoryName);
