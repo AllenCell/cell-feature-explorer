@@ -213,8 +213,8 @@ export function setPointOpacity(payload: number): SetPointOpacityAction {
 /**
  * Sets a filter for the specified feature. If the feature is selected as the
  * groupBy feature, or if the feature is marked as active for filtering (see
- * `setFilterActive`), points that are filtered out by this filter will be
- * excluded from the plot.
+ * `setFilterActive`), points that are excluded by/not in range of this filter
+ * will be excluded from the plot.
  * @param feature The key of the feature to set the filter for.
  * @param filter The filter data to apply to the feature.
  */

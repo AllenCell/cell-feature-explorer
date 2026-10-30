@@ -10,15 +10,33 @@ export type DiscreteFilterData = {
 
 export type ContinuousFilterData = {
     discrete: false;
+    /** Min bound of the filter range, inclusive. */
     min: number;
+    /** Max bound of the filter range, inclusive. */
     max: number;
 };
 
+/**
+ * A user-selected filter, which excludes using string values for discrete data
+ * or with an (inclusive) range for continuous data.
+ */
 export type FilterData = DiscreteFilterData | ContinuousFilterData;
 
+/**
+ * A precomputed filter that can be applied directly to raw numeric feature
+ * values.
+ */
 export type NumericFilter = {
     featureKey: string;
+    /**
+     * For some discrete feature data `data`, the ID `i` is excluded by the
+     * filter if `excludedLUT[data[i]] === true`.
+     */
     excludedLUT?: boolean[];
+    /**
+     * For some continuous feature data `data`, the ID `i` is excluded by the
+     * filter if `data[i] < range[0]` or `range[1] < data[i]`.
+     */
     range?: [number, number];
 };
 

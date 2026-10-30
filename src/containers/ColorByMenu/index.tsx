@@ -77,7 +77,7 @@ interface DispatchProps {
     handleChangeAxis: ActionCreator<SelectAxisAction>;
     handleChangeGroupByCategory: ActionCreator<ChangeGroupByCategory>;
     handleCloseSelectionSet: ActionCreator<DeselectGroupOfPointsAction>;
-    handleSetFeatureFilter: ActionCreator<SetFilterAction>;
+    handleSetFilter: ActionCreator<SetFilterAction>;
     handleChangeDownloadSettings: ActionCreator<ChangeDownloadConfigAction>;
     handleSetColorOverride: ActionCreator<SetColorOverrideAction>;
 }
@@ -111,7 +111,7 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
     }
 
     public onBarClicked({ target }: CheckboxChangeEvent) {
-        const { groupByFilter, groupBy, handleSetFeatureFilter } = this.props;
+        const { groupByFilter, groupBy, handleSetFilter: handleSetFeatureFilter } = this.props;
         let filter = groupByFilter ?? { discrete: true, excluded: new Set() };
         // Toggle whether the category is excluded from the filter
         if (filter.discrete) {
@@ -142,7 +142,12 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
     }
 
     public allOnOff({ target }: CheckboxChangeEvent) {
-        const { groupByFilter, groupBy, handleSetFeatureFilter, interactivePanelData } = this.props;
+        const {
+            groupByFilter,
+            groupBy,
+            handleSetFilter: handleSetFeatureFilter,
+            interactivePanelData,
+        } = this.props;
         let filter = groupByFilter ?? { discrete: true, excluded: new Set() };
         if (filter.discrete) {
             filter = { ...filter, excluded: new Set(filter.excluded) };
@@ -383,7 +388,7 @@ const dispatchToPropsMap: DispatchProps = {
     handleChangeGroupByCategory: selectionStateBranch.actions.changeGroupByCategory,
     handleChangeDownloadSettings: selectionStateBranch.actions.changeDownloadSettings,
     handleCloseSelectionSet: selectionStateBranch.actions.deselectGroupOfPoints,
-    handleSetFeatureFilter: selectionStateBranch.actions.setFeatureFilter,
+    handleSetFilter: selectionStateBranch.actions.setFilter,
     handleSetColorOverride: selectionStateBranch.actions.setColorOverride,
 };
 export default connect<PropsFromState, DispatchProps, PropsFromApp, State>(

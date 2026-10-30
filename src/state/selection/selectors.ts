@@ -25,7 +25,14 @@ import {
     PerCellLabels,
 } from "../metadata/types";
 import { NumberOrString, SelectedGroups, State } from "../types";
-import { findFeature, getCategoryString, getFileInfoDatumFromCellId, sortNumeric } from "../util";
+import {
+    findFeature,
+    getCategoryString,
+    getFileInfoDatumFromCellId,
+    getNumericFilterFromFeature,
+    isIdExcludedByFilters,
+    sortNumeric,
+} from "../util";
 
 import { MISSING_CATEGORY_COLOR, MISSING_CATEGORY_LABEL } from "./constants";
 import {
@@ -377,37 +384,6 @@ export const getColorByCategoryCounts = createSelector(
 // FILTERED DATA
 // =============
 
-const getNumericFilterFromFeature = (
-    featureDef: MeasuredFeatureDef,
-    filter: FilterData | undefined
-): NumericFilter | undefined => {
-    if (!filter) {
-        return undefined;
-    }
-    if (featureDef.discrete && filter.discrete) {
-        const orderedValues = Object.values(featureDef.options).map(
-            (option) => option.key ?? option.name
-        );
-        const excludedLUT = orderedValues.map((value) => filter.excluded.has(value));
-        return {
-            featureKey: featureDef.key,
-            excludedLUT,
-        };
-    } else if (!featureDef.discrete && !filter.discrete) {
-        return {
-            featureKey: featureDef.key,
-            range: [filter.min, filter.max],
-        };
-    } else {
-        console.error(
-            `Feature '${featureDef.displayName} (${featureDef.key})' type and filter type are mismatched.`,
-            featureDef,
-            filter
-        );
-        return undefined;
-    }
-};
-
 export const getGroupByFilter = createSelector(
     [getFilters, getGroupByCategory],
     (filters, groupByCategory): DiscreteFilterData | undefined => {
@@ -441,31 +417,6 @@ export const getNumericFilters = createSelector(
     }
 );
 
-export function isValueExcludedByFilters(
-    id: number,
-    cellData: DataForPlot,
-    numericFilters: Map<string, NumericFilter | undefined>
-): boolean {
-    let isExcluded = false;
-    for (const [featureKey, numericFilter] of numericFilters) {
-        const value = cellData.values[featureKey][id];
-        if (numericFilter && value !== null) {
-            if (numericFilter.range !== undefined) {
-                if (value < numericFilter.range[0] || value > numericFilter.range[1]) {
-                    isExcluded = true;
-                    break;
-                }
-            } else if (numericFilter.excludedLUT) {
-                if (numericFilter.excludedLUT[value]) {
-                    isExcluded = true;
-                    break;
-                }
-            }
-        }
-    }
-    return isExcluded;
-}
-
 export const getFilteredCellData = createSelector(
     /**
      * Takes the full data and filters it based on the selected checkboxes and
@@ -491,33 +442,27 @@ export const getFilteredCellData = createSelector(
         const thumbnails: string[] = [];
         const srcPaths: string[] = [];
         const indices: number[] = [];
-        let excludedValues = 0;
         const numValues = perCellDataForPlot.labels?.cellIds?.length;
         for (let i = 0; i < (numValues ?? 0); i++) {
-            const isExcluded = isValueExcludedByFilters(i, perCellDataForPlot, numericFilters);
+            const isExcluded = isIdExcludedByFilters(i, perCellDataForPlot, numericFilters);
             if (isExcluded) {
-                excludedValues++;
                 continue;
             }
             const categoryName: string = groupingNames[i];
-            if (true) {
-                const cellId = perCellDataForPlot.labels.cellIds[i];
-                cellIds.push(cellId);
-                categoryNameArray.push(categoryName);
-                thumbnails.push(perCellDataForPlot.labels.thumbnailPaths[i]);
-                srcPaths.push(perCellDataForPlot.labels.sourcePaths?.[i] ?? "");
-                indices.push(perCellDataForPlot.indices[i]);
+            const cellId = perCellDataForPlot.labels.cellIds[i];
+            cellIds.push(cellId);
+            categoryNameArray.push(categoryName);
+            thumbnails.push(perCellDataForPlot.labels.thumbnailPaths[i]);
+            srcPaths.push(perCellDataForPlot.labels.sourcePaths?.[i] ?? "");
+            indices.push(perCellDataForPlot.indices[i]);
 
-                measuredFeatureKeys.forEach((featureKey) => {
-                    if (!dataToReturn[featureKey]) {
-                        dataToReturn[featureKey] = [];
-                    }
+            measuredFeatureKeys.forEach((featureKey) => {
+                if (!dataToReturn[featureKey]) {
+                    dataToReturn[featureKey] = [];
+                }
 
-                    dataToReturn[featureKey].push(
-                        perCellDataForPlot.values[featureKey][i] as never
-                    );
-                });
-            }
+                dataToReturn[featureKey].push(perCellDataForPlot.values[featureKey][i] as never);
+            });
         }
         return {
             indices: indices,
