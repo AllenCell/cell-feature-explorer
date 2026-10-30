@@ -162,7 +162,7 @@ export const getInteractivePanelData = createSelector(
             const id = category.key ?? category.name;
             const total: number = countsByCategory[id] || category.count || 0;
             const disabled = !displayable.has(id);
-            const isExcluded = groupByFilter?.excluded.has(id) ?? false;
+            const isExcluded = groupByFilter?.excludedValues.has(id) ?? false;
             const color = getColorForCategory(
                 categoryToColorBy === categoryToGroupBy,
                 isExcluded,

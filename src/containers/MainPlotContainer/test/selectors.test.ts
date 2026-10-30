@@ -178,7 +178,7 @@ describe("MainPlotContainer selectors", () => {
                             newMockState.selection.groupBy,
                             {
                                 discrete: true,
-                                excluded: new Set(["Paxillin"]),
+                                excludedValues: new Set(["Paxillin"]),
                             },
                         ],
                     ]),
