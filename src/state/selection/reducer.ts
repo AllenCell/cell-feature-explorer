@@ -45,6 +45,7 @@ import {
     SET_CONNECT_LINE_OPACITY,
     SET_FILTER,
     SET_FILTER_ACTIVE,
+    CLEAR_FILTERS,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -78,6 +79,7 @@ import {
     SetPointOpacityAction,
     SetPointRadiusAction,
     SetShowConnectLines,
+    ClearFiltersAction,
 } from "./types";
 
 export const initialState: SelectionStateBranch = {
@@ -382,6 +384,14 @@ const actionToConfigMap: TypeToDescriptionMap = {
                 activeFilters: newActiveFilters,
             };
         },
+    },
+    [CLEAR_FILTERS]: {
+        accepts: (action: Action): action is ClearFiltersAction => action.type === CLEAR_FILTERS,
+        perform: (state: SelectionStateBranch, action: ClearFiltersAction) => ({
+            ...state,
+            filters: new Map(),
+            activeFilters: new Set(),
+        }),
     },
     [TOGGLE_APPLY_SELECTION_SET_COLOR]: {
         accepts: (action: Action): action is BoolToggleAction =>
