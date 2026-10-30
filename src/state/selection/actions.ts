@@ -38,6 +38,7 @@ import {
     SET_CONNECT_LINE_OPACITY,
     SET_FILTER_ACTIVE,
     SET_FILTER,
+    CLEAR_FILTERS,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -73,6 +74,7 @@ import {
     SetPointOpacityAction,
     SetPointRadiusAction,
     SyncStateWithURLAction,
+    ClearFiltersAction,
 } from "./types";
 
 export function changeAxis(axisId: string, payload: string): SelectAxisAction {
@@ -236,6 +238,12 @@ export function setFilterActive(feature: string, active: boolean): SetFilterActi
             active,
         },
         type: SET_FILTER_ACTIVE,
+    };
+}
+
+export function clearFilters(): ClearFiltersAction {
+    return {
+        type: CLEAR_FILTERS,
     };
 }
 

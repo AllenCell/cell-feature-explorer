@@ -127,6 +127,10 @@ export interface ChangeSelectionAction {
     type: string;
 }
 
+export interface ClearFiltersAction {
+    type: string;
+}
+
 export interface SetFilterAction {
     payload: {
         feature: string;

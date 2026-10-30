@@ -26,6 +26,7 @@ export const SET_COLOR_OVERRIDES = makeSelectionConstant("set-color-overrides");
 export const SET_POINT_RADIUS = makeSelectionConstant("set-point-radius");
 export const SET_POINT_OPACITY = makeSelectionConstant("set-point-opacity");
 export const SET_FILTER = makeSelectionConstant("set-filter");
+export const CLEAR_FILTERS = makeSelectionConstant("clear-filters");
 export const SET_FILTER_ACTIVE = makeSelectionConstant("set-filter-active");
 export const OPEN_CELL_IN_3D = makeSelectionConstant("open-cell-in-3d");
 export const TOGGLE_APPLY_SELECTION_SET_COLOR = makeSelectionConstant("apply-selection-set-color");
