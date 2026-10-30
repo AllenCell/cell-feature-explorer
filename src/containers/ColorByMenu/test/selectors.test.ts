@@ -76,6 +76,18 @@ describe("ColorByMenu selectors", () => {
                 });
             });
         });
+        it("marks excluded categories as unchecked", () => {
+            const state: State = {
+                ...newMockState,
+                selection: {
+                    ...newMockState.selection,
+                    filterExclude: ["Paxillin"],
+                },
+            };
+            const result: PanelData[] = getInteractivePanelData(state);
+            expect(find(result, { id: "Paxillin" })?.checked).to.be.false;
+            expect(find(result, { id: "Alpha-actinin-1" })?.checked).to.be.true;
+        });
         it("returns disabled === false for any category that has data", () => {
             const result: PanelData[] = getInteractivePanelData(newMockState);
             // "Alpha-actinin-1" and "Paxillin" cell lines in the mock data
