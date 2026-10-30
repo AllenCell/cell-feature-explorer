@@ -1,4 +1,4 @@
-import { chunk, includes, map, reduce, values } from "lodash";
+import { chunk, map, reduce, values } from "lodash";
 import { createSelector } from "reselect";
 
 import {
@@ -23,7 +23,6 @@ import {
     getColorBySelection,
     getDownloadConfig,
     getDownloadRoot,
-    getFiltersToExclude,
     getSelectedGroupKeys,
     getSelectedGroups,
     getSelectedSetTotals,
@@ -177,7 +176,6 @@ export const getInteractivePanelData = createSelector(
             const total: number = countsByCategory[id] || category.count || 0;
             const disabled = !displayableGroups.includes(id);
             const excluded = groupByFilter?.excluded.has(id) ?? false;
-            console.log("Groupbyfilter:", groupByFilter, "excluded: ", excluded);
             const color = getColorForCategory(
                 categoryToColorBy === categoryToGroupBy,
                 excluded,

@@ -50,7 +50,6 @@ import {
     getLineMovingAverageWindow,
     getConnectByFeature,
     getConnectByCategory,
-    getFiltersToExclude,
     getNumericFilters,
     isValueExcludedByFilters,
 } from "../../state/selection/selectors";

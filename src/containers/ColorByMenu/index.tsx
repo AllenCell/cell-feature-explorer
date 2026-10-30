@@ -1,6 +1,6 @@
 import { Checkbox, Col, Collapse, Row } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
-import { filter, groupBy, includes } from "lodash";
+import { includes } from "lodash";
 import React from "react";
 import { connect } from "react-redux";
 import type { ActionCreator } from "redux";
@@ -22,7 +22,6 @@ import { getFeatureDefTooltip, getDownloadRoot } from "../../state/selection/sel
 import {
     BoolToggleAction,
     ChangeDownloadConfigAction,
-    ChangeFilterSelectionAction,
     ChangeGroupByCategory,
     ColorForPlot,
     DeselectGroupOfPointsAction,
@@ -31,7 +30,7 @@ import {
     FilterData,
     SelectAxisAction,
     SetColorOverrideAction,
-    SetFilterByFeatureAction,
+    SetFilterAction,
 } from "../../state/selection/types";
 import { State } from "../../state/types";
 import { getColorByDisplayOptions, getGroupByDisplayOptions } from "../MainPlotContainer/selectors";
@@ -60,7 +59,6 @@ interface PropsFromState {
     downloadUrls: string[];
     downloadConfig: DownloadConfig;
     downloadRoot: string;
-    filtersToExclude: string[];
     filters: Map<string, FilterData>;
     groupByFilter: DiscreteFilterData | undefined;
     interactivePanelData: PanelData[];
@@ -79,8 +77,7 @@ interface DispatchProps {
     handleChangeAxis: ActionCreator<SelectAxisAction>;
     handleChangeGroupByCategory: ActionCreator<ChangeGroupByCategory>;
     handleCloseSelectionSet: ActionCreator<DeselectGroupOfPointsAction>;
-    handleSetFilteredValues: ActionCreator<ChangeFilterSelectionAction>;
-    handleSetFeatureFilter: ActionCreator<SetFilterByFeatureAction>;
+    handleSetFeatureFilter: ActionCreator<SetFilterAction>;
     handleChangeDownloadSettings: ActionCreator<ChangeDownloadConfigAction>;
     handleSetColorOverride: ActionCreator<SetColorOverrideAction>;
 }
@@ -115,27 +112,17 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
 
     public onBarClicked({ target }: CheckboxChangeEvent) {
         const { groupByFilter, groupBy, handleSetFeatureFilter } = this.props;
-        let filter = groupByFilter;
-        if (!filter) {
-            filter = { discrete: true, excluded: new Set() };
-        } else {
-            filter = { ...filter, excluded: new Set(filter.excluded) };
-        }
+        let filter = groupByFilter ?? { discrete: true, excluded: new Set() };
+        // Toggle whether the category is excluded from the filter
         if (filter.discrete) {
+            filter = { ...filter, excluded: new Set(filter.excluded) };
             if (target.checked) {
                 filter.excluded.delete(target.value);
             } else {
                 filter.excluded.add(target.value);
             }
         }
-        console.log("Setting filter for groupBy:", groupByFilter, "with filter:", filter);
         handleSetFeatureFilter(groupBy.toString(), filter);
-        // const { handleSetFilteredValues: handleFilterByCategoryName, filtersToExclude } =
-        //     this.props;
-        // const newFilterList: string[] = includes(filtersToExclude, target.value)
-        //     ? filter(filtersToExclude, (e) => e !== target.value)
-        //     : [...filtersToExclude, target.value];
-        // handleFilterByCategoryName(newFilterList);
     }
 
     public onCategorySetDownloadButtonClicked(categoryName: string) {
@@ -156,10 +143,7 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
 
     public allOnOff({ target }: CheckboxChangeEvent) {
         const { groupByFilter, groupBy, handleSetFeatureFilter, interactivePanelData } = this.props;
-        let filter = groupByFilter;
-        if (!filter) {
-            filter = { discrete: true, excluded: new Set() };
-        }
+        let filter = groupByFilter ?? { discrete: true, excluded: new Set() };
         if (filter.discrete) {
             filter = { ...filter, excluded: new Set(filter.excluded) };
             if (target.checked) {
@@ -237,7 +221,6 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
 
     public renderTaggedStructuresPanel() {
         const {
-            filtersToExclude,
             isInIndeterminateState,
             interactivePanelData,
             downloadUrls,
@@ -294,7 +277,7 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
                         <div className={styles.interactiveLegendHeader}>
                             <Checkbox
                                 indeterminate={isInIndeterminateState}
-                                checked={this.props.groupByFilter?.excluded.size === 0}
+                                checked={(this.props.groupByFilter?.excluded.size ?? 0) === 0}
                                 onChange={this.allOnOff}
                             >
                                 Show/Hide all
@@ -385,7 +368,6 @@ function mapStateToProps(state: State): PropsFromState {
         downloadConfig: selectionStateBranch.selectors.getDownloadConfig(state),
         downloadUrls: createUrlFromListOfIds(state),
         downloadRoot: getDownloadRoot(state),
-        filtersToExclude: selectionStateBranch.selectors.getFiltersToExclude(state),
         filters: selectionStateBranch.selectors.getFilters(state),
         groupByFilter: selectionStateBranch.selectors.getGroupByFilter(state),
         groupByTitle: getGroupByTitle(state),
@@ -401,7 +383,6 @@ const dispatchToPropsMap: DispatchProps = {
     handleChangeGroupByCategory: selectionStateBranch.actions.changeGroupByCategory,
     handleChangeDownloadSettings: selectionStateBranch.actions.changeDownloadSettings,
     handleCloseSelectionSet: selectionStateBranch.actions.deselectGroupOfPoints,
-    handleSetFilteredValues: selectionStateBranch.actions.setFilteredValues,
     handleSetFeatureFilter: selectionStateBranch.actions.setFeatureFilter,
     handleSetColorOverride: selectionStateBranch.actions.setColorOverride,
 };

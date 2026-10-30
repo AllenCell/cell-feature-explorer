@@ -14,7 +14,7 @@ import {
 } from "../selectors";
 import type { PlotlyAnnotation } from "../../../components/MainPlot";
 import { CELL_ID_KEY, PALETTE } from "../../../constants";
-import type { ColorForPlot } from "../../../state/selection/types";
+import type { ColorForPlot, FilterData } from "../../../state/selection/types";
 
 describe("MainPlotContainer selectors", () => {
     const newMockState = mockState;
@@ -76,7 +76,15 @@ describe("MainPlotContainer selectors", () => {
                     // 2 cells are selected, but the first (cell ID 1) will be
                     // excluded by filtering
                     selectedPoints: selectedCellFileInfo,
-                    filterExclude: ["Paxillin"],
+                    filters: new Map<string, FilterData>([
+                        [
+                            newMockState.selection.groupBy,
+                            {
+                                discrete: true,
+                                excluded: new Set(["Paxillin"]),
+                            },
+                        ],
+                    ]),
                 },
             };
             const result: PlotlyAnnotation[] = getAnnotations(state);
