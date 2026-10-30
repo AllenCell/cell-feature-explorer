@@ -153,11 +153,14 @@ export const getInteractivePanelData = createSelector(
         if (countsByCategory[MISSING_CATEGORY_KEY] > 0) {
             // Some data points have no data for this category. Modify categories
             // to include an N/A entry.
-            categories.push({
-                color: MISSING_CATEGORY_COLOR,
-                name: MISSING_CATEGORY_LABEL,
-                key: MISSING_CATEGORY_KEY,
-            });
+            categories = [
+                ...categories,
+                {
+                    color: MISSING_CATEGORY_COLOR,
+                    name: MISSING_CATEGORY_LABEL,
+                    key: MISSING_CATEGORY_KEY,
+                },
+            ];
         }
 
         const names = disambiguateCategoryNames(categories);
