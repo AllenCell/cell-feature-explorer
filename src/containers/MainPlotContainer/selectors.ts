@@ -50,6 +50,8 @@ import {
     getConnectByFeature,
     getConnectByCategory,
     getFiltersToExclude,
+    getNumericFilters,
+    isValueExcludedByFilters,
 } from "../../state/selection/selectors";
 import {
     ColorForPlot,
@@ -300,19 +302,17 @@ const getAnnotationData = createSelector(
     [
         getPerCellDataForPlot,
         getClickedCellsFileInfo,
-        getFiltersToExclude,
+        getNumericFilters,
         getPlotByOnX,
         getPlotByOnY,
-        getGroupingCategoryNamesAsArray,
         getHoveredCardId,
     ],
     (
         allCellData: DataForPlot,
         clickedCellsFileInfo: FileInfo[],
-        filtersToExclude: string[],
+        numericFilters,
         xAxis,
         yAxis,
-        groupByCategoryNames,
         currentHoveredCellId
     ): AnnotationData[] => {
         if (isEmpty(allCellData.values) || isEmpty(allCellData.labels)) {
@@ -336,8 +336,7 @@ const getAnnotationData = createSelector(
             const y = allCellData.values[yAxis][pointIndex] ?? null;
 
             // Apply filtering
-            const groupName = groupByCategoryNames[pointIndex] ?? null;
-            if (filtersToExclude.includes(groupName)) {
+            if (isValueExcludedByFilters(pointIndex, allCellData, numericFilters)) {
                 return acc;
             }
 
