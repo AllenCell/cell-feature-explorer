@@ -159,15 +159,21 @@ export const getNumericFilterFromFeature = (
     if (featureDef.discrete && filter.discrete) {
         // For discrete features, values are marked as excluded based on the
         // string value, but the actual feature data is stored as an integer.
-        // Precompute a lookup table using the string options, so we can
-        // directly look up values by their integer index.
-        const orderedValues = Object.values(featureDef.options).map(
+        // Map the excluded string values to their corresponding integer
+        // indices.
+        const optionKeys = Object.keys(featureDef.options).map(Number);
+        const optionValues = Object.values(featureDef.options).map(
             (option) => option.key ?? option.name
         );
-        const excludedLUT = orderedValues.map((value) => filter.excluded.has(value));
+        const excludedIndices = new Set<number>();
+        for (let i = 0; i < optionKeys.length; i++) {
+            if (filter.excluded.has(optionValues[i])) {
+                excludedIndices.add(optionKeys[i]);
+            }
+        }
         return {
             featureKey: featureDef.key,
-            excludedLUT,
+            excludedIndices: excludedIndices,
         };
     } else if (!featureDef.discrete && !filter.discrete) {
         return {
@@ -206,8 +212,8 @@ export function isIdExcludedByFilters(
                     isExcluded = true;
                     break;
                 }
-            } else if (numericFilter.excludedLUT) {
-                if (numericFilter.excludedLUT[value]) {
+            } else if (numericFilter.excludedIndices) {
+                if (numericFilter.excludedIndices.has(value)) {
                     isExcluded = true;
                     break;
                 }

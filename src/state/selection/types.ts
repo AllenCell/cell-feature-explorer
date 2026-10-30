@@ -30,9 +30,9 @@ export type NumericFilter = {
     featureKey: string;
     /**
      * For some discrete feature data `data`, the ID `i` is excluded by the
-     * filter if `excludedLUT[data[i]] === true`.
+     * filter if `excludedIndices.has(data[i]) === true`.
      */
-    excludedLUT?: boolean[];
+    excludedIndices?: Set<number>;
     /**
      * For some continuous feature data `data`, the ID `i` is excluded by the
      * filter if `data[i] < range[0]` or `range[1] < data[i]`.
