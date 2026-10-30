@@ -5,20 +5,21 @@ import type { FileInfo } from "../metadata/types";
 
 export type DiscreteFilterData = {
     discrete: true;
-    excluded: Set<string>;
+    excludedValues: Set<string>;
 };
 
 export type ContinuousFilterData = {
     discrete: false;
-    /** Min bound of the filter range, inclusive. */
-    min: number;
-    /** Max bound of the filter range, inclusive. */
-    max: number;
+    /** Inclusive range for the filter. */
+    range: [number, number];
 };
 
 /**
- * A user-selected filter, which excludes using string values for discrete data
+ * A filter on a feature, which excludes using string values for discrete data
  * or with an (inclusive) range for continuous data.
+ *
+ * Can be parsed as a `NumericFilter` for applying against raw numeric feature
+ * data.
  */
 export type FilterData = DiscreteFilterData | ContinuousFilterData;
 

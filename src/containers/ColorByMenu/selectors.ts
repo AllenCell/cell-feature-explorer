@@ -71,9 +71,11 @@ export const getGroupByTitle = createSelector(
 export const getCheckAllCheckboxIsIntermediate = createSelector(
     [getGroupByFilter, getGroupingCategoryNames],
     (groupByFilter, categoryNames: string[]): boolean => {
-        const excluded = groupByFilter?.excluded;
+        const excludedValues = groupByFilter?.excludedValues;
         return (
-            excluded !== undefined && excluded.size > 0 && excluded.size !== categoryNames.length
+            excludedValues !== undefined &&
+            excludedValues.size > 0 &&
+            excludedValues.size !== categoryNames.length
         );
     }
 );
@@ -175,7 +177,7 @@ export const getInteractivePanelData = createSelector(
             const id = category.key ?? category.name;
             const total: number = countsByCategory[id] || category.count || 0;
             const disabled = !displayableGroups.includes(id);
-            const excluded = groupByFilter?.excluded.has(id) ?? false;
+            const excluded = groupByFilter?.excludedValues.has(id) ?? false;
             const color = getColorForCategory(
                 categoryToColorBy === categoryToGroupBy,
                 excluded,

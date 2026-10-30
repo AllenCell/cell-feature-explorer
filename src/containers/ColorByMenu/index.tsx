@@ -112,14 +112,14 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
 
     public onBarClicked({ target }: CheckboxChangeEvent) {
         const { groupByFilter, groupBy, handleSetFilter: handleSetFeatureFilter } = this.props;
-        let filter = groupByFilter ?? { discrete: true, excluded: new Set() };
+        let filter = groupByFilter ?? { discrete: true, excludedValues: new Set() };
         // Toggle whether the category is excluded from the filter
         if (filter.discrete) {
-            filter = { ...filter, excluded: new Set(filter.excluded) };
+            filter = { ...filter, excludedValues: new Set(filter.excludedValues) };
             if (target.checked) {
-                filter.excluded.delete(target.value);
+                filter.excludedValues.delete(target.value);
             } else {
-                filter.excluded.add(target.value);
+                filter.excludedValues.add(target.value);
             }
         }
         handleSetFeatureFilter(groupBy.toString(), filter);
@@ -148,14 +148,14 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
             handleSetFilter: handleSetFeatureFilter,
             interactivePanelData,
         } = this.props;
-        let filter = groupByFilter ?? { discrete: true, excluded: new Set() };
+        let filter = groupByFilter ?? { discrete: true, excludedValues: new Set() };
         if (filter.discrete) {
-            filter = { ...filter, excluded: new Set(filter.excluded) };
+            filter = { ...filter, excludedValues: new Set(filter.excludedValues) };
             if (target.checked) {
-                filter.excluded.clear();
+                filter.excludedValues.clear();
             } else {
                 const keys = interactivePanelData.map((ele: PanelData) => ele.id);
-                keys.forEach((key) => filter?.excluded.add(key));
+                keys.forEach((key) => filter?.excludedValues.add(key));
             }
         }
         handleSetFeatureFilter(groupBy.toString(), filter);
@@ -282,7 +282,7 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
                         <div className={styles.interactiveLegendHeader}>
                             <Checkbox
                                 indeterminate={isInIndeterminateState}
-                                checked={(this.props.groupByFilter?.excluded.size ?? 0) === 0}
+                                checked={(this.props.groupByFilter?.excludedValues.size ?? 0) === 0}
                                 onChange={this.allOnOff}
                             >
                                 Show/Hide all

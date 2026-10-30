@@ -167,7 +167,7 @@ export const getNumericFilterFromFeature = (
         );
         const excludedIndices = new Set<number>();
         for (let i = 0; i < optionKeys.length; i++) {
-            if (filter.excluded.has(optionValues[i])) {
+            if (filter.excludedValues.has(optionValues[i])) {
                 excludedIndices.add(optionKeys[i]);
             }
         }
@@ -178,7 +178,7 @@ export const getNumericFilterFromFeature = (
     } else if (!featureDef.discrete && !filter.discrete) {
         return {
             featureKey: featureDef.key,
-            range: [filter.min, filter.max],
+            range: filter.range,
         };
     } else {
         console.error(
