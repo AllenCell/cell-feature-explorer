@@ -106,6 +106,7 @@ const changeDatasetLogic = createLogic({
                 if (!featureKeys.has(state.selection.groupBy)) {
                     actions.push(changeGroupByCategory(selections.defaultGroupBy));
                 }
+                // TODO: Clear filtering and annotations
                 if (
                     !featureKeys.has(state.selection.connectByFeature) &&
                     selections.defaultConnectBy

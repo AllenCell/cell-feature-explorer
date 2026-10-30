@@ -67,7 +67,6 @@ export const getPointRadius = (state: State): number => state.selection.pointRad
 export const getPointOpacity = (state: State): number => state.selection.pointOpacity;
 export const getSelectionSetColors = (state: State): { [key: string]: string } =>
     state.selection.selectedGroupColors;
-export const getFiltersToExclude = (state: State): string[] => state.selection.filterExclude;
 export const getActiveFilters = (state: State): Set<string> => state.selection.activeFilters;
 export const getFilters = (state: State): Map<string, FilterData> => state.selection.filters;
 export const getSelected3DCell = (state: State): string => state.selection.cellSelectedFor3D;
@@ -520,7 +519,6 @@ export const getFilteredCellData = createSelector(
                 });
             }
         }
-        console.log("getFilteredCellData - excluded values:", excludedValues);
         return {
             indices: indices,
             values: dataToReturn,

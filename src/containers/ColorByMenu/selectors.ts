@@ -132,7 +132,6 @@ export const getInteractivePanelData = createSelector(
         categoryNamesArray: string[],
         colorOverrides: (string | undefined)[]
     ): PanelData[] => {
-        const excluded = new Set(filtersToExclude);
         const displayable = new Set(displayableGroups);
 
         // Calculate actual counts from the data
@@ -163,7 +162,7 @@ export const getInteractivePanelData = createSelector(
             const id = category.key ?? category.name;
             const total: number = countsByCategory[id] || category.count || 0;
             const disabled = !displayable.has(id);
-            const isExcluded = excluded.has(id);
+            const isExcluded = groupByFilter?.excluded.has(id) ?? false;
             const color = getColorForCategory(
                 categoryToColorBy === categoryToGroupBy,
                 isExcluded,

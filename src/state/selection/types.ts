@@ -30,7 +30,6 @@ export interface SelectionStateBranch {
     /** Source of the URL for a CSV file. */
     csvUrl: string;
     downloadConfig: DownloadConfig;
-    filterExclude: string[];
     filters: Map<string, FilterData>;
     activeFilters: Set<string>;
     galleryCollapsed: boolean;
@@ -128,12 +127,7 @@ export interface ChangeSelectionAction {
     type: string;
 }
 
-export interface ChangeFilterSelectionAction {
-    payload: string[];
-    type: string;
-}
-
-export interface SetFilterByFeatureAction {
+export interface SetFilterAction {
     payload: {
         feature: string;
         filter: FilterData | null;

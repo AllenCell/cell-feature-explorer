@@ -16,7 +16,6 @@ import {
     SET_MOUSE_POSITION,
     SYNC_STATE_WITH_URL,
     TOGGLE_APPLY_SELECTION_SET_COLOR,
-    SET_FILTERED_VALUES,
     TOGGLE_GALLERY_OPEN_CLOSE,
     CHANGE_DATASET,
     RECEIVE_FILE_INFO,
@@ -38,12 +37,11 @@ import {
     SET_CONNECT_LINE_DEFAULT_COLOR,
     SET_CONNECT_LINE_OPACITY,
     SET_FILTER_ACTIVE,
-    SET_FEATURE_FILTER,
+    SET_FILTER,
 } from "./constants";
 import {
     BoolToggleAction,
     ChangeDownloadConfigAction,
-    ChangeFilterSelectionAction,
     ChangeGroupByCategory,
     ChangeHoveredPointAction,
     ChangeMousePositionAction,
@@ -67,7 +65,7 @@ import {
     SetColorOverridesAction,
     SetCsvUrlAction,
     SetFilterActiveAction,
-    SetFilterByFeatureAction,
+    SetFilterAction,
     SetLineAverageWindowAction,
     SetLineDefaultColorAction,
     SetLineOpacityAction,
@@ -210,29 +208,33 @@ export function setPointOpacity(payload: number): SetPointOpacityAction {
     };
 }
 
-export function setFilteredValues(payload: string[]): ChangeFilterSelectionAction {
-    return {
-        payload,
-        type: SET_FILTERED_VALUES,
-    };
-}
-
-export function setFeatureFilter(
-    feature: string,
-    filter: FilterData | null
-): SetFilterByFeatureAction {
+/**
+ * Sets a filter for the specified feature. If the feature is selected as the
+ * groupBy feature, or if the feature is marked as active for filtering (see
+ * `setFilterActive`), points that are filtered out by this filter will be
+ * excluded from the plot.
+ * @param feature The key of the feature to set the filter for.
+ * @param filter The filter data to apply to the feature.
+ */
+export function setFilter(feature: string, filter: FilterData | null): SetFilterAction {
     return {
         payload: { feature, filter },
-        type: SET_FEATURE_FILTER,
+        type: SET_FILTER,
     };
 }
 
-export function setFilterActive(payload: {
-    feature: string;
-    active: boolean;
-}): SetFilterActiveAction {
+/**
+ * Sets whether the specified feature's filter should be applied to points in
+ * the plot.
+ * @param feature The key of the feature to set the filter active state for.
+ * @param active Whether the filter should be applied to points in the plot.
+ */
+export function setFilterActive(feature: string, active: boolean): SetFilterActiveAction {
     return {
-        payload,
+        payload: {
+            feature,
+            active,
+        },
         type: SET_FILTER_ACTIVE,
     };
 }

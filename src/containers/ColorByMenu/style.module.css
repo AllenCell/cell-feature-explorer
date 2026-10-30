@@ -35,3 +35,10 @@
 .feature-select-row :global(.ant-select) {
   width: 100%;
 }
+
+/* Make intermediate checkbox visible */
+.interactive-legend-container
+    :global(.ant-checkbox.ant-checkbox-indeterminate)
+    > :global(.ant-checkbox-inner)::after {
+    background-color: var(--dimgray);
+}

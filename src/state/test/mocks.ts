@@ -13,6 +13,7 @@ import { initialState as initialMetaData } from "../metadata/reducer";
 import { DataForPlot, FileInfo, MeasuredFeatureDef } from "../metadata/types";
 import { INITIAL_COLORS } from "../selection/constants";
 import { initialState as initialSelectionState } from "../selection/reducer";
+import type { FilterData } from "../selection/types";
 
 export const selectedCellFileInfo: FileInfo[] = [
     {
@@ -177,7 +178,6 @@ export const mockState = {
         },
         downloadRoot: "dlurl/",
         groupBy: INITIAL_COLOR_AND_GROUP_BY,
-        filterExclude: [],
         plotByOnX: "apical-proximity",
         plotByOnY: "anaphase-segmentation-complete",
         defaultColors: INITIAL_COLORS,
@@ -186,5 +186,6 @@ export const mockState = {
         selectedGroups: {},
         selectedPoints: selectedCellFileInfo,
         displayableGroups: displayableGroups,
+        filters: new Map<string, FilterData>(),
     },
 };

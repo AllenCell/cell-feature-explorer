@@ -23,7 +23,6 @@ import {
     SET_DOWNLOAD_CONFIG,
     SET_MOUSE_POSITION,
     TOGGLE_APPLY_SELECTION_SET_COLOR,
-    SET_FILTERED_VALUES,
     TOGGLE_GALLERY_OPEN_CLOSE,
     SET_DATASET,
     RECEIVE_FILE_INFO_FOR_ALBUM_CELLS,
@@ -44,7 +43,7 @@ import {
     SET_CONNECT_LINE_WIDTH,
     SET_CONNECT_LINE_DEFAULT_COLOR,
     SET_CONNECT_LINE_OPACITY,
-    SET_FEATURE_FILTER,
+    SET_FILTER,
     SET_FILTER_ACTIVE,
 } from "./constants";
 import {
@@ -52,12 +51,10 @@ import {
     ChangeConnectByCategory,
     ChangeConnectByFeature,
     ChangeDownloadConfigAction,
-    ChangeFilterSelectionAction,
     ChangeGroupByCategory,
     ChangeHoveredPointAction,
     ChangeMousePositionAction,
     ChangeSelectedDatasetAction,
-    ChangeSelectionAction,
     ClearDatasetAction,
     DeselectGroupOfPointsAction,
     DeselectPointAction,
@@ -73,7 +70,7 @@ import {
     SetColorOverridesAction,
     SetCsvUrlAction,
     SetFilterActiveAction,
-    SetFilterByFeatureAction,
+    SetFilterAction,
     SetLineAverageWindowAction,
     SetLineDefaultColorAction,
     SetLineOpacityAction,
@@ -93,7 +90,6 @@ export const initialState: SelectionStateBranch = {
         key: "",
         type: "",
     },
-    filterExclude: [] as string[],
     filters: new Map(),
     activeFilters: new Set(),
     galleryCollapsed: true,
@@ -356,33 +352,15 @@ const actionToConfigMap: TypeToDescriptionMap = {
             colorOverrides: action.payload,
         }),
     },
-    [SET_FILTERED_VALUES]: {
-        accepts: (action: Action): action is ChangeFilterSelectionAction =>
-            action.type === SET_FILTERED_VALUES,
-        perform: (state: SelectionStateBranch, action: ChangeFilterSelectionAction) => ({
-            ...state,
-            filterExclude: action.payload,
-        }),
-    },
-    [SET_FEATURE_FILTER]: {
-        accepts: (action: Action): action is SetFilterByFeatureAction =>
-            action.type === SET_FEATURE_FILTER,
-        perform: (state: SelectionStateBranch, action: SetFilterByFeatureAction) => {
+    [SET_FILTER]: {
+        accepts: (action: Action): action is SetFilterAction => action.type === SET_FILTER,
+        perform: (state: SelectionStateBranch, action: SetFilterAction) => {
             const newFilters = new Map(state.filters);
             if (action.payload.filter === null) {
                 newFilters.delete(action.payload.feature);
             } else {
                 newFilters.set(action.payload.feature, action.payload.filter);
             }
-            console.log(
-                "Setting filter for feature:",
-                action.payload.feature,
-                "with filter:",
-                action.payload.filter,
-                "from action",
-                action
-            );
-            console.log("New filters map:", newFilters);
             return {
                 ...state,
                 filters: newFilters,
