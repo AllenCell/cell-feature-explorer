@@ -3,8 +3,14 @@ import type { Action, Reducer } from "redux";
 
 import { APP_ID, CELL_ID_KEY } from "../constants";
 
-import { DiscreteMeasuredFeatureDef, FileInfo, MeasuredFeatureDef } from "./metadata/types";
+import {
+    DataForPlot,
+    DiscreteMeasuredFeatureDef,
+    FileInfo,
+    MeasuredFeatureDef,
+} from "./metadata/types";
 import { BatchedAction, TypeToDescriptionMap } from "./types";
+import { FilterData, NumericFilter } from "./selection/types";
 
 const HTTP_REGEX = /^https?:\/\//;
 
@@ -136,4 +142,77 @@ export function sortNumeric<T>(arr: T[], toString: (item: T) => string): T[] {
     const collator = new Intl.Collator("en", { numeric: true });
     arr.sort((a, b) => collator.compare(toString(a), toString(b)));
     return arr;
+}
+
+/**
+ * Transforms a FilterData object into a NumericFilter object based on the
+ * feature definition, which can be compared against raw (numeric) feature
+ * values.
+ */
+export const getNumericFilterFromFeature = (
+    featureDef: MeasuredFeatureDef,
+    filter: FilterData | undefined
+): NumericFilter | undefined => {
+    if (!filter) {
+        return undefined;
+    }
+    if (featureDef.discrete && filter.discrete) {
+        // For discrete features, values are marked as excluded based on the
+        // string value, but the actual feature data is stored as an integer.
+        // Precompute a lookup table using the string options, so we can
+        // directly look up values by their integer index.
+        const orderedValues = Object.values(featureDef.options).map(
+            (option) => option.key ?? option.name
+        );
+        const excludedLUT = orderedValues.map((value) => filter.excluded.has(value));
+        return {
+            featureKey: featureDef.key,
+            excludedLUT,
+        };
+    } else if (!featureDef.discrete && !filter.discrete) {
+        return {
+            featureKey: featureDef.key,
+            range: [filter.min, filter.max],
+        };
+    } else {
+        console.error(
+            `Feature '${featureDef.displayName}' (key: '${featureDef.key}') type and filter type are mismatched and will be skipped.`,
+            featureDef,
+            filter
+        );
+        return undefined;
+    }
+};
+
+/**
+ * Returns whether the specified cell index is excluded by the provided filters,
+ * using the current feature data.
+ * @param id The cell index to check for exclusion.
+ * @param cellData The current feature data for all cells.
+ * @param numericFilters The set of numeric filters to apply.
+ * @returns whether the cell is excluded by the provided filters.
+ */
+export function isIdExcludedByFilters(
+    id: number,
+    cellData: DataForPlot,
+    numericFilters: Map<string, NumericFilter | undefined>
+): boolean {
+    let isExcluded = false;
+    for (const [featureKey, numericFilter] of numericFilters) {
+        const value = cellData.values[featureKey][id];
+        if (numericFilter && value !== null) {
+            if (numericFilter.range !== undefined) {
+                if (value < numericFilter.range[0] || value > numericFilter.range[1]) {
+                    isExcluded = true;
+                    break;
+                }
+            } else if (numericFilter.excludedLUT) {
+                if (numericFilter.excludedLUT[value]) {
+                    isExcluded = true;
+                    break;
+                }
+            }
+        }
+    }
+    return isExcluded;
 }

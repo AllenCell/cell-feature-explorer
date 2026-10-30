@@ -50,8 +50,8 @@ import {
     getConnectByFeature,
     getConnectByCategory,
     getNumericFilters,
-    isValueExcludedByFilters,
 } from "../../state/selection/selectors";
+import { isIdExcludedByFilters } from "../../state/util";
 import {
     ColorForPlot,
     MainPlotSettings,
@@ -335,7 +335,7 @@ const getAnnotationData = createSelector(
             const y = allCellData.values[yAxis][pointIndex] ?? null;
 
             // Apply filtering
-            if (isValueExcludedByFilters(pointIndex, allCellData, numericFilters)) {
+            if (isIdExcludedByFilters(pointIndex, allCellData, numericFilters)) {
                 return acc;
             }
 
