@@ -46,6 +46,15 @@ describe("ColorByMenu selectors", () => {
             const expected = ["same name (1)", "same name (2)", "diff name"];
             expect(result).to.deep.equal(expected);
         });
+
+        it("leaves unique names unchanged and handles empty input", () => {
+            const mockData = [
+                { name: "a", key: "1", color: "#ffffff" },
+                { name: "b", key: "2", color: "#ffffff" },
+            ];
+            expect(disambiguateCategoryNames(mockData)).to.deep.equal(["a", "b"]);
+            expect(disambiguateCategoryNames([])).to.deep.equal([]);
+        });
     });
 
     describe("getInteractivePanelData", () => {

@@ -72,20 +72,16 @@ export const getCheckAllCheckboxIsIntermediate = createSelector(
 );
 
 export const disambiguateCategoryNames = (options: MeasuredFeaturesOption[]): string[] => {
-    const categoryNames: string[] = map(options, (option) => option.name);
-    const keys: string[] = map(options, (option) => option.key || "");
-
-    const repeatedNames: string[] = categoryNames.filter((name, i) => {
-        return categoryNames.indexOf(name) !== i;
-    });
-    const disambiguatedNames: string[] = categoryNames.map((name, i) => {
-        if (repeatedNames.includes(name)) {
-            return `${name} (${keys[i]})`;
+    const nameCounts = new Map<string, number>();
+    for (const option of options) {
+        nameCounts.set(option.name, (nameCounts.get(option.name) ?? 0) + 1);
+    }
+    return options.map((option) => {
+        if ((nameCounts.get(option.name) ?? 0) > 1) {
+            return `${option.name} (${option.key || ""})`;
         }
-        return name;
+        return option.name;
     });
-
-    return disambiguatedNames;
 };
 
 export const getLegendColors = createSelector(
