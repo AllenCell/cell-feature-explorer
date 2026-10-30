@@ -442,6 +442,31 @@ export const getNumericFilters = createSelector(
     }
 );
 
+export function isValueExcludedByFilters(
+    id: number,
+    cellData: DataForPlot,
+    numericFilters: Map<string, NumericFilter | undefined>
+): boolean {
+    let isExcluded = false;
+    for (const [featureKey, numericFilter] of numericFilters) {
+        const value = cellData.values[featureKey][id];
+        if (numericFilter && value !== null) {
+            if (numericFilter.range !== undefined) {
+                if (value < numericFilter.range[0] || value > numericFilter.range[1]) {
+                    isExcluded = true;
+                    break;
+                }
+            } else if (numericFilter.excludedLUT) {
+                if (numericFilter.excludedLUT[value]) {
+                    isExcluded = true;
+                    break;
+                }
+            }
+        }
+    }
+    return isExcluded;
+}
+
 export const getFilteredCellData = createSelector(
     /**
      * Takes the full data and filters it based on the selected checkboxes and
@@ -449,7 +474,6 @@ export const getFilteredCellData = createSelector(
      */
     [
         getMeasuredFeaturesKeys,
-        getFiltersToExclude,
         getPerCellDataForPlot,
         getGroupByCategory,
         getGroupingCategoryNamesAsArray,
@@ -457,47 +481,23 @@ export const getFilteredCellData = createSelector(
     ],
     (
         measuredFeatureKeys,
-        filtersToExclude,
-        perCellDataForPlot: DataForPlot,
+        perCellDataForPlot,
         categoryKey: string,
         groupingNames,
         numericFilters
     ): DataForPlot => {
-        console.log(numericFilters);
-        if (!filtersToExclude.length) {
-            return {
-                ...perCellDataForPlot,
-                labels: {
-                    ...perCellDataForPlot.labels,
-                    [categoryKey]: groupingNames,
-                },
-            };
-        }
         const categoryNameArray: string[] = [];
         const dataToReturn: MappingOfMeasuredValuesArrays = {};
         const cellIds: string[] = [];
         const thumbnails: string[] = [];
         const srcPaths: string[] = [];
         const indices: number[] = [];
-        for (let i = 0; i < perCellDataForPlot.labels.cellIds.length; i++) {
-            let isExcluded = false;
-            for (const [featureKey, numericFilter] of numericFilters) {
-                const value = perCellDataForPlot.values[featureKey][i];
-                if (numericFilter && value !== null) {
-                    if (numericFilter.range !== undefined) {
-                        if (value < numericFilter.range[0] || value > numericFilter.range[1]) {
-                            isExcluded = true;
-                            break;
-                        }
-                    } else if (numericFilter.excludedLUT) {
-                        if (numericFilter.excludedLUT[value]) {
-                            isExcluded = true;
-                            break;
-                        }
-                    }
-                }
-            }
+        let excludedValues = 0;
+        const numValues = perCellDataForPlot.labels?.cellIds?.length;
+        for (let i = 0; i < (numValues ?? 0); i++) {
+            const isExcluded = isValueExcludedByFilters(i, perCellDataForPlot, numericFilters);
             if (isExcluded) {
+                excludedValues++;
                 continue;
             }
             const categoryName: string = groupingNames[i];
@@ -520,6 +520,7 @@ export const getFilteredCellData = createSelector(
                 });
             }
         }
+        console.log("getFilteredCellData - excluded values:", excludedValues);
         return {
             indices: indices,
             values: dataToReturn,
