@@ -387,7 +387,7 @@ const actionToConfigMap: TypeToDescriptionMap = {
     },
     [CLEAR_FILTERS]: {
         accepts: (action: Action): action is ClearFiltersAction => action.type === CLEAR_FILTERS,
-        perform: (state: SelectionStateBranch, _action: ClearFiltersAction) => ({
+        perform: (state: SelectionStateBranch) => ({
             ...state,
             filters: new Map(),
             activeFilters: new Set(),
