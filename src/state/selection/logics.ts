@@ -38,7 +38,6 @@ import {
     SelectPointAction,
     SyncStateWithURLAction,
 } from "./types";
-import { makeAnnotations } from "../../containers/MainPlotContainer/selectors";
 
 const syncStateWithUrl = createLogic({
     type: SYNC_STATE_WITH_URL,
