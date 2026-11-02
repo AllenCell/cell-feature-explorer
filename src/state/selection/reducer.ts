@@ -23,7 +23,6 @@ import {
     SET_DOWNLOAD_CONFIG,
     SET_MOUSE_POSITION,
     TOGGLE_APPLY_SELECTION_SET_COLOR,
-    TOGGLE_FILTER_BY_CATEGORY_NAME,
     TOGGLE_GALLERY_OPEN_CLOSE,
     SET_DATASET,
     RECEIVE_FILE_INFO_FOR_ALBUM_CELLS,
@@ -44,6 +43,9 @@ import {
     SET_CONNECT_LINE_WIDTH,
     SET_CONNECT_LINE_DEFAULT_COLOR,
     SET_CONNECT_LINE_OPACITY,
+    SET_FILTER,
+    SET_FILTER_ACTIVE,
+    CLEAR_FILTERS,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -54,7 +56,6 @@ import {
     ChangeHoveredPointAction,
     ChangeMousePositionAction,
     ChangeSelectedDatasetAction,
-    ChangeSelectionAction,
     ClearDatasetAction,
     DeselectGroupOfPointsAction,
     DeselectPointAction,
@@ -69,6 +70,8 @@ import {
     SetColorOverrideAction,
     SetColorOverridesAction,
     SetCsvUrlAction,
+    SetFilterActiveAction,
+    SetFilterAction,
     SetLineAverageWindowAction,
     SetLineDefaultColorAction,
     SetLineOpacityAction,
@@ -76,6 +79,7 @@ import {
     SetPointOpacityAction,
     SetPointRadiusAction,
     SetShowConnectLines,
+    ClearFiltersAction,
 } from "./types";
 
 export const initialState: SelectionStateBranch = {
@@ -88,7 +92,8 @@ export const initialState: SelectionStateBranch = {
         key: "",
         type: "",
     },
-    filterExclude: [] as string[],
+    filters: new Map(),
+    activeFilters: new Set(),
     galleryCollapsed: true,
     hoveredCardId: "",
     hoveredPointData: null,
@@ -349,12 +354,43 @@ const actionToConfigMap: TypeToDescriptionMap = {
             colorOverrides: action.payload,
         }),
     },
-    [TOGGLE_FILTER_BY_CATEGORY_NAME]: {
-        accepts: (action: Action): action is ChangeSelectionAction =>
-            action.type === TOGGLE_FILTER_BY_CATEGORY_NAME,
-        perform: (state: SelectionStateBranch, action: ChangeSelectionAction) => ({
+    [SET_FILTER]: {
+        accepts: (action: Action): action is SetFilterAction => action.type === SET_FILTER,
+        perform: (state: SelectionStateBranch, action: SetFilterAction) => {
+            const newFilters = new Map(state.filters);
+            if (action.payload.filter === null) {
+                newFilters.delete(action.payload.feature);
+            } else {
+                newFilters.set(action.payload.feature, action.payload.filter);
+            }
+            return {
+                ...state,
+                filters: newFilters,
+            };
+        },
+    },
+    [SET_FILTER_ACTIVE]: {
+        accepts: (action: Action): action is SetFilterActiveAction =>
+            action.type === SET_FILTER_ACTIVE,
+        perform: (state: SelectionStateBranch, action: SetFilterActiveAction) => {
+            const newActiveFilters = new Set(state.activeFilters);
+            if (action.payload.active) {
+                newActiveFilters.add(action.payload.feature);
+            } else {
+                newActiveFilters.delete(action.payload.feature);
+            }
+            return {
+                ...state,
+                activeFilters: newActiveFilters,
+            };
+        },
+    },
+    [CLEAR_FILTERS]: {
+        accepts: (action: Action): action is ClearFiltersAction => action.type === CLEAR_FILTERS,
+        perform: (state: SelectionStateBranch) => ({
             ...state,
-            filterExclude: action.payload,
+            filters: new Map(),
+            activeFilters: new Set(),
         }),
     },
     [TOGGLE_APPLY_SELECTION_SET_COLOR]: {

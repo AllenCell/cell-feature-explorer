@@ -26,6 +26,7 @@ import {
     changeConnectByCategory,
     changeConnectByFeature,
     changeGroupByCategory,
+    clearFilters,
 } from "./actions";
 import { FileInfo } from "../metadata/types";
 import { DatasetMetaData } from "../image-dataset/types";
@@ -119,6 +120,7 @@ const changeDatasetLogic = createLogic({
                 if (!featureKeys.has(state.selection.colorBy) && selections.defaultColorBy) {
                     actions.push(changeAxis(COLOR_BY_SELECTOR, selections.defaultColorBy));
                 }
+                actions.push(clearFilters());
                 dispatch(batchActions(actions));
                 dispatch({
                     type: SET_DATASET,

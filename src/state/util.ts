@@ -3,8 +3,17 @@ import type { Action, Reducer } from "redux";
 
 import { APP_ID, CELL_ID_KEY } from "../constants";
 
-import { DiscreteMeasuredFeatureDef, FileInfo, MeasuredFeatureDef } from "./metadata/types";
+import {
+    DataForPlot,
+    DiscreteMeasuredFeatureDef,
+    FileInfo,
+    MeasuredFeatureDef,
+} from "./metadata/types";
 import { BatchedAction, TypeToDescriptionMap } from "./types";
+import { FilterData, NumericFilter } from "./selection/types";
+import {
+    MISSING_CATEGORY_KEY
+} from "./selection/constants";
 
 const HTTP_REGEX = /^https?:\/\//;
 
@@ -136,4 +145,95 @@ export function sortNumeric<T>(arr: T[], toString: (item: T) => string): T[] {
     const collator = new Intl.Collator("en", { numeric: true });
     arr.sort((a, b) => collator.compare(toString(a), toString(b)));
     return arr;
+}
+
+/**
+ * Transforms a FilterData object into a NumericFilter object based on the
+ * feature definition, which can be compared against raw (numeric) feature
+ * values.
+ */
+export const getNumericFilterFromFeature = (
+    featureDef: MeasuredFeatureDef,
+    filter: FilterData | undefined
+): NumericFilter | undefined => {
+    if (!filter) {
+        return undefined;
+    }
+    if (featureDef.discrete && filter.discrete) {
+        // For discrete features, values are marked as excluded based on the
+        // string key, but the actual feature data is stored as an integer. Map
+        // the excluded string values to their corresponding integer value.
+        const featureOptions = { ...featureDef.options };
+        const optionValues: (number | null)[] = Object.keys(featureOptions).map((key) =>
+            Number.parseInt(key)
+        );
+        const optionStringKey = Object.values(featureOptions).map(
+            (option) => option.key ?? option.name
+        );
+
+        // In the data, missing values are represented as `null`. If the user is
+        // filtering out missing values (MISSING_CATEGORY_KEY),
+        // `excludedIndices` will include `null`.
+        optionStringKey.push(MISSING_CATEGORY_KEY);
+        optionValues.push(null);
+
+        const excludedIndices = new Set<number | null>();
+        for (let i = 0; i < optionValues.length; i++) {
+            if (filter.excludedValues.has(optionStringKey[i])) {
+                excludedIndices.add(optionValues[i]);
+            }
+        }
+        return {
+            featureKey: featureDef.key,
+            excludedIndices: excludedIndices,
+        };
+    } else if (!featureDef.discrete && !filter.discrete) {
+        return {
+            featureKey: featureDef.key,
+            range: filter.range,
+        };
+    } else {
+        console.error(
+            `Feature '${featureDef.displayName}' (key: '${featureDef.key}') type and filter type are mismatched and will be skipped.`,
+            featureDef,
+            filter
+        );
+        return undefined;
+    }
+};
+
+/**
+ * Returns whether the specified cell index is excluded by the provided filters,
+ * using the current feature data.
+ * @param id The cell index to check for exclusion.
+ * @param cellData The current feature data for all cells.
+ * @param numericFilters The set of numeric filters to apply.
+ * @returns whether the cell is excluded by the provided filters.
+ */
+export function isIdExcludedByFilters(
+    id: number,
+    cellData: DataForPlot,
+    numericFilters: Map<string, NumericFilter | undefined>
+): boolean {
+    let isExcluded = false;
+    for (const [featureKey, numericFilter] of numericFilters) {
+        const value = cellData.values[featureKey][id] ?? null;
+        if (numericFilter) {
+            if (numericFilter.range) {
+                if (value === null) {
+                    isExcluded = true;
+                    break;
+                } else if (value < numericFilter.range[0] || value > numericFilter.range[1]) {
+                    isExcluded = true;
+                    break;
+                }
+            } else if (numericFilter.excludedIndices) {
+                if (numericFilter.excludedIndices.has(value)) {
+                    isExcluded = true;
+                    break;
+                }
+            }
+        }
+    }
+    return isExcluded;
 }

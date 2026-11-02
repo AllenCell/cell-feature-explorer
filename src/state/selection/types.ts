@@ -3,6 +3,44 @@ import { CELL_ID_KEY, GENERAL_PLOT_SETTINGS } from "../../constants";
 import type { URLSearchParamMap } from "../../util/UrlState";
 import type { FileInfo } from "../metadata/types";
 
+export type DiscreteFilterData = {
+    discrete: true;
+    excludedValues: Set<string>;
+};
+
+export type ContinuousFilterData = {
+    discrete: false;
+    /** Inclusive range for the filter. */
+    range: [number, number];
+};
+
+/**
+ * A filter on a feature, which excludes using string values for discrete data
+ * or with an (inclusive) range for continuous data.
+ *
+ * Can be parsed as a `NumericFilter` for applying against raw numeric feature
+ * data.
+ */
+export type FilterData = DiscreteFilterData | ContinuousFilterData;
+
+/**
+ * A precomputed filter that can be applied directly to raw numeric feature
+ * values.
+ */
+export type NumericFilter = {
+    featureKey: string;
+    /**
+     * For some discrete feature data `data`, the ID `i` is excluded by the
+     * filter if `excludedIndices.has(data[i]) === true`.
+     */
+    excludedIndices?: Set<number | null>;
+    /**
+     * For some continuous feature data `data`, the ID `i` is excluded by the
+     * filter if `data[i] < range[0]` or `range[1] < data[i]`.
+     */
+    range?: [number, number];
+};
+
 export interface SelectionStateBranch {
     applySelectionSetColoring: boolean;
     cellSelectedFor3D: string;
@@ -11,7 +49,8 @@ export interface SelectionStateBranch {
     /** Source of the URL for a CSV file. */
     csvUrl: string;
     downloadConfig: DownloadConfig;
-    filterExclude: string[];
+    filters: Map<string, FilterData>;
+    activeFilters: Set<string>;
     galleryCollapsed: boolean;
     hoveredCardId: string;
     hoveredPointData: SelectedPointData | null;
@@ -104,6 +143,26 @@ export interface ResetSelectionAction {
 
 export interface ChangeSelectionAction {
     payload: string;
+    type: string;
+}
+
+export interface ClearFiltersAction {
+    type: string;
+}
+
+export interface SetFilterAction {
+    payload: {
+        feature: string;
+        filter: FilterData | null;
+    };
+    type: string;
+}
+
+export interface SetFilterActiveAction {
+    payload: {
+        feature: string;
+        active: boolean;
+    };
     type: string;
 }
 

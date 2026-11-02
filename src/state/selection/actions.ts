@@ -16,7 +16,6 @@ import {
     SET_MOUSE_POSITION,
     SYNC_STATE_WITH_URL,
     TOGGLE_APPLY_SELECTION_SET_COLOR,
-    TOGGLE_FILTER_BY_CATEGORY_NAME,
     TOGGLE_GALLERY_OPEN_CLOSE,
     CHANGE_DATASET,
     RECEIVE_FILE_INFO,
@@ -37,6 +36,9 @@ import {
     SET_CONNECT_LINE_WIDTH,
     SET_CONNECT_LINE_DEFAULT_COLOR,
     SET_CONNECT_LINE_OPACITY,
+    SET_FILTER_ACTIVE,
+    SET_FILTER,
+    CLEAR_FILTERS,
 } from "./constants";
 import {
     BoolToggleAction,
@@ -49,6 +51,7 @@ import {
     DeselectGroupOfPointsAction,
     DeselectPointAction,
     DownloadConfig,
+    FilterData,
     LassoOrBoxSelectAction,
     LassoOrBoxSelectPointData,
     MousePosition,
@@ -62,6 +65,8 @@ import {
     SetColorOverrideAction,
     SetColorOverridesAction,
     SetCsvUrlAction,
+    SetFilterActiveAction,
+    SetFilterAction,
     SetLineAverageWindowAction,
     SetLineDefaultColorAction,
     SetLineOpacityAction,
@@ -69,6 +74,7 @@ import {
     SetPointOpacityAction,
     SetPointRadiusAction,
     SyncStateWithURLAction,
+    ClearFiltersAction,
 } from "./types";
 
 export function changeAxis(axisId: string, payload: string): SelectAxisAction {
@@ -204,10 +210,40 @@ export function setPointOpacity(payload: number): SetPointOpacityAction {
     };
 }
 
-export function toggleFilterByCategoryName(payload: string): ChangeSelectionAction {
+/**
+ * Sets a filter for the specified feature. If the feature is selected as the
+ * groupBy feature, or if the feature is marked as active for filtering (see
+ * `setFilterActive`), points that are excluded by/not in range of this filter
+ * will be excluded from the plot.
+ * @param feature The key of the feature to set the filter for.
+ * @param filter The filter data to apply to the feature.
+ */
+export function setFilter(feature: string, filter: FilterData | null): SetFilterAction {
     return {
-        payload,
-        type: TOGGLE_FILTER_BY_CATEGORY_NAME,
+        payload: { feature, filter },
+        type: SET_FILTER,
+    };
+}
+
+/**
+ * Sets whether the specified feature's filter should be applied to points in
+ * the plot.
+ * @param feature The key of the feature to set the filter active state for.
+ * @param active Whether the filter should be applied to points in the plot.
+ */
+export function setFilterActive(feature: string, active: boolean): SetFilterActiveAction {
+    return {
+        payload: {
+            feature,
+            active,
+        },
+        type: SET_FILTER_ACTIVE,
+    };
+}
+
+export function clearFilters(): ClearFiltersAction {
+    return {
+        type: CLEAR_FILTERS,
     };
 }
 

@@ -25,15 +25,25 @@ import {
     PerCellLabels,
 } from "../metadata/types";
 import { NumberOrString, SelectedGroups, State } from "../types";
-import { findFeature, getCategoryString, getFileInfoDatumFromCellId, sortNumeric } from "../util";
+import {
+    findFeature,
+    getCategoryString,
+    getFileInfoDatumFromCellId,
+    getNumericFilterFromFeature,
+    isIdExcludedByFilters,
+    sortNumeric,
+} from "../util";
 
 import { MISSING_CATEGORY_COLOR, MISSING_CATEGORY_LABEL } from "./constants";
 import {
     ColorForPlot,
+    DiscreteFilterData,
     DownloadConfig,
+    FilterData,
     LassoOrBoxSelectPointData,
     MainPlotSettings,
     MousePosition,
+    NumericFilter,
     SelectedPointData,
 } from "./types";
 
@@ -64,7 +74,8 @@ export const getPointRadius = (state: State): number => state.selection.pointRad
 export const getPointOpacity = (state: State): number => state.selection.pointOpacity;
 export const getSelectionSetColors = (state: State): { [key: string]: string } =>
     state.selection.selectedGroupColors;
-export const getFiltersToExclude = (state: State): string[] => state.selection.filterExclude;
+export const getActiveFilters = (state: State): Set<string> => state.selection.activeFilters;
+export const getFilters = (state: State): Map<string, FilterData> => state.selection.filters;
 export const getSelected3DCell = (state: State): string => state.selection.cellSelectedFor3D;
 export const getApplyColorToSelections = (state: State): boolean =>
     state.selection.applySelectionSetColoring;
@@ -373,6 +384,43 @@ export const getColorByCategoryCounts = createSelector(
 // FILTERED DATA
 // =============
 
+export const getGroupByFilter = createSelector(
+    [getFilters, getGroupByCategory],
+    (filters, groupByCategory): DiscreteFilterData | undefined => {
+        const groupByFilter = filters.get(groupByCategory);
+        if (!groupByFilter || !groupByFilter.discrete) {
+            return undefined;
+        }
+        return groupByFilter;
+    }
+);
+
+export const getNumericFilters = createSelector(
+    [getActiveFilters, getFilters, getMeasuredFeaturesDefs, getGroupByCategory],
+    (
+        activeFilters,
+        filters,
+        featureDefs,
+        groupByCategory
+    ): Map<string, NumericFilter | undefined> => {
+        // Add the group by category to the set of active filters.
+        activeFilters = new Set(activeFilters);
+        activeFilters.add(groupByCategory);
+
+        const numericFilters: Map<string, NumericFilter | undefined> = new Map();
+        for (const featureDef of featureDefs) {
+            if (activeFilters.has(featureDef.key)) {
+                const numericFilter = getNumericFilterFromFeature(
+                    featureDef,
+                    filters.get(featureDef.key)
+                );
+                numericFilters.set(featureDef.key, numericFilter);
+            }
+        }
+        return numericFilters;
+    }
+);
+
 export const getFilteredCellData = createSelector(
     /**
      * Takes the full data and filters it based on the selected checkboxes and
@@ -380,19 +428,27 @@ export const getFilteredCellData = createSelector(
      */
     [
         getMeasuredFeaturesKeys,
-        getFiltersToExclude,
         getPerCellDataForPlot,
         getGroupByCategory,
         getGroupingCategoryNamesAsArray,
+        getNumericFilters,
     ],
     (
         measuredFeatureKeys,
-        filtersToExclude,
-        perCellDataForPlot: DataForPlot,
+        perCellDataForPlot,
         categoryKey: string,
-        groupingNames
+        groupingNames,
+        numericFilters
     ): DataForPlot => {
-        if (!filtersToExclude.length) {
+        const hasNoFilters =
+            numericFilters.size === 0 ||
+            Array.from(numericFilters.values()).every(
+                (filter) =>
+                    filter === undefined ||
+                    (!filter.range && !filter.excludedIndices) ||
+                    (filter.excludedIndices && filter.excludedIndices.size === 0)
+            );
+        if (hasNoFilters) {
             return {
                 ...perCellDataForPlot,
                 labels: {
@@ -407,26 +463,27 @@ export const getFilteredCellData = createSelector(
         const thumbnails: string[] = [];
         const srcPaths: string[] = [];
         const indices: number[] = [];
-        for (let i = 0; i < perCellDataForPlot.labels.cellIds.length; i++) {
-            const categoryName: string = groupingNames[i];
-            if (!includes(filtersToExclude, categoryName)) {
-                const cellId = perCellDataForPlot.labels.cellIds[i];
-                cellIds.push(cellId);
-                categoryNameArray.push(categoryName);
-                thumbnails.push(perCellDataForPlot.labels.thumbnailPaths[i]);
-                srcPaths.push(perCellDataForPlot.labels.sourcePaths?.[i] ?? "");
-                indices.push(perCellDataForPlot.indices[i]);
-
-                measuredFeatureKeys.forEach((featureKey) => {
-                    if (!dataToReturn[featureKey]) {
-                        dataToReturn[featureKey] = [];
-                    }
-
-                    dataToReturn[featureKey].push(
-                        perCellDataForPlot.values[featureKey][i] as never
-                    );
-                });
+        const numValues = perCellDataForPlot.labels?.cellIds?.length;
+        for (let i = 0; i < (numValues ?? 0); i++) {
+            const isExcluded = isIdExcludedByFilters(i, perCellDataForPlot, numericFilters);
+            if (isExcluded) {
+                continue;
             }
+            const categoryName: string = groupingNames[i];
+            const cellId = perCellDataForPlot.labels.cellIds[i];
+            cellIds.push(cellId);
+            categoryNameArray.push(categoryName);
+            thumbnails.push(perCellDataForPlot.labels.thumbnailPaths[i]);
+            srcPaths.push(perCellDataForPlot.labels.sourcePaths?.[i] ?? "");
+            indices.push(perCellDataForPlot.indices[i]);
+
+            measuredFeatureKeys.forEach((featureKey) => {
+                if (!dataToReturn[featureKey]) {
+                    dataToReturn[featureKey] = [];
+                }
+
+                dataToReturn[featureKey].push(perCellDataForPlot.values[featureKey][i] as never);
+            });
         }
         return {
             indices: indices,
