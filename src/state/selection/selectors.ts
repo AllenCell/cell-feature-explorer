@@ -436,6 +436,23 @@ export const getFilteredCellData = createSelector(
         groupingNames,
         numericFilters
     ): DataForPlot => {
+        const hasNoFilters =
+            numericFilters.size === 0 ||
+            Array.from(numericFilters.values()).every(
+                (filter) =>
+                    filter === undefined ||
+                    (filter.range && filter.range[0] === filter.range[1]) ||
+                    (filter.excludedIndices && filter.excludedIndices.size === 0)
+            );
+        if (hasNoFilters) {
+            return {
+                ...perCellDataForPlot,
+                labels: {
+                    ...perCellDataForPlot.labels,
+                    [categoryKey]: groupingNames,
+                },
+            };
+        }
         const categoryNameArray: string[] = [];
         const dataToReturn: MappingOfMeasuredValuesArrays = {};
         const cellIds: string[] = [];
