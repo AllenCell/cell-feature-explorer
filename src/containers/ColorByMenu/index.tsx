@@ -59,7 +59,6 @@ interface PropsFromState {
     downloadUrls: string[];
     downloadConfig: DownloadConfig;
     downloadRoot: string;
-    filters: Map<string, FilterData>;
     groupByFilter: DiscreteFilterData | undefined;
     interactivePanelData: PanelData[];
     selectionSetsPanelData: PanelData[];
@@ -110,12 +109,17 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
             this.onSelectionSetDownloadButtonClicked.bind(this);
     }
 
+    private getDiscreteFilterCopy(filter: DiscreteFilterData | undefined): DiscreteFilterData {
+        return filter
+            ? { ...filter, excludedValues: new Set(filter.excludedValues) }
+            : { discrete: true, excludedValues: new Set() };
+    }
+
     public onBarClicked({ target }: CheckboxChangeEvent) {
         const { groupByFilter, groupBy, handleSetFilter: handleSetFeatureFilter } = this.props;
-        let filter = groupByFilter ?? { discrete: true, excludedValues: new Set() };
+        let filter = this.getDiscreteFilterCopy(groupByFilter);
         // Toggle whether the category is excluded from the filter
         if (filter.discrete) {
-            filter = { ...filter, excludedValues: new Set(filter.excludedValues) };
             if (target.checked) {
                 filter.excludedValues.delete(target.value);
             } else {
@@ -148,9 +152,8 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
             handleSetFilter: handleSetFeatureFilter,
             interactivePanelData,
         } = this.props;
-        let filter = groupByFilter ?? { discrete: true, excludedValues: new Set() };
+        let filter = this.getDiscreteFilterCopy(groupByFilter);
         if (filter.discrete) {
-            filter = { ...filter, excludedValues: new Set(filter.excludedValues) };
             if (target.checked) {
                 filter.excludedValues.clear();
             } else {
@@ -373,7 +376,6 @@ function mapStateToProps(state: State): PropsFromState {
         downloadConfig: selectionStateBranch.selectors.getDownloadConfig(state),
         downloadUrls: createUrlFromListOfIds(state),
         downloadRoot: getDownloadRoot(state),
-        filters: selectionStateBranch.selectors.getFilters(state),
         groupByFilter: selectionStateBranch.selectors.getGroupByFilter(state),
         groupByTitle: getGroupByTitle(state),
         interactivePanelData: getInteractivePanelData(state),
