@@ -163,30 +163,26 @@ export const getNumericFilterFromFeature = (
     }
     if (featureDef.discrete && filter.discrete) {
         // For discrete features, values are marked as excluded based on the
-        // string value, but the actual feature data is stored as an integer.
-        // Map the excluded string values to their corresponding integer
-        // indices.
+        // string key, but the actual feature data is stored as an integer. Map
+        // the excluded string values to their corresponding integer value.
         const featureOptions = { ...featureDef.options };
-        if (filter.excludedValues.has(MISSING_CATEGORY_KEY)) {
-            featureOptions[MISSING_CATEGORY_KEY] = {
-                key: MISSING_CATEGORY_KEY,
-                name: MISSING_CATEGORY_LABEL,
-                color: MISSING_CATEGORY_COLOR,
-            };
-        }
-        const optionKeys = Object.keys(featureOptions).map((key) => {
-            if (key === MISSING_CATEGORY_KEY) {
-                return null;
-            }
-            return Number.parseInt(key);
-        });
-        const optionValues = Object.values(featureOptions).map(
+        const optionValues: (number | null)[] = Object.keys(featureOptions).map((key) =>
+            Number.parseInt(key)
+        );
+        const optionStringKey = Object.values(featureOptions).map(
             (option) => option.key ?? option.name
         );
+
+        // In the data, missing values are represented as `null`. If the user is
+        // filtering out missing values (MISSING_CATEGORY_KEY),
+        // `excludedIndices` will include `null`.
+        optionStringKey.push(MISSING_CATEGORY_KEY);
+        optionValues.push(null);
+
         const excludedIndices = new Set<number | null>();
-        for (let i = 0; i < optionKeys.length; i++) {
-            if (filter.excludedValues.has(optionValues[i])) {
-                excludedIndices.add(optionKeys[i]);
+        for (let i = 0; i < optionValues.length; i++) {
+            if (filter.excludedValues.has(optionStringKey[i])) {
+                excludedIndices.add(optionValues[i]);
             }
         }
         return {
