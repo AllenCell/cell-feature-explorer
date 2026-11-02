@@ -387,7 +387,11 @@ export const getColorByCategoryCounts = createSelector(
 export const getGroupByFilter = createSelector(
     [getFilters, getGroupByCategory],
     (filters, groupByCategory): DiscreteFilterData | undefined => {
-        return filters.get(groupByCategory) as DiscreteFilterData;
+        const groupByFilter = filters.get(groupByCategory);
+        if (!groupByFilter || !groupByFilter.discrete) {
+            return undefined;
+        }
+        return groupByFilter;
     }
 );
 
@@ -441,7 +445,7 @@ export const getFilteredCellData = createSelector(
             Array.from(numericFilters.values()).every(
                 (filter) =>
                     filter === undefined ||
-                    (filter.range && filter.range[0] === filter.range[1]) ||
+                    (!filter.range && !filter.excludedIndices) ||
                     (filter.excludedIndices && filter.excludedIndices.size === 0)
             );
         if (hasNoFilters) {

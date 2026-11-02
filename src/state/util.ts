@@ -223,10 +223,10 @@ export function isIdExcludedByFilters(
 ): boolean {
     let isExcluded = false;
     for (const [featureKey, numericFilter] of numericFilters) {
-        const value = cellData.values[featureKey][id];
+        const value = cellData.values[featureKey][id] ?? null;
         if (numericFilter) {
             if (numericFilter.range) {
-                if (value === undefined || value === null) {
+                if (value === null) {
                     isExcluded = true;
                     break;
                 } else if (value < numericFilter.range[0] || value > numericFilter.range[1]) {
