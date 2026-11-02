@@ -33,7 +33,7 @@ export type NumericFilter = {
      * For some discrete feature data `data`, the ID `i` is excluded by the
      * filter if `excludedIndices.has(data[i]) === true`.
      */
-    excludedIndices?: Set<number>;
+    excludedIndices?: Set<number | null>;
     /**
      * For some continuous feature data `data`, the ID `i` is excluded by the
      * filter if `data[i] < range[0]` or `range[1] < data[i]`.

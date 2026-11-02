@@ -11,6 +11,11 @@ import {
 } from "./metadata/types";
 import { BatchedAction, TypeToDescriptionMap } from "./types";
 import { FilterData, NumericFilter } from "./selection/types";
+import {
+    MISSING_CATEGORY_COLOR,
+    MISSING_CATEGORY_KEY,
+    MISSING_CATEGORY_LABEL,
+} from "./selection/constants";
 
 const HTTP_REGEX = /^https?:\/\//;
 
@@ -161,11 +166,24 @@ export const getNumericFilterFromFeature = (
         // string value, but the actual feature data is stored as an integer.
         // Map the excluded string values to their corresponding integer
         // indices.
-        const optionKeys = Object.keys(featureDef.options).map(Number);
-        const optionValues = Object.values(featureDef.options).map(
+        const featureOptions = { ...featureDef.options };
+        if (filter.excludedValues.has(MISSING_CATEGORY_KEY)) {
+            featureOptions[MISSING_CATEGORY_KEY] = {
+                key: MISSING_CATEGORY_KEY,
+                name: MISSING_CATEGORY_LABEL,
+                color: MISSING_CATEGORY_COLOR,
+            };
+        }
+        const optionKeys = Object.keys(featureOptions).map((key) => {
+            if (key === MISSING_CATEGORY_KEY) {
+                return null;
+            }
+            return Number.parseInt(key);
+        });
+        const optionValues = Object.values(featureOptions).map(
             (option) => option.key ?? option.name
         );
-        const excludedIndices = new Set<number>();
+        const excludedIndices = new Set<number | null>();
         for (let i = 0; i < optionKeys.length; i++) {
             if (filter.excludedValues.has(optionValues[i])) {
                 excludedIndices.add(optionKeys[i]);
@@ -206,9 +224,12 @@ export function isIdExcludedByFilters(
     let isExcluded = false;
     for (const [featureKey, numericFilter] of numericFilters) {
         const value = cellData.values[featureKey][id];
-        if (numericFilter && value !== null) {
-            if (numericFilter.range !== undefined) {
-                if (value < numericFilter.range[0] || value > numericFilter.range[1]) {
+        if (numericFilter) {
+            if (numericFilter.range) {
+                if (value === undefined || value === null) {
+                    isExcluded = true;
+                    break;
+                } else if (value < numericFilter.range[0] || value > numericFilter.range[1]) {
                     isExcluded = true;
                     break;
                 }
