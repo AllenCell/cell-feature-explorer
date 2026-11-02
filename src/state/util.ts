@@ -12,9 +12,7 @@ import {
 import { BatchedAction, TypeToDescriptionMap } from "./types";
 import { FilterData, NumericFilter } from "./selection/types";
 import {
-    MISSING_CATEGORY_COLOR,
-    MISSING_CATEGORY_KEY,
-    MISSING_CATEGORY_LABEL,
+    MISSING_CATEGORY_KEY
 } from "./selection/constants";
 
 const HTTP_REGEX = /^https?:\/\//;

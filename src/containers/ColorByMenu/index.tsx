@@ -27,7 +27,6 @@ import {
     DeselectGroupOfPointsAction,
     DiscreteFilterData,
     DownloadConfig,
-    FilterData,
     SelectAxisAction,
     SetColorOverrideAction,
     SetFilterAction,
