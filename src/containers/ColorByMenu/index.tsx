@@ -117,7 +117,7 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
 
     public onBarClicked({ target }: CheckboxChangeEvent) {
         const { groupByFilter, groupBy, handleSetFilter: handleSetFeatureFilter } = this.props;
-        let filter = this.getDiscreteFilterCopy(groupByFilter);
+        const filter = this.getDiscreteFilterCopy(groupByFilter);
         // Toggle whether the category is excluded from the filter
         if (filter.discrete) {
             if (target.checked) {
@@ -152,7 +152,7 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
             handleSetFilter: handleSetFeatureFilter,
             interactivePanelData,
         } = this.props;
-        let filter = this.getDiscreteFilterCopy(groupByFilter);
+        const filter = this.getDiscreteFilterCopy(groupByFilter);
         if (filter.discrete) {
             if (target.checked) {
                 filter.excludedValues.clear();
