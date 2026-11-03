@@ -7,13 +7,16 @@ import {
     getAnnotations,
     getFormattedHoveredXValue,
     getFormattedHoveredYValue,
+    getScatterPlotDataArray,
     getXDisplayName,
     getYDisplayName,
     handleNullValues,
     makeAnnotations,
+    mapCategoriesToColors,
 } from "../selectors";
 import type { PlotlyAnnotation } from "../../../components/MainPlot";
-import { CELL_ID_KEY, PALETTE } from "../../../constants";
+import { CELL_ID_KEY, PALETTE, SCATTER_PLOT_NAME } from "../../../constants";
+import { MISSING_CATEGORY_COLOR } from "../../../state/selection/constants";
 import type { ColorForPlot } from "../../../state/selection/types";
 
 describe("MainPlotContainer selectors", () => {
@@ -37,6 +40,80 @@ describe("MainPlotContainer selectors", () => {
             expect(result.yValues).to.deep.equal([]);
         });
     });
+    describe("mapCategoriesToColors", () => {
+        const colorsForPlot: ColorForPlot[] = [
+            { color: "#111111", name: "A", label: "A", key: 0 },
+            { color: "#222222", name: "1", label: "one", key: 1 },
+            { color: "#333333", name: "null", label: "N/A", key: NaN },
+        ];
+
+        it("maps string and numeric category values to their group colors", () => {
+            const result = mapCategoriesToColors(["A", 1, "A"], colorsForPlot);
+            expect(result).to.deep.equal(["#111111", "#222222", "#111111"]);
+        });
+
+        it("maps null values to the fallback group", () => {
+            expect(mapCategoriesToColors([null], colorsForPlot)).to.deep.equal(["#333333"]);
+        });
+
+        it("uses the missing category color for values with no group", () => {
+            const result = mapCategoriesToColors(["unknown", 42], []);
+            expect(result).to.deep.equal([MISSING_CATEGORY_COLOR, MISSING_CATEGORY_COLOR]);
+        });
+    });
+
+    describe("getScatterPlotDataArray", () => {
+        const findScatterTrace = (state: State): any =>
+            getScatterPlotDataArray(state).find((trace) => trace.name === SCATTER_PLOT_NAME);
+
+        it("uses a single trace with per-point colors when coloring by the group-by feature", () => {
+            // In the mock state, colorBy and groupBy are both "cell-line", and the
+            // two cells are Paxillin (option 5) and Alpha-actinin-1 (option 7).
+            const trace = findScatterTrace(newMockState);
+            expect(trace.transforms).to.be.undefined;
+            expect(trace.marker.color).to.deep.equal(["#77207C", "#FF96FF"]);
+        });
+
+        it("colors by a categorical feature that differs from the group-by feature", () => {
+            const state: State = {
+                ...newMockState,
+                selection: {
+                    ...newMockState.selection,
+                    colorBy: "anaphase-segmentation-complete",
+                },
+            };
+            const trace = findScatterTrace(state);
+            // Feature values are [1, 0]
+            expect(trace.marker.color).to.deep.equal(["#7f48f3", "#fed98e"]);
+        });
+
+        it("applies color overrides to categorical colors", () => {
+            // Overrides are indexed by label-sorted option order; the first
+            // sorted label is "Actin filaments" (Alpha-actinin-1, cell 2).
+            const state: State = {
+                ...newMockState,
+                selection: {
+                    ...newMockState.selection,
+                    colorOverrides: ["#abcdef"],
+                },
+            };
+            const trace = findScatterTrace(state);
+            expect(trace.marker.color).to.deep.equal(["#77207C", "#abcdef"]);
+        });
+
+        it("passes numeric values through for a continuous color-by feature", () => {
+            const state: State = {
+                ...newMockState,
+                selection: {
+                    ...newMockState.selection,
+                    colorBy: "apical-proximity",
+                },
+            };
+            const trace = findScatterTrace(state);
+            expect(trace.marker.color).to.deep.equal([-0.25868651080317, -0.1]);
+        });
+    });
+
     describe("getAnnotations selector", () => {
         it("it returns an Annotation object for every index in selectedPoints array", () => {
             const state: State = {
