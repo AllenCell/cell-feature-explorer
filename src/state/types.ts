@@ -72,12 +72,11 @@ export interface PlotlyCustomData {
     connectByFeatureValue?: number | null;
 }
 
-export enum DataType {
-    CONTINUOUS = "continuous",
-    GROUPED = "grouped",
-}
-
-export interface ContinuousPlotData {
+/**
+ * Data for a single scatter trace. `color` is either a numeric array (plotted
+ * with a continuous colorscale) or an array of per-point color strings.
+ */
+export interface ScatterPlotData {
     color?: Color | Color[] | number | number[];
     ids?: string[];
     x: (number | null)[];
@@ -85,25 +84,6 @@ export interface ContinuousPlotData {
     customdata?: PlotlyCustomData[];
     opacity?: number[];
     plotName?: string;
-    dataType: DataType.CONTINUOUS;
-}
-
-interface GroupSettings {
-    name: string;
-    color: Color | number;
-}
-
-export interface GroupedPlotData {
-    color?: Color | Color[] | number | number[];
-    ids?: string[];
-    x: (number | null)[];
-    y: (number | null)[];
-    customdata?: PlotlyCustomData[];
-    opacity?: number[];
-    plotName?: string;
-    dataType: DataType.GROUPED;
-    groups: string[];
-    groupSettings: GroupSettings[];
 }
 
 export interface LinePlotData {

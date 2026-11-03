@@ -63,7 +63,6 @@ interface PropsFromState {
     annotations: PlotlyAnnotation[];
     categoricalFeatures: string[];
     clickedPoints: string[];
-    filtersToExclude: string[];
     galleryCollapsed: boolean;
     hoveredPointData: SelectedPointData | null;
     hoveredXValue: string;
@@ -188,17 +187,16 @@ class MainPlotContainer extends React.Component<MainPlotContainerProps, MainPlot
     // TODO: retype once plotly has id and fullData types
     public onPointHovered(hovered: any) {
         const { points, event } = hovered;
-        const { filtersToExclude, updateMousePosition, changeHoveredPoint } = this.props;
+        const { updateMousePosition, changeHoveredPoint } = this.props;
         updateMousePosition({
             pageX: event.pageX,
             pageY: event.pageY,
         });
 
+        // Points in hidden categories are filtered out of the trace data
+        // upstream, so any hovered scatter point is visible.
         points.forEach((point: any) => {
-            if (
-                point.data.name === SCATTER_PLOT_NAME &&
-                !includes(filtersToExclude, point.fullData.name)
-            ) {
+            if (point.data.name === SCATTER_PLOT_NAME) {
                 window.clearTimeout(this.thumbnailTimeout);
                 changeHoveredPoint({
                     [CELL_ID_KEY]: point.id,
@@ -382,7 +380,6 @@ function mapStateToProps(state: State): PropsFromState {
         annotations: getAnnotations(state),
         clickedPoints: selectionStateBranch.selectors.getClickedScatterPoints(state),
         categoricalFeatures: metadataStateBranch.selectors.getCategoricalFeatureKeys(state),
-        filtersToExclude: selectionStateBranch.selectors.getFiltersToExclude(state),
         galleryCollapsed: selectionStateBranch.selectors.getGalleryCollapsed(state),
         hoveredPointData: getDataForOverlayCard(state),
         hoveredXValue: getFormattedHoveredXValue(state),
