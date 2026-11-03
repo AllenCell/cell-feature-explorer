@@ -2,10 +2,12 @@ import { describe, it, expect } from "vitest";
 import { find } from "lodash";
 
 import { DOWNLOAD_CONFIG_TYPE_PROTEIN } from "../../../constants/index";
+import { MISSING_CATEGORY_KEY } from "../../../state/selection/constants";
 import { mockState } from "../../../state/test/mocks";
 import { State } from "../../../state/types";
 import {
     disambiguateCategoryNames,
+    getCheckAllCheckboxIsIntermediate,
     getInteractivePanelData,
     getListOfCellIdsByDownloadConfig,
     getSelectionPanelData,
@@ -114,6 +116,47 @@ describe("ColorByMenu selectors", () => {
             result.forEach((ele) => {
                 expect(ele.disabled).to.be.true;
             });
+        });
+    });
+
+    describe("getCheckAllCheckboxIsIntermediate", () => {
+        // One cell has no value for the group-by feature, so the panel has an
+        // N/A row in addition to the feature's own categories.
+        const stateWithMissing: State = {
+            ...newMockState,
+            metadata: {
+                ...newMockState.metadata,
+                featureData: {
+                    ...newMockState.metadata.featureData,
+                    values: {
+                        ...newMockState.metadata.featureData.values,
+                        "cell-line": [5, null],
+                    },
+                },
+            },
+        };
+        const withFilter = (filterExclude: string[]): State => ({
+            ...stateWithMissing,
+            selection: { ...stateWithMissing.selection, filterExclude },
+        });
+        const allIds = getInteractivePanelData(stateWithMissing).map((row) => row.id);
+
+        it("is false when nothing is hidden", () => {
+            expect(getCheckAllCheckboxIsIntermediate(withFilter([]))).to.be.false;
+        });
+
+        it("is false when every row, including N/A, is hidden", () => {
+            expect(allIds).to.include(MISSING_CATEGORY_KEY);
+            expect(getCheckAllCheckboxIsIntermediate(withFilter(allIds))).to.be.false;
+        });
+
+        it("is true when only the ordinary categories are hidden and N/A is still shown", () => {
+            const ordinaryIds = allIds.filter((id) => id !== MISSING_CATEGORY_KEY);
+            expect(getCheckAllCheckboxIsIntermediate(withFilter(ordinaryIds))).to.be.true;
+        });
+
+        it("is true when a single category is hidden", () => {
+            expect(getCheckAllCheckboxIsIntermediate(withFilter(["Paxillin"]))).to.be.true;
         });
     });
 

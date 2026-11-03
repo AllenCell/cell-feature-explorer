@@ -28,7 +28,6 @@ import {
     getSelectedGroups,
     getSelectedSetTotals,
     getSelectionSetColors,
-    getGroupingCategoryNames,
     getGroupByFeatureOptionsAsList,
     getGroupByCategory,
     getCategoryGroupColorsAndNames,
@@ -61,13 +60,6 @@ export const getGroupByTitle = createSelector(
     [getGroupByFeatureDef],
     (groupByFeatureDef: MeasuredFeatureDef): string => {
         return groupByFeatureDef.displayName;
-    }
-);
-
-export const getCheckAllCheckboxIsIntermediate = createSelector(
-    [getFiltersToExclude, getGroupingCategoryNames],
-    (filtersToExclude, categoryNames: string[]): boolean => {
-        return filtersToExclude.length > 0 && filtersToExclude.length !== categoryNames.length;
     }
 );
 
@@ -184,6 +176,14 @@ export const getInteractivePanelData = createSelector(
                 total,
             };
         });
+    }
+);
+
+export const getCheckAllCheckboxIsIntermediate = createSelector(
+    [getInteractivePanelData],
+    (panelData: PanelData[]): boolean => {
+        const checkedCount = panelData.filter((row) => row.checked).length;
+        return checkedCount > 0 && checkedCount < panelData.length;
     }
 );
 
