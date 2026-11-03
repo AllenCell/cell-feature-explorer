@@ -193,8 +193,6 @@ class MainPlotContainer extends React.Component<MainPlotContainerProps, MainPlot
             pageY: event.pageY,
         });
 
-        // Points in hidden categories are filtered out of the trace data
-        // upstream, so any hovered scatter point is visible.
         points.forEach((point: any) => {
             if (point.data.name === SCATTER_PLOT_NAME) {
                 window.clearTimeout(this.thumbnailTimeout);
