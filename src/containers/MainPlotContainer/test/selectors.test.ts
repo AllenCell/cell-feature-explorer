@@ -16,8 +16,10 @@ import {
 } from "../selectors";
 import type { PlotlyAnnotation } from "../../../components/MainPlot";
 import { CELL_ID_KEY, PALETTE, SCATTER_PLOT_NAME } from "../../../constants";
+import type { DiscreteMeasuredFeatureDef } from "../../../state/metadata/types";
 import { MISSING_CATEGORY_COLOR } from "../../../state/selection/constants";
 import type { ColorForPlot } from "../../../state/selection/types";
+import { findFeature } from "../../../state/util";
 
 describe("MainPlotContainer selectors", () => {
     const newMockState = mockState;
@@ -66,12 +68,25 @@ describe("MainPlotContainer selectors", () => {
         const findScatterTrace = (state: State): any =>
             getScatterPlotDataArray(state).find((trace) => trace.name === SCATTER_PLOT_NAME);
 
+        const { measuredFeaturesDefs, featureData } = newMockState.metadata;
+        const cellLineOptions = (
+            findFeature(measuredFeaturesDefs, "cell-line") as DiscreteMeasuredFeatureDef
+        ).options;
+        const anaphaseOptions = (
+            findFeature(measuredFeaturesDefs, "anaphase-segmentation-complete") as DiscreteMeasuredFeatureDef
+        ).options;
+        const PAXILLIN_COLOR = cellLineOptions["5"].color;
+        const ALPHA_ACTININ_COLOR = cellLineOptions["7"].color;
+        const ANAPHASE_COMPLETE_COLOR = anaphaseOptions["1"].color;
+        const ANAPHASE_INCOMPLETE_COLOR = anaphaseOptions["0"].color;
+        const APICAL_PROXIMITY_VALUES = featureData.values["apical-proximity"];
+        const OVERRIDE_COLOR = "#abcdef";
+
         it("uses a single trace with per-point colors when coloring by the group-by feature", () => {
-            // In the mock state, colorBy and groupBy are both "cell-line", and the
-            // two cells are Paxillin (option 5) and Alpha-actinin-1 (option 7).
+            // In the mock state, colorBy and groupBy are both "cell-line".
             const trace = findScatterTrace(newMockState);
             expect(trace.transforms).to.be.undefined;
-            expect(trace.marker.color).to.deep.equal(["#77207C", "#FF96FF"]);
+            expect(trace.marker.color).to.deep.equal([PAXILLIN_COLOR, ALPHA_ACTININ_COLOR]);
         });
 
         it("colors by a categorical feature that differs from the group-by feature", () => {
@@ -83,8 +98,10 @@ describe("MainPlotContainer selectors", () => {
                 },
             };
             const trace = findScatterTrace(state);
-            // Feature values are [1, 0]
-            expect(trace.marker.color).to.deep.equal(["#7f48f3", "#fed98e"]);
+            expect(trace.marker.color).to.deep.equal([
+                ANAPHASE_COMPLETE_COLOR,
+                ANAPHASE_INCOMPLETE_COLOR,
+            ]);
         });
 
         it("applies color overrides to categorical colors", () => {
@@ -94,11 +111,11 @@ describe("MainPlotContainer selectors", () => {
                 ...newMockState,
                 selection: {
                     ...newMockState.selection,
-                    colorOverrides: ["#abcdef"],
+                    colorOverrides: [OVERRIDE_COLOR],
                 },
             };
             const trace = findScatterTrace(state);
-            expect(trace.marker.color).to.deep.equal(["#77207C", "#abcdef"]);
+            expect(trace.marker.color).to.deep.equal([PAXILLIN_COLOR, OVERRIDE_COLOR]);
         });
 
         it("passes numeric values through for a continuous color-by feature", () => {
@@ -110,7 +127,7 @@ describe("MainPlotContainer selectors", () => {
                 },
             };
             const trace = findScatterTrace(state);
-            expect(trace.marker.color).to.deep.equal([-0.25868651080317, -0.1]);
+            expect(trace.marker.color).to.deep.equal(APICAL_PROXIMITY_VALUES);
         });
     });
 
