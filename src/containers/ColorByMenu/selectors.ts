@@ -1,4 +1,4 @@
-import { chunk, includes, map, reduce, values } from "lodash";
+import { chunk, map, reduce, values } from "lodash";
 import { createSelector } from "reselect";
 
 import {
@@ -28,7 +28,6 @@ import {
     getSelectedGroups,
     getSelectedSetTotals,
     getSelectionSetColors,
-    getGroupingCategoryNames,
     getGroupByFeatureOptionsAsList,
     getGroupByCategory,
     getCategoryGroupColorsAndNames,
@@ -64,28 +63,17 @@ export const getGroupByTitle = createSelector(
     }
 );
 
-export const getCheckAllCheckboxIsIntermediate = createSelector(
-    [getFiltersToExclude, getGroupingCategoryNames],
-    (filtersToExclude, categoryNames: string[]): boolean => {
-        return filtersToExclude.length > 0 && filtersToExclude.length !== categoryNames.length;
-    }
-);
-
 export const disambiguateCategoryNames = (options: MeasuredFeaturesOption[]): string[] => {
-    const categoryNames: string[] = map(options, (option) => option.name);
-    const keys: string[] = map(options, (option) => option.key || "");
-
-    const repeatedNames: string[] = categoryNames.filter((name, i) => {
-        return categoryNames.indexOf(name) !== i;
-    });
-    const disambiguatedNames: string[] = categoryNames.map((name, i) => {
-        if (repeatedNames.includes(name)) {
-            return `${name} (${keys[i]})`;
+    const nameCounts = new Map<string, number>();
+    for (const option of options) {
+        nameCounts.set(option.name, (nameCounts.get(option.name) ?? 0) + 1);
+    }
+    return options.map((option) => {
+        if ((nameCounts.get(option.name) ?? 0) > 1) {
+            return `${option.name} (${option.key || ""})`;
         }
-        return name;
+        return option.name;
     });
-
-    return disambiguatedNames;
 };
 
 export const getLegendColors = createSelector(
@@ -140,6 +128,9 @@ export const getInteractivePanelData = createSelector(
         categoryNamesArray: string[],
         colorOverrides: (string | undefined)[]
     ): PanelData[] => {
+        const excluded = new Set(filtersToExclude);
+        const displayable = new Set(displayableGroups);
+
         // Calculate actual counts from the data
         const countsByCategory: { [key: string]: number } = reduce(
             categoryNamesArray,
@@ -167,16 +158,17 @@ export const getInteractivePanelData = createSelector(
         return map(categories, (category: MeasuredFeaturesOption, index: number) => {
             const id = category.key ?? category.name;
             const total: number = countsByCategory[id] || category.count || 0;
-            const disabled = !displayableGroups.includes(id);
+            const disabled = !displayable.has(id);
+            const isExcluded = excluded.has(id);
             const color = getColorForCategory(
                 categoryToColorBy === categoryToGroupBy,
-                includes(filtersToExclude, id),
+                isExcluded,
                 disabled,
                 category.color,
                 colorOverrides[index]
             );
             return {
-                checked: !includes(filtersToExclude, id),
+                checked: !isExcluded,
                 color: color,
                 id: id,
                 name: names[index],
@@ -184,6 +176,14 @@ export const getInteractivePanelData = createSelector(
                 total,
             };
         });
+    }
+);
+
+export const getCheckAllCheckboxIsIntermediate = createSelector(
+    [getInteractivePanelData],
+    (panelData: PanelData[]): boolean => {
+        const checkedCount = panelData.filter((row) => row.checked).length;
+        return checkedCount > 0 && checkedCount < panelData.length;
     }
 );
 

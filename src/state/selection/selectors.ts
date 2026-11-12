@@ -401,6 +401,7 @@ export const getFilteredCellData = createSelector(
                 },
             };
         }
+        const excluded = new Set(filtersToExclude);
         const categoryNameArray: string[] = [];
         const dataToReturn: MappingOfMeasuredValuesArrays = {};
         const cellIds: string[] = [];
@@ -409,7 +410,7 @@ export const getFilteredCellData = createSelector(
         const indices: number[] = [];
         for (let i = 0; i < perCellDataForPlot.labels.cellIds.length; i++) {
             const categoryName: string = groupingNames[i];
-            if (!includes(filtersToExclude, categoryName)) {
+            if (!excluded.has(categoryName)) {
                 const cellId = perCellDataForPlot.labels.cellIds[i];
                 cellIds.push(cellId);
                 categoryNameArray.push(categoryName);
