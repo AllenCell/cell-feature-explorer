@@ -38,7 +38,6 @@ import {
     getSelectedGroupsData,
     getFilteredXValues,
     getFilteredYValues,
-    getGroupByCategory,
     getGroupingCategoryNamesAsArray,
     getHoveredPointData,
     getXValues,
@@ -58,13 +57,12 @@ import {
     SelectedPointData,
     TickConversion,
 } from "../../state/selection/types";
+import { MISSING_CATEGORY_COLOR } from "../../state/selection/constants";
 import {
     AnnotationData,
-    ContinuousPlotData,
     PlotlyCustomData,
-    GroupedPlotData,
-    DataType,
     LinePlotData,
+    ScatterPlotData,
 } from "../../state/types";
 import { findFeature } from "../../state/util";
 import { getGroupByTitle } from "../ColorByMenu/selectors";
@@ -138,6 +136,26 @@ export const getPlotlyCustomData = createSelector(
     }
 );
 
+/**
+ * Maps each point's categorical value to a color string, using the group
+ * identifiers (`name`) from `colorsForPlot`. Values are matched by their string
+ * form, so numeric option keys match `"3"` and `null` matches the `"null"`
+ * fallback entry. Values with no matching group get the missing-category color.
+ *
+ * This replaces Plotly's `groupby` transform, which split the scatter trace into
+ * one WebGL trace per category and could not scale to thousands of categories.
+ */
+export function mapCategoriesToColors(
+    values: (string | number | null)[],
+    colorsForPlot: ColorForPlot[]
+): string[] {
+    const colorByGroup = new Map<string, string>();
+    for (const group of colorsForPlot) {
+        colorByGroup.set(group.name, group.color);
+    }
+    return values.map((value) => colorByGroup.get(String(value)) ?? MISSING_CATEGORY_COLOR);
+}
+
 export const getMainPlotData = createSelector(
     [
         getFilteredXValues,
@@ -146,7 +164,6 @@ export const getMainPlotData = createSelector(
         getPlotlyCustomData,
         getFilteredColorByValues,
         getColorBySelection,
-        getGroupByCategory,
         getCategoryGroupColorsAndNames,
         getCategoricalFeatureKeys,
     ],
@@ -157,36 +174,23 @@ export const getMainPlotData = createSelector(
         customData,
         colorByValues,
         categoryToColorBy,
-        categoryToGroupBy,
         colorsForPlot,
         categoricalFeatures
-    ): GroupedPlotData | ContinuousPlotData => {
+    ): ScatterPlotData => {
         // Only preserve values at indices where both x and y values are not null,
         // because a coordinate like (3, null) won't be plotted anyway and produces
         // inaccurate histograms.
         const newXAndYValues = handleNullValues(xValues, yValues);
-        const isGrouped: boolean = includes(categoricalFeatures, categoryToColorBy);
-        if (isGrouped) {
-            return {
-                color: categoryToColorBy === categoryToGroupBy ? undefined : colorByValues,
-                dataType: DataType.GROUPED,
-                groupSettings: colorsForPlot,
-                groups: colorByValues as string[],
-                ids,
-                x: newXAndYValues.xValues,
-                y: newXAndYValues.yValues,
-                customdata: customData,
-            };
-        } else {
-            return {
-                color: categoryToColorBy === categoryToGroupBy ? undefined : colorByValues,
-                dataType: DataType.CONTINUOUS,
-                ids,
-                x: newXAndYValues.xValues,
-                y: newXAndYValues.yValues,
-                customdata: customData,
-            };
-        }
+        const isCategorical: boolean = includes(categoricalFeatures, categoryToColorBy);
+        return {
+            color: isCategorical
+                ? mapCategoriesToColors(colorByValues, colorsForPlot)
+                : colorByValues,
+            ids,
+            x: newXAndYValues.xValues,
+            y: newXAndYValues.yValues,
+            customdata: customData,
+        };
     }
 );
 
@@ -356,33 +360,22 @@ const getAnnotationData = createSelector(
 export const composePlotlyData = createSelector(
     [getMainPlotData, getApplyColorToSelections, getSelectedGroupsData, getLinePlotData],
     (
-        mainPlotDataValues: ContinuousPlotData | GroupedPlotData,
+        mainPlotDataValues: ScatterPlotData,
         applyColorToSelections,
         selectedGroups,
         linePlotData
     ): {
-        mainPlotData: ContinuousPlotData | GroupedPlotData;
-        selectedGroupPlotData: ContinuousPlotData | null;
+        mainPlotData: ScatterPlotData;
+        selectedGroupPlotData: ScatterPlotData | null;
         linePlotData: LinePlotData[] | null;
     } => {
         const mainPlotData = {
             ...mainPlotDataValues,
             plotName: SCATTER_PLOT_NAME,
         };
-        if (
-            mainPlotDataValues.dataType === DataType.GROUPED &&
-            mainPlotData.dataType === DataType.GROUPED
-        ) {
-            // NOTE: because of line 213, if one of these are true,
-            // both are true, but typescript wanted both to be checked
-            mainPlotData.groupSettings = {
-                ...mainPlotDataValues.groupSettings,
-            };
-        }
         const selectedGroupPlotData = applyColorToSelections
             ? {
                   ...selectedGroups,
-                  dataType: "continuous" as DataType.CONTINUOUS,
                   plotName: SELECTIONS_PLOT_NAME,
               }
             : null;
@@ -394,55 +387,17 @@ export const composePlotlyData = createSelector(
     }
 );
 
-function colorSettings(
-    plotSettings: Partial<PlotData>,
-    plotData: GroupedPlotData | ContinuousPlotData,
-    mainPlotSettings: MainPlotSettings
-): Partial<PlotData> {
-    if (plotData.dataType === DataType.GROUPED) {
-        return {
-            ...plotSettings,
-            transforms: [
-                {
-                    groups: plotData.groups,
-                    nameformat: `%{group}`,
-                    styles: map(plotData.groupSettings, (ele) => {
-                        return {
-                            target: ele.name,
-                            value: {
-                                marker: {
-                                    color: ele.color,
-                                    opacity: mainPlotSettings.unselectedCircleOpacity,
-                                },
-                            },
-                        };
-                    }),
-                    // literal typing to avoid a widened type inferred
-                    type: "groupby" as const,
-                },
-            ],
-        };
-    }
-
-    return {
-        ...plotSettings,
-        marker: {
-            ...plotSettings.marker,
-            color: plotData.color,
-            opacity: plotData.opacity ?? mainPlotSettings.unselectedCircleOpacity,
-        },
-    };
-}
-
 function makeScatterPlotData(
-    plotData: ContinuousPlotData | GroupedPlotData,
+    plotData: ScatterPlotData,
     mainPlotSettings: MainPlotSettings
 ): Partial<PlotData> {
-    const plotSettings = {
+    return {
         hoverinfo: "none" as const,
         ids: plotData.ids,
         customdata: plotData.customdata as any,
         marker: {
+            color: plotData.color,
+            opacity: plotData.opacity ?? mainPlotSettings.unselectedCircleOpacity,
             size: mainPlotSettings.circleRadius,
             symbol: "circle",
         },
@@ -456,7 +411,6 @@ function makeScatterPlotData(
         y: plotData.y,
         z: [],
     };
-    return colorSettings(plotSettings, plotData, mainPlotSettings);
 }
 
 // TODO: Add the ability to adjust the line settings via an additional selector
