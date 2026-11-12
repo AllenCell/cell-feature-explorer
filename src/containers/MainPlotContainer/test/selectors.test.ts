@@ -7,14 +7,19 @@ import {
     getAnnotations,
     getFormattedHoveredXValue,
     getFormattedHoveredYValue,
+    getScatterPlotDataArray,
     getXDisplayName,
     getYDisplayName,
     handleNullValues,
     makeAnnotations,
+    mapCategoriesToColors,
 } from "../selectors";
 import type { PlotlyAnnotation } from "../../../components/MainPlot";
-import { CELL_ID_KEY, PALETTE } from "../../../constants";
+import { CELL_ID_KEY, PALETTE, SCATTER_PLOT_NAME } from "../../../constants";
+import type { DiscreteMeasuredFeatureDef } from "../../../state/metadata/types";
+import { MISSING_CATEGORY_COLOR } from "../../../state/selection/constants";
 import type { ColorForPlot } from "../../../state/selection/types";
+import { findFeature } from "../../../state/util";
 
 describe("MainPlotContainer selectors", () => {
     const newMockState = mockState;
@@ -37,6 +42,95 @@ describe("MainPlotContainer selectors", () => {
             expect(result.yValues).to.deep.equal([]);
         });
     });
+    describe("mapCategoriesToColors", () => {
+        const colorsForPlot: ColorForPlot[] = [
+            { color: "#111111", name: "A", label: "A", key: 0 },
+            { color: "#222222", name: "1", label: "one", key: 1 },
+            { color: "#333333", name: "null", label: "N/A", key: NaN },
+        ];
+
+        it("maps string and numeric category values to their group colors", () => {
+            const result = mapCategoriesToColors(["A", 1, "A"], colorsForPlot);
+            expect(result).to.deep.equal(["#111111", "#222222", "#111111"]);
+        });
+
+        it("maps null values to the fallback group", () => {
+            expect(mapCategoriesToColors([null], colorsForPlot)).to.deep.equal(["#333333"]);
+        });
+
+        it("uses the missing category color for values with no group", () => {
+            const result = mapCategoriesToColors(["unknown", 42], []);
+            expect(result).to.deep.equal([MISSING_CATEGORY_COLOR, MISSING_CATEGORY_COLOR]);
+        });
+    });
+
+    describe("getScatterPlotDataArray", () => {
+        const findScatterTrace = (state: State): any =>
+            getScatterPlotDataArray(state).find((trace) => trace.name === SCATTER_PLOT_NAME);
+
+        const { measuredFeaturesDefs, featureData } = newMockState.metadata;
+        const cellLineOptions = (
+            findFeature(measuredFeaturesDefs, "cell-line") as DiscreteMeasuredFeatureDef
+        ).options;
+        const anaphaseOptions = (
+            findFeature(measuredFeaturesDefs, "anaphase-segmentation-complete") as DiscreteMeasuredFeatureDef
+        ).options;
+        const PAXILLIN_COLOR = cellLineOptions["5"].color;
+        const ALPHA_ACTININ_COLOR = cellLineOptions["7"].color;
+        const ANAPHASE_COMPLETE_COLOR = anaphaseOptions["1"].color;
+        const ANAPHASE_INCOMPLETE_COLOR = anaphaseOptions["0"].color;
+        const APICAL_PROXIMITY_VALUES = featureData.values["apical-proximity"];
+        const OVERRIDE_COLOR = "#abcdef";
+
+        it("uses a single trace with per-point colors when coloring by the group-by feature", () => {
+            // In the mock state, colorBy and groupBy are both "cell-line".
+            const trace = findScatterTrace(newMockState);
+            expect(trace.transforms).to.be.undefined;
+            expect(trace.marker.color).to.deep.equal([PAXILLIN_COLOR, ALPHA_ACTININ_COLOR]);
+        });
+
+        it("colors by a categorical feature that differs from the group-by feature", () => {
+            const state: State = {
+                ...newMockState,
+                selection: {
+                    ...newMockState.selection,
+                    colorBy: "anaphase-segmentation-complete",
+                },
+            };
+            const trace = findScatterTrace(state);
+            expect(trace.marker.color).to.deep.equal([
+                ANAPHASE_COMPLETE_COLOR,
+                ANAPHASE_INCOMPLETE_COLOR,
+            ]);
+        });
+
+        it("applies color overrides to categorical colors", () => {
+            // Overrides are indexed by label-sorted option order; the first
+            // sorted label is "Actin filaments" (Alpha-actinin-1, cell 2).
+            const state: State = {
+                ...newMockState,
+                selection: {
+                    ...newMockState.selection,
+                    colorOverrides: [OVERRIDE_COLOR],
+                },
+            };
+            const trace = findScatterTrace(state);
+            expect(trace.marker.color).to.deep.equal([PAXILLIN_COLOR, OVERRIDE_COLOR]);
+        });
+
+        it("passes numeric values through for a continuous color-by feature", () => {
+            const state: State = {
+                ...newMockState,
+                selection: {
+                    ...newMockState.selection,
+                    colorBy: "apical-proximity",
+                },
+            };
+            const trace = findScatterTrace(state);
+            expect(trace.marker.color).to.deep.equal(APICAL_PROXIMITY_VALUES);
+        });
+    });
+
     describe("getAnnotations selector", () => {
         it("it returns an Annotation object for every index in selectedPoints array", () => {
             const state: State = {
