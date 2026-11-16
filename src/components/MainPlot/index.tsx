@@ -123,7 +123,12 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
     const computeHelpTextPos = React.useCallback(() => {
         const gd = graphDivRef.current;
         const currentAnnotations = annotationsRef.current;
-        if (!gd || !currentAnnotations.length || !showFullAnnotationRef.current) {
+        if (
+            !gd ||
+            gd.offsetParent === null ||
+            !currentAnnotations.length ||
+            !showFullAnnotationRef.current
+        ) {
             setHelpTextPos(null);
             return;
         }

@@ -83,7 +83,7 @@ class Cfe extends React.Component<CfeProps, CfeState> {
             this.alignContainer.style.setProperty("margin-right", "6px");
             document.querySelector(".viewer-toolbar-left")?.prepend(this.alignContainer);
         }
-        if (prevState.currentTab !== currentTab && currentTab === VIEWER_TAB_KEY) {
+        if (prevState.currentTab !== currentTab) {
             // Need to manually trigger events that depend on the window resizing,
             // otherwise the 3D viewer canvas will have 0 height and 0 width.
             window.dispatchEvent(new Event("resize"));
