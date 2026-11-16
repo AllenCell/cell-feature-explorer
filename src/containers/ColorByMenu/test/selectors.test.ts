@@ -83,7 +83,9 @@ describe("ColorByMenu selectors", () => {
                 ...newMockState,
                 selection: {
                     ...newMockState.selection,
-                    filterExclude: ["Paxillin"],
+                    filters: new Map([
+                        ["cell-line", { discrete: true, excludedValues: new Set(["Paxillin"]) }],
+                    ]),
                 },
             };
             const result: PanelData[] = getInteractivePanelData(state);
@@ -137,7 +139,12 @@ describe("ColorByMenu selectors", () => {
         };
         const withFilter = (filterExclude: string[]): State => ({
             ...stateWithMissing,
-            selection: { ...stateWithMissing.selection, filterExclude },
+            selection: {
+                ...stateWithMissing.selection,
+                filters: new Map([
+                    ["cell-line", { discrete: true, excludedValues: new Set(filterExclude) }],
+                ]),
+            },
         });
         const allIds = getInteractivePanelData(stateWithMissing).map((row) => row.id);
 
