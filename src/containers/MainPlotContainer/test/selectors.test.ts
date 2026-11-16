@@ -18,7 +18,7 @@ import type { PlotlyAnnotation } from "../../../components/MainPlot";
 import { CELL_ID_KEY, PALETTE, SCATTER_PLOT_NAME } from "../../../constants";
 import type { DiscreteMeasuredFeatureDef } from "../../../state/metadata/types";
 import { MISSING_CATEGORY_COLOR } from "../../../state/selection/constants";
-import type { ColorForPlot } from "../../../state/selection/types";
+import type { ColorForPlot, FilterData } from "../../../state/selection/types";
 import { findFeature } from "../../../state/util";
 
 describe("MainPlotContainer selectors", () => {
@@ -73,7 +73,10 @@ describe("MainPlotContainer selectors", () => {
             findFeature(measuredFeaturesDefs, "cell-line") as DiscreteMeasuredFeatureDef
         ).options;
         const anaphaseOptions = (
-            findFeature(measuredFeaturesDefs, "anaphase-segmentation-complete") as DiscreteMeasuredFeatureDef
+            findFeature(
+                measuredFeaturesDefs,
+                "anaphase-segmentation-complete"
+            ) as DiscreteMeasuredFeatureDef
         ).options;
         const PAXILLIN_COLOR = cellLineOptions["5"].color;
         const ALPHA_ACTININ_COLOR = cellLineOptions["7"].color;
@@ -170,7 +173,15 @@ describe("MainPlotContainer selectors", () => {
                     // 2 cells are selected, but the first (cell ID 1) will be
                     // excluded by filtering
                     selectedPoints: selectedCellFileInfo,
-                    filterExclude: ["Paxillin"],
+                    filters: new Map<string, FilterData>([
+                        [
+                            newMockState.selection.groupBy,
+                            {
+                                discrete: true,
+                                excludedValues: new Set(["Paxillin"]),
+                            },
+                        ],
+                    ]),
                 },
             };
             const result: PlotlyAnnotation[] = getAnnotations(state);
