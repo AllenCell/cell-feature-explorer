@@ -187,5 +187,6 @@ export const mockState = {
         selectedPoints: selectedCellFileInfo,
         displayableGroups: displayableGroups,
         filters: new Map<string, FilterData>(),
+        getActiveFilters: new Set(),
     },
 };

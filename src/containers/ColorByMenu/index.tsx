@@ -118,12 +118,10 @@ class ColorByMenu extends React.Component<ColorByMenuProps> {
         const { groupByFilter, groupBy, handleSetFilter: handleSetFeatureFilter } = this.props;
         const filter = this.getDiscreteFilterCopy(groupByFilter);
         // Toggle whether the category is excluded from the filter
-        if (filter.discrete) {
-            if (target.checked) {
-                filter.excludedValues.delete(target.value);
-            } else {
-                filter.excludedValues.add(target.value);
-            }
+        if (target.checked) {
+            filter.excludedValues.delete(target.value);
+        } else {
+            filter.excludedValues.add(target.value);
         }
         handleSetFeatureFilter(groupBy.toString(), filter);
     }
