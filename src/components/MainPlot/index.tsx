@@ -123,7 +123,12 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
     const computeHelpTextPos = React.useCallback(() => {
         const gd = graphDivRef.current;
         const currentAnnotations = annotationsRef.current;
-        if (!gd || !currentAnnotations.length || !showFullAnnotationRef.current) {
+        if (
+            !gd ||
+            gd.offsetParent === null ||
+            !currentAnnotations.length ||
+            !showFullAnnotationRef.current
+        ) {
             setHelpTextPos(null);
             return;
         }
@@ -243,10 +248,20 @@ const MainPlot: React.FC<MainPlotProps> = (props) => {
 
     const handleAnnotationClick = React.useCallback(() => setShowFullAnnotation(false), []);
 
-    // Stable — only sets the ref; onAfterPlot handles position computation.
-    const handleInitialized = React.useCallback((_figure: any, gd: any) => {
-        graphDivRef.current = gd;
-    }, []);
+    // Recompute the help text position when the plot is hidden or shown by a tab switch,
+    // since the overlay is portaled to document.body and isn't hidden with the plot.
+    const resizeObserverRef = React.useRef<ResizeObserver | null>(null);
+    React.useEffect(() => () => resizeObserverRef.current?.disconnect(), []);
+
+    const handleInitialized = React.useCallback(
+        (_figure: any, gd: any) => {
+            graphDivRef.current = gd;
+            resizeObserverRef.current?.disconnect();
+            resizeObserverRef.current = new ResizeObserver(computeHelpTextPos);
+            resizeObserverRef.current.observe(gd);
+        },
+        [computeHelpTextPos]
+    );
 
     const { onPointHovered, onPointUnhovered, onGroupSelected, plotDataArray } = props;
     const lastAnnotation = annotations.length > 0 ? annotations[annotations.length - 1] : null;
