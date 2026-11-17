@@ -2,13 +2,14 @@ import { describe, it, expect } from "vitest";
 import { find } from "lodash";
 
 import { DOWNLOAD_CONFIG_TYPE_PROTEIN } from "../../../constants/index";
-import { MISSING_CATEGORY_KEY } from "../../../state/selection/constants";
+import { MISSING_CATEGORY_KEY, MISSING_CATEGORY_LABEL } from "../../../state/selection/constants";
 import { mockState } from "../../../state/test/mocks";
 import { State } from "../../../state/types";
 import {
     disambiguateCategoryNames,
     getCheckAllCheckboxIsIntermediate,
     getInteractivePanelData,
+    getLegendColors,
     getListOfCellIdsByDownloadConfig,
     getSelectionPanelData,
 } from "../selectors";
@@ -118,6 +119,43 @@ describe("ColorByMenu selectors", () => {
             result.forEach((ele) => {
                 expect(ele.disabled).to.be.true;
             });
+        });
+    });
+
+    describe("getLegendColors", () => {
+        const colorByAnaphase: State = {
+            ...newMockState,
+            selection: {
+                ...newMockState.selection,
+                colorBy: "anaphase-segmentation-complete",
+            },
+        };
+        const withAnaphaseValues = (values: (number | null)[]): State => ({
+            ...colorByAnaphase,
+            metadata: {
+                ...colorByAnaphase.metadata,
+                featureData: {
+                    ...colorByAnaphase.metadata.featureData,
+                    values: {
+                        ...colorByAnaphase.metadata.featureData.values,
+                        "anaphase-segmentation-complete": values,
+                    },
+                },
+            },
+        });
+
+        it("returns nothing when color by and group by are the same", () => {
+            expect(getLegendColors(newMockState)).to.deep.equal([]);
+        });
+        it("omits the N/A entry when every cell has a color by value", () => {
+            const labels = getLegendColors(colorByAnaphase).map((ele) => ele.label);
+            expect(labels).to.have.length(3);
+            expect(labels).not.to.include(MISSING_CATEGORY_LABEL);
+        });
+        it("includes the N/A entry when a cell has no color by value", () => {
+            const result = getLegendColors(withAnaphaseValues([1, null]));
+            expect(result).to.have.length(4);
+            expect(result[result.length - 1].label).to.equal(MISSING_CATEGORY_LABEL);
         });
     });
 

@@ -7,7 +7,7 @@ import {
     DOWNLOAD_CONFIG_TYPE_SELECTION_SET,
     OFF_COLOR,
 } from "../../constants/index";
-import { getLabelsPerCell } from "../../state/metadata/selectors";
+import { getLabelsPerCell, getPerCellDataForPlot } from "../../state/metadata/selectors";
 import {
     MappingOfMeasuredValuesArrays,
     MeasuredFeatureDef,
@@ -81,14 +81,25 @@ export const disambiguateCategoryNames = (options: MeasuredFeaturesOption[]): st
 };
 
 export const getLegendColors = createSelector(
-    [getCategoryGroupColorsAndNames, getGroupByCategory, getColorBySelection],
-    (colorsAndNames, categoryToGroupBy, categoryToColorBy): ColorForPlot[] => {
+    [
+        getCategoryGroupColorsAndNames,
+        getGroupByCategory,
+        getColorBySelection,
+        getPerCellDataForPlot,
+    ],
+    (colorsAndNames, categoryToGroupBy, categoryToColorBy, measuredData): ColorForPlot[] => {
         // if color by and group by are the same, the legend
         // is redundant
         if (categoryToColorBy === categoryToGroupBy) {
             return [];
         }
-        return colorsAndNames;
+        // The last entry is the missing-data fallback; only list it if some
+        // cell's value doesn't match any category.
+        const categories = colorsAndNames.slice(0, -1);
+        const categoryNames = new Set(categories.map((category) => category.name));
+        const colorByValues = measuredData.values[categoryToColorBy] ?? [];
+        const hasMissing = colorByValues.some((value) => !categoryNames.has(String(value)));
+        return hasMissing ? colorsAndNames : categories;
     }
 );
 
