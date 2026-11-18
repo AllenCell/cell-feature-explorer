@@ -41,6 +41,15 @@ describe("CsvRequest", () => {
         new CsvRequest(testCsv);
     });
 
+    it("drops feature columns from the retained rows after parsing", () => {
+        const csvDataset = new CsvRequest(testCsv);
+        expect(Object.keys(csvDataset.csvData[0]).sort()).to.deep.equal([
+            "CellId",
+            "thumbnailPath",
+            "volumeviewerPath",
+        ]);
+    });
+
     it("extracts feature data", async () => {
         const csvDataset = new CsvRequest(testCsv);
 

@@ -1,5 +1,6 @@
 import { parseViewerUrlParams, ViewerChannelSettings } from "@aics/vole-app";
 import { Album } from "../..";
+import { pick } from "lodash";
 import * as Papa from "papaparse";
 import {
     DataForPlot,
@@ -78,6 +79,18 @@ const METADATA_KEYS = new Set([
     FMS_UPLOADED_KEY,
     LINK_PATH_KEY,
 ]);
+
+/** Columns read per cell after parsing. Other columns are dropped once features are parsed. */
+const RETAINED_ROW_KEYS = [
+    CELL_ID_KEY,
+    FOV_ID_KEY,
+    FOV_THUMBNAIL_PATH,
+    FOV_VOLUME_VIEWER_PATH,
+    THUMBNAIL_PATH,
+    VOLUME_VIEWER_PATH,
+    GROUP_BY_KEY,
+    LINK_PATH_KEY,
+];
 
 const enum FeatureType {
     CONTINUOUS,
@@ -470,6 +483,9 @@ class CsvRequest implements ImageDataset {
 
         this.parseFeatures(this.csvData);
         this.assignDefaultGroupByFeatureKey(this.csvData);
+
+        // Feature values now live in `featureInfo`, so the full rows are no longer needed
+        this.csvData = this.csvData.map((row) => pick(row, RETAINED_ROW_KEYS));
     }
 
     selectDataset(): Promise<InitialDatasetSelections> {
