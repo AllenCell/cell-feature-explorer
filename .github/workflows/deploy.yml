@@ -7,6 +7,9 @@ on:
         branches:
             - main
 
+permissions:
+    contents: read
+
 jobs:
     lint:
         name: Lint
@@ -46,14 +49,16 @@ jobs:
         needs: [lint, typeCheck, test]
         name: Upload to Amazon S3
         runs-on: ubuntu-latest
+        permissions:
+            id-token: write  # Required for requesting the JWT and OIDC
+            contents: read   # Required for actions/checkout
 
         steps:
             - uses: actions/checkout@v3
             - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v1
+              uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37  # v6.1.0
               with:
-                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  role-to-assume: arn:aws:iam::239877123246:role/github_cell_feature_explorer
                   aws-region: us-west-2
             - name: Setup node
               uses: actions/setup-node@v3
