@@ -17,33 +17,45 @@ jobs:
         name: Lint
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
-            - name: Setup Node
-              uses: actions/setup-node@v3
+            - name: Checkout
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
+              with:
+                  persist-credentials: false            - name: Setup Node
+              uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 #v6.2.0
               with:
                   node-version: ${{env.NODE_VERSION}}
+                  registry-url: https://registry.npmjs.org/
+                  cache: "npm"
             - run: npm ci
             - run: npm run lint --if-present
     test:
         name: Unit Test
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
-            - name: Setup Node
-              uses: actions/setup-node@v3
+            - name: Checkout
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
+              with:
+                  persist-credentials: false            - name: Setup Node
+              uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 #v6.2.0
               with:
                   node-version: ${{env.NODE_VERSION}}
+                  registry-url: https://registry.npmjs.org/
+                  cache: "npm"
             - run: npm ci
             - run: npm test --if-present
     typeCheck:
         name: Type Check
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
-            - name: Setup Node
-              uses: actions/setup-node@v3
+            - name: Checkout
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
+              with:
+                  persist-credentials: false            - name: Setup Node
+              uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 #v6.2.0
               with:
                   node-version: ${{env.NODE_VERSION}}
+                  registry-url: https://registry.npmjs.org/
+                  cache: "npm"
             - run: npm ci
             - run: npm run typeCheck --if-present
 
@@ -52,20 +64,25 @@ jobs:
         name: Upload to Amazon S3
         runs-on: ubuntu-latest
         permissions:
-            id-token: write  # Required for requesting the JWT and OIDC
-            contents: read   # Required for actions/checkout
+            id-token: write # Required for requesting the JWT and OIDC
+            contents: read # Required for actions/checkout
 
         steps:
-            - uses: actions/checkout@v3
+            - name: Checkout
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
+              with:
+                  persist-credentials: false
             - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37  # v6.1.0
+              uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37 # v6.1.0
               with:
                   role-to-assume: arn:aws:iam::${{ vars.AWS_SOFTWARE_ACCOUNT_ID }}:role/github_cell_feature_explorer
                   aws-region: ${{ vars.AWS_DEFAULT_REGION }}
-            - name: Setup node
-              uses: actions/setup-node@v3
+            - name: Setup Node
+              uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 #v6.2.0
               with:
                   node-version: ${{env.NODE_VERSION}}
+                  registry-url: https://registry.npmjs.org/
+                  package-manager-cache: false # Do not cache when publishing to prevent cache pollution attacks
             - run: npm ci
             - name: Staging Database
               if: ${{ github.event.inputs.use_staging_db == 'true' }}
