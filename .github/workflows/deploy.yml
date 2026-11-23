@@ -58,8 +58,8 @@ jobs:
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37  # v6.1.0
               with:
-                  role-to-assume: arn:aws:iam::239877123246:role/github_cell_feature_explorer
-                  aws-region: us-west-2
+                  role-to-assume: arn:aws:iam::${{ vars.AWS_SOFTWARE_ACCOUNT_ID }}:role/github_cell_feature_explorer
+                  aws-region: ${{ vars.AWS_DEFAULT_REGION }}
             - name: Setup node
               uses: actions/setup-node@v3
               with:

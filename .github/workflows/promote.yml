@@ -5,7 +5,7 @@ on:
     push:
         # Sequence of patterns matched against refs/tags
         tags:
-            - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+            - "v*"  # Push events to matching v*, i.e. v1.0, v20.15.10
 
 permissions: {}
 
@@ -22,10 +22,12 @@ jobs:
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37  # v6.1.0
               with:
-                  role-to-assume: arn:aws:iam::239877123246:role/github_cell_feature_explorer
-                  aws-region: us-west-2
+                  role-to-assume: arn:aws:iam::${{ vars.AWS_SOFTWARE_ACCOUNT_ID }}:role/github_cell_feature_explorer
+                  aws-region: ${{ vars.AWS_DEFAULT_REGION }}
 
             - name: Copy files from staging bucket to production
               run: aws s3 sync s3://staging.cfe.allencell.org s3://production.cfe.allencell.org --delete
             - name: Clear cloudfront cache
-              run: aws cloudfront create-invalidation --distribution-id E3S5ZMP0OVZ8R1 --paths "/*"
+              run: aws cloudfront create-invalidation --distribution-id "${CLOUDFRONT_DISTRIBUTION_ID}" --paths "/*"
+              env:
+                  CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.PRODUCTION_CLOUDFRONT_DISTRIBUTION_ID }}
